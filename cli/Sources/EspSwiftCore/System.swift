@@ -27,21 +27,61 @@ public struct CommandResult: Sendable {
     }
 }
 
-/// What espswift reads from the system it runs on: files, the environment,
-/// and the output of commands. Commands use it instead of Foundation
-/// directly, so tests can give them a system of their own (see FakeSystem in
-/// the tests).
+/// An error with a message for the user.
+public struct EspSwiftError: Error, CustomStringConvertible, Equatable {
+    public var description: String
+
+    public init(_ description: String) {
+        self.description = description
+    }
+}
+
+/// What espswift does on the system it runs on: files, the environment,
+/// running programs and talking to the user. Commands use it instead of
+/// Foundation directly, so tests can give them a system of their own (see
+/// FakeSystem in the tests).
 public protocol System: Sendable {
     var operatingSystem: OperatingSystem { get }
     var homeDirectory: String { get }
     var environment: [String: String] { get }
+    /// The path of the running espswift, with symbolic links resolved.
+    var executablePath: String? { get }
+
+    // ── Reading ──
     func fileExists(_ path: String) -> Bool
     func isDirectory(_ path: String) -> Bool
     /// The names of the entries in a folder; empty if it doesn't exist.
     func contentsOfDirectory(_ path: String) -> [String]
     func readFile(_ path: String) -> String?
-    /// Runs a program and waits for it; nil if it couldn't be started.
+    func readData(_ path: String) -> Data?
+
+    // ── Changing ──
+    func createDirectory(_ path: String) throws
+    /// Removes a file or a folder with everything in it.
+    func removeItem(_ path: String) throws
+    /// Copies a file, or a folder's contents into a folder, replacing files
+    /// that are there and keeping others (like `cp -R from/. to`).
+    func copyContents(of source: String, to destination: String) throws
+    /// Creates (or replaces) a symbolic link.
+    func createSymbolicLink(at path: String, to destination: String) throws
+    func writeFile(_ path: String, _ data: Data) throws
+    func makeExecutable(_ path: String) throws
+
+    // ── Programs ──
+    /// Runs a program and waits for it, collecting its output; nil if it
+    /// couldn't be started.
     func run(_ executable: String, _ arguments: [String]) -> CommandResult?
+    /// Runs a program with its output going to the terminal, for long steps
+    /// such as downloads; returns its exit status (-1 if it couldn't start).
+    func runVisibly(_ executable: String, _ arguments: [String], environment: [String: String]) -> Int32
+
+    // ── The user ──
+    /// Shows a line of progress.
+    func report(_ message: String)
+    /// Whether espswift can ask questions (it runs in a terminal).
+    var isInteractive: Bool { get }
+    /// Asks a question and returns the answer; nil if there is none.
+    func ask(_ question: String) -> String?
 }
 
 extension System {
@@ -55,6 +95,18 @@ extension System {
     /// The full path of a program found in the search path.
     public func findExecutable(_ name: String) -> String? {
         searchPath.map { "\($0)/\(name)" }.first(where: fileExists)
+    }
+
+    public func writeFile(_ path: String, _ text: String) throws {
+        try writeFile(path, Data(text.utf8))
+    }
+
+    /// Asks a yes/no question. Without a terminal, the default is the answer.
+    public func confirm(_ question: String, default defaultAnswer: Bool) -> Bool {
+        guard isInteractive else { return defaultAnswer }
+        let answer = ask("\(question) \(defaultAnswer ? "[Y/n]" : "[y/N]") ")?
+            .trimmingCharacters(in: .whitespaces).lowercased() ?? ""
+        return answer.isEmpty ? defaultAnswer : answer.hasPrefix("y")
     }
 }
 
@@ -70,6 +122,10 @@ public struct LiveSystem: System {
 
     public var environment: [String: String] {
         ProcessInfo.processInfo.environment
+    }
+
+    public var executablePath: String? {
+        Bundle.main.executableURL?.resolvingSymlinksInPath().path
     }
 
     public func fileExists(_ path: String) -> Bool {
@@ -89,6 +145,46 @@ public struct LiveSystem: System {
         try? String(contentsOfFile: path, encoding: .utf8)
     }
 
+    public func readData(_ path: String) -> Data? {
+        FileManager.default.contents(atPath: path)
+    }
+
+    public func createDirectory(_ path: String) throws {
+        try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+    }
+
+    public func removeItem(_ path: String) throws {
+        // Also removes a symbolic link whose destination is gone.
+        if fileExists(path) || (try? FileManager.default.destinationOfSymbolicLink(atPath: path)) != nil {
+            try FileManager.default.removeItem(atPath: path)
+        }
+    }
+
+    public func copyContents(of source: String, to destination: String) throws {
+        guard isDirectory(source) else {
+            try removeItem(destination)
+            try FileManager.default.copyItem(atPath: source, toPath: destination)
+            return
+        }
+        try createDirectory(destination)
+        for entry in contentsOfDirectory(source) {
+            try copyContents(of: "\(source)/\(entry)", to: "\(destination)/\(entry)")
+        }
+    }
+
+    public func createSymbolicLink(at path: String, to destination: String) throws {
+        try removeItem(path)
+        try FileManager.default.createSymbolicLink(atPath: path, withDestinationPath: destination)
+    }
+
+    public func writeFile(_ path: String, _ data: Data) throws {
+        try data.write(to: URL(fileURLWithPath: path))
+    }
+
+    public func makeExecutable(_ path: String) throws {
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: path)
+    }
+
     public func run(_ executable: String, _ arguments: [String]) -> CommandResult? {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
@@ -106,5 +202,35 @@ public struct LiveSystem: System {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         return CommandResult(status: process.terminationStatus, output: String(decoding: data, as: UTF8.self))
+    }
+
+    public func runVisibly(_ executable: String, _ arguments: [String], environment: [String: String]) -> Int32 {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+        process.environment = environment
+        do {
+            try process.run()
+        } catch {
+            return -1
+        }
+        process.waitUntilExit()
+        return process.terminationStatus
+    }
+
+    public func report(_ message: String) {
+        print(message)
+        // Before the output of programs espswift runs, also into a file.
+        fflush(nil)  // all streams; Glibc's stdout is a mutable global Swift 6 rejects
+    }
+
+    public var isInteractive: Bool {
+        isatty(STDIN_FILENO) != 0
+    }
+
+    public func ask(_ question: String) -> String? {
+        print(question, terminator: "")
+        fflush(nil)  // all streams; Glibc's stdout is a mutable global Swift 6 rejects
+        return readLine()
     }
 }

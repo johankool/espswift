@@ -1,0 +1,143 @@
+@testable import EspSwiftCore
+import Foundation
+import Testing
+
+@Suite struct SetupTests {
+    let resources = Resources(root: "/opt/homebrew/Cellar/espswift/0.1.0/share/espswift")
+
+    @Test func setsUpAFreshMac() throws {
+        let system = FakeSystem.freshMac
+        try Setup(system: system, resources: resources).run(installXcodeTemplate: true)
+        let runs = system.actions.filter { $0.hasPrefix("run ") }
+        #expect(runs == [
+            "run /opt/homebrew/bin/brew install python@3.14 cmake ninja",
+            "run /usr/bin/git clone --recursive --branch v6.1 --depth 1 --shallow-submodules https://github.com/espressif/esp-idf.git /Users/test/.espswift/esp-idf",
+            "run /Users/test/.espswift/esp-idf/install.sh esp32c2,esp32c3,esp32c5,esp32c6,esp32c61,esp32h2,esp32p4",
+            "run /usr/bin/curl -fL https://download.swift.org/swift-6.4.0-release/xcode/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE-osx.pkg -o /Users/test/.espswift/swift-6.4.0-RELEASE-osx.pkg",
+            "run /usr/sbin/installer -pkg /Users/test/.espswift/swift-6.4.0-RELEASE-osx.pkg -target CurrentUserHomeDirectory",
+            "run /usr/bin/clang -o /Users/test/.espswift/scripts/monitor \(resources.scripts)/monitor_wrapper.c",
+        ])
+        #expect(system.actions.contains("link /Users/test/.espswift/python/bin/python3 -> /opt/homebrew/bin/python3.14"))
+        #expect(system.readFile("/Users/test/.espswift/swift-toolchain") == FakeSystem.toolchain + "\n")
+
+        // The template, with the toolchain and the monitor filled in.
+        let plist = try #require(system.readFile("\(FakeSystem.template)/TemplateInfo.plist"))
+        #expect(plist.contains("org.swift.640202609131a") && !plist.contains("ESPSWIFT_SWIFT_TOOLCHAIN_ID"))
+        #expect(system.readFile("\(FakeSystem.template)/scheme.xcscheme") == "FilePath = \"/Users/test/.espswift/scripts/monitor\"")
+        #expect(system.actions.contains("chmod \(FakeSystem.template)/build.sh"))
+
+        // The scripts, but not the wrapper's source.
+        #expect(system.fileExists("/Users/test/.espswift/scripts/build.sh"))
+        #expect(system.fileExists("/Users/test/.espswift/scripts/indexing_flags.py"))
+        #expect(!system.fileExists("/Users/test/.espswift/scripts/monitor_wrapper.c"))
+    }
+
+    @Test func leavesOutTheTemplateWhenAsked() throws {
+        let system = FakeSystem.freshMac
+        try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        #expect(!system.isDirectory(FakeSystem.template))
+    }
+
+    @Test func installsOnlyWhatsMissing() throws {
+        let system = FakeSystem.workingMac
+        try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        let runs = system.actions.filter { $0.hasPrefix("run ") }
+        // ESP-IDF's installer runs again (it only adds what's missing); no
+        // Homebrew, download or Swift installer.
+        #expect(runs.count == 2)
+        #expect(runs[0].hasPrefix("run /Users/test/.espswift/esp-idf/install.sh "))
+        #expect(runs[1].hasPrefix("run /usr/bin/clang "))
+    }
+
+    @Test func usesSwiftlyWhenInstalled() throws {
+        let system = FakeSystem.freshMac
+        system.commands["/opt/homebrew/bin/swiftly"] = CommandResult(status: 0, output: "")
+        system.effects["/opt/homebrew/bin/swiftly"] = { system, _ in
+            system.commands["\(FakeSystem.toolchain)/usr/bin/swiftc"] = CommandResult(status: 0, output: "")
+            return 0
+        }
+        try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        #expect(system.actions.contains("run /opt/homebrew/bin/swiftly install 6.4.0 --assume-yes"))
+        #expect(!system.actions.contains { $0.hasPrefix("run /usr/sbin/installer") })
+    }
+
+    @Test func explainsMissingToolsWithoutHomebrew() {
+        let system = FakeSystem.freshMac
+        system.commands["/opt/homebrew/bin/brew"] = nil
+        system.effects["/opt/homebrew/bin/brew"] = nil
+        #expect(throws: EspSwiftError.self) {
+            try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        }
+        #expect(!system.actions.contains { $0.hasPrefix("run ") })
+    }
+
+    @Test func needsSwiftlyOnLinux() throws {
+        let system = FakeSystem.freshMac
+        system.operatingSystem = .linux
+        system.homeDirectory = "/home/test"
+        for tool in ["python3.14", "cmake", "ninja"] {
+            system.commands["/usr/bin/\(tool)"] = CommandResult(status: 0, output: "")
+        }
+        let error = #expect(throws: EspSwiftError.self) {
+            try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        }
+        #expect(error?.description.contains("swiftly") == true)
+        #expect(Setup(system: system, resources: resources).swiftToolchain == "/home/test/.local/share/swiftly/toolchains/6.4.0")
+    }
+}
+
+@Suite struct UninstallTests {
+    @Test func removesEverythingWithAll() throws {
+        let system = FakeSystem.workingMac
+        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif"])
+        try Uninstall(system: system).run(assumeYes: true, all: true)
+        #expect(system.actions == [
+            "rm /Users/test/.espswift",
+            "rm \(FakeSystem.template)",
+            "rm \(FakeSystem.toolchain)",
+            "rm /Users/test/.espressif",
+        ])
+    }
+
+    @Test func keepsSharedItemsWithoutConfirmation() throws {
+        let system = FakeSystem.workingMac
+        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif"])
+        try Uninstall(system: system).run(assumeYes: true, all: false)
+        #expect(system.actions == ["rm /Users/test/.espswift", "rm \(FakeSystem.template)"])
+    }
+
+    @Test func asksFirstInATerminal() throws {
+        let system = FakeSystem.workingMac
+        system.isInteractive = true
+        system.answers = ["n"]
+        try Uninstall(system: system).run(assumeYes: false, all: false)
+        #expect(system.actions.isEmpty)
+    }
+
+    @Test func needsYesOutsideATerminal() {
+        #expect(throws: EspSwiftError.self) {
+            try Uninstall(system: FakeSystem.workingMac).run(assumeYes: false, all: false)
+        }
+    }
+}
+
+@Suite struct ResourcesTests {
+    @Test func findsHomebrewsShareFolder() throws {
+        let system = FakeSystem.freshMac
+        #expect(try Resources.find(system: system).root == "/opt/homebrew/Cellar/espswift/0.1.0/share/espswift")
+    }
+
+    @Test func findsTheRepositoryInDevelopment() throws {
+        let system = FakeSystem()
+        system.executablePath = "/Users/test/repo/cli/.build/debug/espswift"
+        system.directories = ["/Users/test/repo/Xcode Template/ESP32 RISC-V.xctemplate", "/Users/test/repo/scripts"]
+        #expect(try Resources.find(system: system).root == "/Users/test/repo")
+    }
+
+    @Test func prefersTheEnvironment() throws {
+        let system = FakeSystem.freshMac
+        system.environment["ESPSWIFT_RESOURCES"] = "/custom"
+        system.directories.formUnion(["/custom/Xcode Template/ESP32 RISC-V.xctemplate", "/custom/scripts"])
+        #expect(try Resources.find(system: system).root == "/custom")
+    }
+}

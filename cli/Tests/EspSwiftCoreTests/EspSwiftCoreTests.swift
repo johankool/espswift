@@ -62,7 +62,7 @@ import Testing
     }
 
     @Test func failsWithoutESPIDF() {
-        var system = FakeSystem.workingMac
+        let system = FakeSystem.workingMac
         system.files["/Users/test/.espswift/esp-idf/tools/cmake/version.cmake"] = nil
         let checks = Doctor(system: system).checks()
         let check = checks.first { $0.name.hasPrefix("ESP-IDF 6") }
@@ -73,7 +73,7 @@ import Testing
     }
 
     @Test func failsOnANewerPython() {
-        var system = FakeSystem.workingMac
+        let system = FakeSystem.workingMac
         system.commands["/Users/test/.espswift/python/bin/python3"] = CommandResult(status: 0, output: "Python 3.15.0\n")
         let check = Doctor(system: system).checks().first { $0.name.hasPrefix("Python") }
         #expect(check?.status == .failed)
@@ -81,14 +81,14 @@ import Testing
     }
 
     @Test func failsWithoutEmbeddedSwiftForRISCV() {
-        var system = FakeSystem.workingMac
+        let system = FakeSystem.workingMac
         system.directories = system.directories.filter { !$0.hasSuffix("riscv32-none-none-eabi") }
         let check = Doctor(system: system).checks().first { $0.name.hasPrefix("Swift") }
         #expect(check?.status == .failed)
     }
 
     @Test func warnsWithoutABoard() {
-        var system = FakeSystem.workingMac
+        let system = FakeSystem.workingMac
         system.files["/dev/cu.usbmodem21101"] = nil
         let checks = Doctor(system: system).checks()
         #expect(checks.last?.status == .warning)
@@ -96,7 +96,7 @@ import Testing
     }
 
     @Test func skipsTheXcodeTemplateOnLinux() {
-        var system = FakeSystem.workingMac
+        let system = FakeSystem.workingMac
         system.operatingSystem = .linux
         #expect(!Doctor(system: system).checks().contains { $0.name == "Xcode template" })
     }

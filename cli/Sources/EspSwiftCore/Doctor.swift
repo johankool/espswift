@@ -30,8 +30,8 @@ public struct Doctor: Sendable {
     public var system: System
     public var locations: Locations
 
-    /// What to run to install what's missing, until `espswift setup` exists.
-    static let setupFix = "Run install.sh from the Embedded Swift Xcode Template repository."
+    /// What to run to install what's missing.
+    static let setupFix = "Run: espswift setup"
 
     public init(system: System) {
         self.system = system
@@ -142,7 +142,7 @@ public struct Doctor: Sendable {
     func checkXcodeTemplate() -> Check {
         guard let template = locations.xcodeTemplate, system.isDirectory(template) else {
             return Check("Xcode template", .warning, "not installed",
-                         fix: "Run install.sh to use ESPSwift from Xcode.")
+                         fix: "To use ESPSwift from Xcode, run: espswift xcode install-template")
         }
         // install.sh fills in the identifier of the Swift toolchain, which the
         // template's Indexing target uses for code completion.

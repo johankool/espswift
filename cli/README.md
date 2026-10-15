@@ -5,10 +5,18 @@ The command-line tool for Embedded Swift on RISC-V based ESP32 chips, written in
 It's being built in phases (see below). So far it has:
 
 ```
-espswift doctor          # checks ESP-IDF, Swift, Python, CMake, Ninja, the Xcode template and connected boards
-espswift ports [--first] # lists the serial ports of connected boards
+espswift setup [--[no-]xcode-template]     # installs ESP-IDF, Swift and the tools they need (replaces install.sh)
+espswift doctor                            # checks ESP-IDF, Swift, Python, CMake, Ninja, the Xcode template and boards
+espswift ports [--first]                   # lists the serial ports of connected boards
+espswift xcode install-template            # installs or updates the Xcode template (macOS)
+espswift xcode uninstall-template
+espswift uninstall [--yes] [--all]         # removes what setup installed (replaces uninstall.sh)
 espswift --version
 ```
+
+`espswift setup` does what `install.sh` does, and can run again to install what's missing and update the template and scripts. On macOS it asks whether to install the Xcode template (without a terminal, it does). It installs missing prerequisites with Homebrew on macOS; on Linux it says which to install, and installs Swift with [swiftly](https://www.swift.org/install/linux/).
+
+The template and the helper scripts it installs come from, in order: the folder in `ESPSWIFT_RESOURCES`; `share/espswift` next to the `bin` folder espswift is in (where a Homebrew formula puts them); or, when run from this repository, the repository itself.
 
 ## Building
 
@@ -30,7 +38,7 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 ## Plan
 
 0. Skeleton: `doctor`, `ports`, `--version`, CI on macOS and Linux. *(done)*
-1. `setup` and `uninstall`, replacing `install.sh` and `uninstall.sh`, with a prompt for the Xcode template; a Homebrew tap and a release workflow.
+1. `setup` and `uninstall`, replacing `install.sh` and `uninstall.sh`, with a prompt for the Xcode template *(done)*; a Homebrew tap and a release workflow *(when it's published)*.
 2. `build`, replacing `scripts/build.sh` and the build output filter; projects' `build.sh` calls `espswift build`.
 3. `flash`, `monitor` and `run`; the Run scheme starts `espswift run` directly, without the monitor wrapper.
 4. The Python helpers in Swift (the Swift package build, code completion flags), and `add`, `settings` (menuconfig), `update` and `debug`.
