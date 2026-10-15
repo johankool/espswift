@@ -82,6 +82,7 @@ public struct Setup: Sendable {
             try XcodeTemplate(system: system).install(from: resources, swiftToolchain: swiftToolchain)
         }
         try installScripts()
+        try linkCommand()
         system.report("")
         system.report("ESPSwift is set up. Check it with: espswift doctor")
     }
@@ -92,6 +93,10 @@ public struct Setup: Sendable {
     var pythonProgram: String {
         system.operatingSystem == .macOS ? "python\(Pins.python)" : "python3"
     }
+
+    /// The packages ESP-IDF's tools need on Ubuntu and Debian, from ESP-IDF's
+    /// Linux setup guide (OpenOCD, for debugging, needs libusb).
+    static let linuxPackages = "git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0"
 
     /// The programs ESP-IDF needs, checked before downloading anything.
     func missingPrerequisites() -> [(program: String, package: String)] {
@@ -117,7 +122,7 @@ public struct Setup: Sendable {
         }
         let how = system.operatingSystem == .macOS
             ? "Install Homebrew from https://brew.sh and run espswift setup again, or install them yourself."
-            : "Install them with your package manager (for example: sudo apt install \(packages.joined(separator: " "))), then run espswift setup again."
+            : "Install them, with the other packages ESP-IDF's tools need, with your package manager (on Ubuntu or Debian: sudo apt install \(Self.linuxPackages)), then run espswift setup again."
         throw EspSwiftError("ESP-IDF needs \(missing.map(\.program).joined(separator: ", ")), which weren't found. \(how)")
     }
 
@@ -235,6 +240,33 @@ public struct Setup: Sendable {
                                 environment: system.environment) == 0 else {
             throw EspSwiftError("Installing Swift \(Pins.swift) failed.")
         }
+    }
+
+    // ── 7. espswift ──────────────────────────────────────────────────
+
+    /// Where projects find espswift: their build.sh runs
+    /// ~/.espswift/bin/espswift, which Xcode can find without a PATH.
+    public var commandLink: String { "\(locations.espswiftHome)/bin/espswift" }
+
+    /// Links ~/.espswift/bin/espswift to the espswift that runs. For one
+    /// installed with Homebrew, to Homebrew's bin/espswift, which stays the
+    /// same when Homebrew updates it (the Cellar folder doesn't). One built
+    /// from the repository (install.sh) is copied to ~/.espswift/libexec
+    /// first, so projects don't depend on the repository.
+    func linkCommand() throws {
+        guard let executable = system.executablePath else { return }
+        var destination = executable
+        if let cellar = executable.range(of: "/Cellar/espswift/") {
+            let homebrewBin = "\(executable[..<cellar.lowerBound])/bin/espswift"
+            if system.fileExists(homebrewBin) { destination = homebrewBin }
+        } else if executable.contains("/.build/") {
+            destination = "\(locations.espswiftHome)/libexec/espswift"
+            try system.createDirectory(Resources.parent(of: destination))
+            try system.copyContents(of: executable, to: destination)
+            try system.makeExecutable(destination)
+        }
+        try system.createDirectory(Resources.parent(of: commandLink))
+        try system.createSymbolicLink(at: commandLink, to: destination)
     }
 
     // ── 6. Helper scripts ────────────────────────────────────────────

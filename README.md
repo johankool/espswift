@@ -42,7 +42,7 @@ cd Embedded-Swift-Xcode-Template
 bash install.sh
 ```
 
-Installation takes 5–10 minutes (~3GB download).
+`install.sh` builds `espswift`, ESPSwift's command-line tool (in `cli/`, which needs Swift 6, part of Xcode), and runs `espswift setup`, which installs everything else. Installation takes 5–10 minutes (~3GB download).
 
 ### Create a Project
 1. Restart Xcode
@@ -162,14 +162,13 @@ New projects come with the Run scheme that flashes the board and shows its outpu
 
 ```
 Embedded-Swift-Xcode-Template/
-├── install.sh                        # One-command environment setup
+├── install.sh                        # Builds espswift and runs espswift setup
 ├── uninstall.sh                      # Removes what install.sh installed
+├── cli/                              # espswift, ESPSwift's command-line tool (see cli/README.md)
 ├── tests/
 │   └── test_template.sh             # Builds the template for every chip (also run in CI)
 ├── scripts/
-│   ├── build.sh                     # Builds a project (each project's build.sh calls it)
 │   ├── build_package.py             # Builds a project's Swift package with SwiftPM
-│   ├── filter_build_output.sh       # Turns ESP-IDF's build output into Xcode issues
 │   ├── run.sh                       # Cmd+R: flashes the last build, then starts the monitor
 │   ├── debug.sh                     # Debugs the firmware on the board with LLDB
 │   ├── detect_port.sh               # Auto-detects the connected board
@@ -187,7 +186,7 @@ Embedded-Swift-Xcode-Template/
 └── ESP32 RISC-V.xctemplate/
 ├── TemplateInfo.plist       # Xcode template configuration
 ├── README.md                # Getting-started guide for the new project
-├── build.sh                 # Calls ESPSwift's scripts/build.sh
+├── build.sh                 # Runs espswift build
 ├── CMakeLists.txt           # Root CMake configuration
 ├── sdkconfig.defaults       # ESP-IDF defaults (watchdog off)
 ├── gitignore                # Installed as .gitignore at the project root
@@ -224,8 +223,9 @@ Running `install.sh` or `ESPSwiftInstaller.app` installs the following into your
 
 | Path | Contents |
 |------|----------|
+| `~/.espswift/bin/espswift` | `espswift`, which projects build with |
 | `~/.espswift/esp-idf/` | ESP-IDF 6.1 (~750 MB) |
-| `~/.espswift/scripts/` | Helper scripts (build, flash, monitor, etc.) |
+| `~/.espswift/scripts/` | Helper scripts (flash, monitor, code completion, etc.) |
 | `~/.espswift/python/` | Link to Python 3.14, the version ESP-IDF's Python environment was made for |
 | `~/.espressif/` | ESP-IDF's compilers, tools and Python environment (~3.5 GB, including ~1 GB of downloaded archives) |
 | `~/Library/Developer/Toolchains/` | Swift 6.4.0 release toolchain (~5 GB), installed with [swiftly](https://www.swift.org/install/macos/) if you have it, otherwise from swift.org's installer |
@@ -236,7 +236,7 @@ Nothing is installed to system directories. Everything is scoped to your user ho
 
 ### Updating ESPSwift
 
-Run `install.sh` again from an up-to-date copy of this repository. Each project's `build.sh` only calls the build script `install.sh` installs (`~/.espswift/scripts/build.sh`), so updating ESPSwift also updates how existing projects build.
+Run `install.sh` again from an up-to-date copy of this repository. Each project's `build.sh` only runs the `espswift` that `install.sh` installs (`~/.espswift/bin/espswift build`), so updating ESPSwift also updates how existing projects build.
 
 When an update changes what projects need, the build shows a warning in Xcode's Issue navigator with the command that updates the project. You can also run it yourself, with the folder that contains the project's `.xcodeproj`:
 

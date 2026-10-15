@@ -11,9 +11,9 @@
 name: Build template
 
 # Skip runs for changes to documentation only (Markdown files), except in
-# the Xcode template, whose README the test checks for unfilled placeholders,
-# and for changes to the espswift tool only (cli/, see cli.yml). Later
-# patterns override earlier ones.
+# the Xcode template, whose README the test checks for unfilled placeholders.
+# Later patterns override earlier ones. (Projects build with espswift, so
+# changes to cli/ run this too.)
 on:
   push:
     branches: [main]
@@ -21,13 +21,11 @@ on:
       - '**'
       - '!**.md'
       - 'Xcode Template/**'
-      - '!cli/**'
   pull_request:
     paths:
       - '**'
       - '!**.md'
       - 'Xcode Template/**'
-      - '!cli/**'
   workflow_dispatch:
 
 permissions:

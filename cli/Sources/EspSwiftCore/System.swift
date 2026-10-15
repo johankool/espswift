@@ -46,6 +46,7 @@ public protocol System: Sendable {
     var environment: [String: String] { get }
     /// The path of the running espswift, with symbolic links resolved.
     var executablePath: String? { get }
+    var currentDirectory: String { get }
 
     // ── Reading ──
     func fileExists(_ path: String) -> Bool
@@ -74,6 +75,11 @@ public protocol System: Sendable {
     /// Runs a program with its output going to the terminal, for long steps
     /// such as downloads; returns its exit status (-1 if it couldn't start).
     func runVisibly(_ executable: String, _ arguments: [String], environment: [String: String]) -> Int32
+    /// Runs a program, passing each line of its output (standard output and
+    /// standard error) to `onLine` as it comes; returns its exit status (-1
+    /// if it couldn't start).
+    func runStreaming(_ executable: String, _ arguments: [String], environment: [String: String],
+                      onLine: (String) -> Void) -> Int32
 
     // ── The user ──
     /// Shows a line of progress.
@@ -126,6 +132,10 @@ public struct LiveSystem: System {
 
     public var executablePath: String? {
         Bundle.main.executableURL?.resolvingSymlinksInPath().path
+    }
+
+    public var currentDirectory: String {
+        FileManager.default.currentDirectoryPath
     }
 
     public func fileExists(_ path: String) -> Bool {
@@ -213,6 +223,39 @@ public struct LiveSystem: System {
             try process.run()
         } catch {
             return -1
+        }
+        process.waitUntilExit()
+        return process.terminationStatus
+    }
+
+    public func runStreaming(_ executable: String, _ arguments: [String], environment: [String: String],
+                             onLine: (String) -> Void) -> Int32 {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+        process.environment = environment
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+        do {
+            try process.run()
+        } catch {
+            return -1
+        }
+        // Lines as they come; a line split over two reads is joined first.
+        var pending = Data()
+        let reader = pipe.fileHandleForReading
+        while true {
+            let data = reader.availableData
+            if data.isEmpty { break }
+            pending.append(data)
+            while let newline = pending.firstIndex(of: UInt8(ascii: "\n")) {
+                onLine(String(decoding: pending[pending.startIndex..<newline], as: UTF8.self))
+                pending.removeSubrange(pending.startIndex...newline)
+            }
+        }
+        if !pending.isEmpty {
+            onLine(String(decoding: pending, as: UTF8.self))
         }
         process.waitUntilExit()
         return process.terminationStatus

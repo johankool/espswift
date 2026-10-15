@@ -8,6 +8,9 @@ final class FakeSystem: System, @unchecked Sendable {
     var homeDirectory = "/Users/test"
     var environment: [String: String] = ["PATH": "/usr/bin:/bin"]
     var executablePath: String? = "/opt/homebrew/Cellar/espswift/0.1.0/bin/espswift"
+    var currentDirectory = "/Users/test"
+    /// The output lines of streamed commands, by executable path.
+    var streams: [String: [String]] = [:]
     /// Files and their contents.
     var files: [String: Data] = [:]
     var directories: Set<String> = []
@@ -85,6 +88,13 @@ final class FakeSystem: System, @unchecked Sendable {
 
     func runVisibly(_ executable: String, _ arguments: [String], environment: [String: String]) -> Int32 {
         actions.append((["run", executable] + arguments).joined(separator: " "))
+        return effects[executable]?(self, arguments) ?? 0
+    }
+
+    func runStreaming(_ executable: String, _ arguments: [String], environment: [String: String],
+                      onLine: (String) -> Void) -> Int32 {
+        actions.append((["run", executable] + arguments).joined(separator: " "))
+        streams[executable, default: []].forEach(onLine)
         return effects[executable]?(self, arguments) ?? 0
     }
 

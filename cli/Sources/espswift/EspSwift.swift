@@ -8,7 +8,7 @@ struct EspSwift: ParsableCommand {
         commandName: "espswift",
         abstract: "Embedded Swift for RISC-V based ESP32 chips.",
         version: espswiftVersion,
-        subcommands: [Setup.self, Doctor.self, Ports.self, Xcode.self, Uninstall.self]
+        subcommands: [Setup.self, Build.self, Doctor.self, Ports.self, Xcode.self, Uninstall.self, Internal.self]
     )
 }
 
@@ -49,6 +49,45 @@ extension EspSwift {
                     throw EspSwiftError("The Xcode template is only for macOS.")
                 }
                 try EspSwiftCore.Setup(system: system, resources: resources).run(installXcodeTemplate: installTemplate)
+            }
+        }
+    }
+
+    struct Build: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Builds the project with ESP-IDF.",
+            discussion: """
+                Shows the errors and warnings, in the form Xcode lists in its Issue \
+                navigator, and keeps ESP-IDF's full output in the build folder \
+                (log/build-output.log). Xcode runs it through the project's build.sh.
+                """
+        )
+
+        @Argument(help: "build or clean (Xcode passes its action).")
+        var action: String = "build"
+
+        @Flag(help: "Clean instead of build.")
+        var clean = false
+
+        @Flag(help: "Show all of ESP-IDF's output.")
+        var verbose = false
+
+        @Option(help: "The project's folder; by default, the one espswift runs in.")
+        var project: String?
+
+        func run() throws {
+            let system = LiveSystem()
+            let action: EspSwiftCore.Build.Action = clean ? .clean
+                : EspSwiftCore.Build.Action(rawValue: self.action.isEmpty ? "build" : self.action) ?? .build
+            do {
+                let project = try Project.find(system: system, start: self.project)
+                try EspSwiftCore.Build(system: system, project: project, verbose: verbose).run(action)
+            } catch let error as EspSwiftError {
+                // As a line Xcode lists in the Issue navigator.
+                print("error: \(error)")
+                throw ExitCode.failure
+            } catch is EspSwiftCore.Build.Failed {
+                throw ExitCode.failure
             }
         }
     }
@@ -162,5 +201,34 @@ func printError(_ message: String) {
 struct StandardError: TextOutputStream {
     mutating func write(_ string: String) {
         FileHandle.standardError.write(Data(string.utf8))
+    }
+}
+
+extension EspSwift {
+    /// Commands for espswift's own use, such as from the build.
+    struct Internal: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Commands espswift uses itself.",
+            shouldDisplay: false,
+            subcommands: [FilterBuildOutput.self]
+        )
+
+        struct FilterBuildOutput: ParsableCommand {
+            static let configuration = CommandConfiguration(
+                abstract: "Filters ESP-IDF's build output on standard input for Xcode."
+            )
+
+            @Argument(help: "The project's source folder (with CMakeLists.txt).")
+            var sourceFolder: String
+
+            func run() throws {
+                let system = LiveSystem()
+                var filter = BuildOutputFilter(sourceFolder: sourceFolder, readFile: system.readFile)
+                while let line = readLine(strippingNewline: true) {
+                    for output in filter.process(line) { print(output) }
+                }
+                for output in filter.finish() { print(output) }
+            }
+        }
     }
 }

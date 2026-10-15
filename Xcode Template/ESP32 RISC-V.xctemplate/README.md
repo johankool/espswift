@@ -36,7 +36,7 @@ ___PROJECTNAME___/
 │       ├── Sources/Blink/      # The blink pattern
 │       └── Tests/BlinkTests/   # Its tests: Cmd+U
 └── ___PROJECTNAME___/           # The ESP-IDF project (the "source folder")
-    ├── build.sh                # Run by Xcode on Cmd+B: calls ESPSwift's build script
+    ├── build.sh                # Run by Xcode on Cmd+B: runs espswift build
     ├── CMakeLists.txt          # ESP-IDF project file
     ├── sdkconfig.defaults      # The chip and your ESP-IDF settings
     ├── sdkconfig               # Full ESP-IDF settings, created on first build

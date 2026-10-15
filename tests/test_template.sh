@@ -84,6 +84,16 @@ else
     WORK_DIR=$(mktemp -d -t espswift-template-test)
     CREATED_WORK_DIR=true
 fi
+# Projects build with espswift (their build.sh runs `espswift build`); use
+# this repository's, built here, unless ESPSWIFT_BIN names another.
+if [ -z "$ESPSWIFT_BIN" ]; then
+    echo "Building espswift..."
+    swift build --package-path "$REPO_ROOT/cli" > "$WORK_DIR/espswift-build.log" 2>&1 \
+        || { echo "Building espswift failed; see $WORK_DIR/espswift-build.log"; exit 1; }
+    ESPSWIFT_BIN="$REPO_ROOT/cli/.build/debug/espswift"
+fi
+export ESPSWIFT_BIN
+
 echo "Testing the template for: ${CHIPS[*]}"
 echo "Working directory: $WORK_DIR"
 

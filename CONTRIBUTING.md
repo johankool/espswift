@@ -37,7 +37,7 @@ git checkout -b fix/your-bug-fix
 
 ### 4. Make your changes and test them
 
-If you changed the template, a script in `scripts/` or `install.sh`, build a project from the template for every chip it offers:
+If you changed the template, `espswift` (`cli/`), a script in `scripts/` or `install.sh`, build a project from the template for every chip it offers:
 
 ```bash
 bash tests/test_template.sh            # all chips
@@ -73,16 +73,15 @@ Then open a PR on GitHub against the `main` branch.
 
 ```
 Embedded-Swift-Xcode-Template/
-├── install.sh                        # Main setup script
+├── install.sh                        # Builds espswift and runs espswift setup
 ├── uninstall.sh                      # Removes what install.sh installed
+├── cli/                              # espswift, ESPSwift's command-line tool (see cli/README.md)
 ├── tests/
 │   └── test_template.sh             # Builds the template for every chip
 ├── .github/workflows/
 │   └── build-template.yml           # Runs install.sh and the test in CI
 ├── scripts/
-│   ├── build.sh                     # Builds a project (each project's build.sh calls it)
 │   ├── build_package.py             # Builds a project's Swift package with SwiftPM
-│   ├── filter_build_output.sh       # Turns ESP-IDF's build output into Xcode issues
 │   ├── run.sh                       # Cmd+R: flashes the last build, then starts the monitor
 │   ├── debug.sh                     # Debugs the firmware on the board with LLDB
 │   ├── detect_port.sh               # Auto-detects the connected board
