@@ -1,0 +1,63 @@
+# Builds the espswift command-line tool (cli/) and runs its tests, on macOS
+# and on Linux, as espswift is meant to run on both.
+
+name: espswift
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cli/**'
+      - '.github/workflows/cli.yml'
+  pull_request:
+    paths:
+      - 'cli/**'
+      - '.github/workflows/cli.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    name: macOS
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build
+        working-directory: cli
+        run: swift build
+      - name: Test
+        working-directory: cli
+        run: swift test
+      - name: Run
+        working-directory: cli
+        run: |
+          .build/debug/espswift --version
+          # ESPSwift isn't installed on the runner, so the checks fail; this
+          # only checks that the doctor runs.
+          .build/debug/espswift doctor || true
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    container: swift:6.4-noble
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build
+        working-directory: cli
+        run: swift build
+      - name: Test
+        working-directory: cli
+        run: swift test
+      - name: Run
+        working-directory: cli
+        run: |
+          .build/debug/espswift --version
+          .build/debug/espswift doctor || true

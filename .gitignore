@@ -22,3 +22,7 @@ installer/ESPSwiftInstaller/**/xcuserdata/
 installer/ESPSwiftInstaller/**/*.xcuserstate
 installer/ESPSwiftInstaller/.DS_Store
 installer/*.dmg
+
+# espswift (cli/) build output
+.build/
+.swiftpm/

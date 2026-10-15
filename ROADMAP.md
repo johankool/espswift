@@ -15,7 +15,7 @@ This project is being developed as part of the [Swift Mentorship Program](https:
 ## Longer-term
 
 - [ ] `espswift-idf` Swift Package: idiomatic Swift wrappers for ESP-IDF APIs (GPIO, LED, timers, ...), so projects don't call C functions such as `led_strip_new_rmt_device` directly
-- [ ] `espswift` CLI (doctor / build / flash / monitor)
+- [ ] `espswift` CLI, written in Swift and installed with Homebrew, replacing `install.sh` and the scripts, on macOS and Linux. In progress: see [cli/README.md](cli/README.md) for the plan; so far `espswift doctor` and `espswift ports`.
 - [ ] Homebrew tap
 - [ ] ESP32-S3 support (needs Xtensa support in Swift)
 
