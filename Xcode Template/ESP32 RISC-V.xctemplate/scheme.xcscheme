@@ -55,8 +55,18 @@
       queueDebuggingEnableBacktraceRecording = "Yes">
       <PathRunnable
          runnableDebuggingMode = "0"
-         FilePath = "ESPSWIFT_MONITOR_PATH">
+         FilePath = "ESPSWIFT_COMMAND_PATH">
       </PathRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "run"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--last-build"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

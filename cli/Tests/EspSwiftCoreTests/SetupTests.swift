@@ -15,7 +15,6 @@ import Testing
             "run /Users/test/.espswift/esp-idf/install.sh esp32c2,esp32c3,esp32c5,esp32c6,esp32c61,esp32h2,esp32p4",
             "run /usr/bin/curl -fL https://download.swift.org/swift-6.4.0-release/xcode/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE-osx.pkg -o /Users/test/.espswift/swift-6.4.0-RELEASE-osx.pkg",
             "run /usr/sbin/installer -pkg /Users/test/.espswift/swift-6.4.0-RELEASE-osx.pkg -target CurrentUserHomeDirectory",
-            "run /usr/bin/clang -o /Users/test/.espswift/scripts/monitor \(resources.scripts)/monitor_wrapper.c",
         ])
         #expect(system.actions.contains("link /Users/test/.espswift/python/bin/python3 -> /opt/homebrew/bin/python3.14"))
         #expect(system.readFile("/Users/test/.espswift/swift-toolchain") == FakeSystem.toolchain + "\n")
@@ -23,13 +22,11 @@ import Testing
         // The template, with the toolchain and the monitor filled in.
         let plist = try #require(system.readFile("\(FakeSystem.template)/TemplateInfo.plist"))
         #expect(plist.contains("org.swift.640202609131a") && !plist.contains("ESPSWIFT_SWIFT_TOOLCHAIN_ID"))
-        #expect(system.readFile("\(FakeSystem.template)/scheme.xcscheme") == "FilePath = \"/Users/test/.espswift/scripts/monitor\"")
+        #expect(system.readFile("\(FakeSystem.template)/scheme.xcscheme") == "FilePath = \"/Users/test/.espswift/bin/espswift\"")
         #expect(system.actions.contains("chmod \(FakeSystem.template)/build.sh"))
 
-        // The scripts, but not the wrapper's source.
         #expect(system.fileExists("/Users/test/.espswift/scripts/build.sh"))
         #expect(system.fileExists("/Users/test/.espswift/scripts/indexing_flags.py"))
-        #expect(!system.fileExists("/Users/test/.espswift/scripts/monitor_wrapper.c"))
     }
 
     @Test func leavesOutTheTemplateWhenAsked() throws {
@@ -44,9 +41,8 @@ import Testing
         let runs = system.actions.filter { $0.hasPrefix("run ") }
         // ESP-IDF's installer runs again (it only adds what's missing); no
         // Homebrew, download or Swift installer.
-        #expect(runs.count == 2)
+        #expect(runs.count == 1)
         #expect(runs[0].hasPrefix("run /Users/test/.espswift/esp-idf/install.sh "))
-        #expect(runs[1].hasPrefix("run /usr/bin/clang "))
     }
 
     @Test func usesSwiftlyWhenInstalled() throws {
@@ -99,7 +95,7 @@ import Testing
         system.directories.insert("/usr/lib/swift/embedded/riscv32-none-none-eabi")
         try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
         #expect(system.readFile("/home/test/.espswift/swift-toolchain") == "/\n")
-        #expect(!system.actions.contains { $0.contains("swiftly") || $0.contains("clang") })
+        #expect(!system.actions.contains { $0.contains("swiftly") })
     }
 
     @Test func findsSwiftlysNewestToolchainOnLinux() throws {

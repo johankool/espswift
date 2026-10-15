@@ -25,7 +25,9 @@ let package = Package(
             ]
         ),
         // What the commands do, testable without a terminal or a real system.
-        .target(name: "EspSwiftCore"),
+        .target(name: "EspSwiftCore", dependencies: ["CSerialPort"]),
+        // Opening serial ports, which needs C (ioctl).
+        .target(name: "CSerialPort"),
         .testTarget(name: "EspSwiftCoreTests", dependencies: ["EspSwiftCore"]),
     ]
 )

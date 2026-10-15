@@ -26,4 +26,16 @@ public enum SerialPorts {
     public static func connected(system: System) -> [String] {
         ports(in: system.contentsOfDirectory("/dev"), on: system.operatingSystem)
     }
+
+    /// The port to use: the one asked for (--port, or ESPSWIFT_PORT), else
+    /// the first connected board's.
+    public static func choose(_ requested: String?, system: System) throws -> String {
+        if let port = requested ?? system.environment["ESPSWIFT_PORT"], !port.isEmpty {
+            return port
+        }
+        guard let port = connected(system: system).first else {
+            throw EspSwiftError("No board found. Connect one over USB (or name its port with --port).")
+        }
+        return port
+    }
 }

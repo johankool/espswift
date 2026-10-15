@@ -246,7 +246,7 @@ public struct Setup: Sendable {
 
     /// Where projects find espswift: their build.sh runs
     /// ~/.espswift/bin/espswift, which Xcode can find without a PATH.
-    public var commandLink: String { "\(locations.espswiftHome)/bin/espswift" }
+    public var commandLink: String { locations.command }
 
     /// Links ~/.espswift/bin/espswift to the espswift that runs. For one
     /// installed with Homebrew, to Homebrew's bin/espswift, which stays the
@@ -279,14 +279,6 @@ public struct Setup: Sendable {
         for file in system.contentsOfDirectory(resources.scripts) where file.hasSuffix(".sh") || file.hasSuffix(".py") {
             try system.copyContents(of: "\(resources.scripts)/\(file)", to: "\(destination)/\(file)")
             try system.makeExecutable("\(destination)/\(file)")
-        }
-        // Xcode's Run scheme can only start a native program, so a small one
-        // starts run.sh.
-        if system.operatingSystem == .macOS {
-            let status = system.runVisibly("/usr/bin/clang", [
-                "-o", "\(destination)/monitor", "\(resources.scripts)/monitor_wrapper.c",
-            ], environment: system.environment)
-            guard status == 0 else { throw EspSwiftError("Compiling the monitor wrapper failed.") }
         }
         system.report("Installed the helper scripts in \(destination).")
     }

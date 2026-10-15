@@ -146,15 +146,21 @@ To build for another RISC-V based ESP32 (`esp32c2`, `esp32c3`, `esp32c5`, `esp32
 
 The example blinks the RGB LED of Espressif's DevKit boards. Its pin is chosen per chip in `Firmware/ESPIDF/include/ESPIDF.h` (`BOARD_RGB_LED_GPIO`); change it there if your board's LED is on another pin.
 
-## Watching serial output in Terminal
+## Building, flashing and watching in Terminal
 
-`Cmd+R` shows the board's output in Xcode. To see it in Terminal instead, run:
+`Cmd+B` and `Cmd+R` run `espswift`, ESPSwift's command-line tool, which you can also use in Terminal, in any folder of the project:
 
 ```bash
-~/.espswift/scripts/monitor.sh
+~/.espswift/bin/espswift build      # build (Cmd+B)
+~/.espswift/bin/espswift run        # build, flash and show the serial output (Cmd+R)
+~/.espswift/bin/espswift flash      # flash the latest build
+~/.espswift/bin/espswift monitor    # show the serial output
+~/.espswift/bin/espswift ports      # list the connected boards
 ```
 
-Press `Ctrl+C` to stop.
+Press `Ctrl+C` to stop the serial output. With several boards connected, choose one with `--port`, e.g. `--port /dev/cu.usbmodem1101`. `espswift monitor --idf` runs ESP-IDF's own monitor instead, which decodes crash backtraces into file and line numbers and sends what you type to the board.
+
+The serial output starts when the monitor connects, just after the board starts, so the very first lines can be missing; press the board's RESET button to see them.
 
 ## More help
 

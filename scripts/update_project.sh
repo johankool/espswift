@@ -11,7 +11,6 @@
 #      so they never got ESPSwift's fixes.)
 #   2. Points the Indexing target, which code completion uses, at the Swift
 #      toolchain install.sh installed, e.g. after a Swift upgrade.
-#   3. Creates the Run scheme (Cmd+R) if the project doesn't have one.
 #
 # It changes the Xcode project, so don't run it while Xcode is building the
 # project. If the project is open, Xcode reloads it.
@@ -41,7 +40,6 @@ PROJECT_NAME="$(basename "$XCODEPROJ" .xcodeproj)"
 SOURCE_DIR="$PROJECT_DIR/$PROJECT_NAME"
 PBXPROJ="$XCODEPROJ/project.pbxproj"
 
-SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
 # The installed template; set ESPSWIFT_TEMPLATE to use another (tests do).
 TEMPLATE="${ESPSWIFT_TEMPLATE:-$HOME/Library/Developer/Xcode/Templates/Project Templates/Other/ESP32 RISC-V.xctemplate}"
 
@@ -79,17 +77,6 @@ if [ -n "$SWIFT_TOOLCHAIN" ] && [ -f "$SWIFT_TOOLCHAIN/Info.plist" ]; then
     elif ! grep -q "TOOLCHAINS = " "$PBXPROJ"; then
         echo "  Note: This project has no Indexing target, so it doesn't get code completion."
         echo "        Projects created from the current template have one."
-    fi
-fi
-
-# ── 3. Run scheme ────────────────────────────────────────────────
-
-SCHEME="$XCODEPROJ/xcshareddata/xcschemes/$PROJECT_NAME.xcscheme"
-if [ ! -f "$SCHEME" ]; then
-    bash "$SCRIPTS_DIR/setup_scheme.sh" "$PROJECT_DIR" "$PROJECT_NAME" > /dev/null
-    if [ -f "$SCHEME" ]; then
-        echo "  Created the Run scheme (close and reopen the project for Xcode to show it)."
-        CHANGED=true
     fi
 fi
 

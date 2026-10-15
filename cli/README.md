@@ -7,6 +7,9 @@ It's being built in phases (see below). So far it has:
 ```
 espswift setup [--[no-]xcode-template]     # installs ESP-IDF, Swift and the tools they need (replaces install.sh)
 espswift build [clean] [--verbose]         # builds the project, showing errors as Xcode issues (projects' build.sh runs it)
+espswift flash [--port] [--last-build]     # flashes the project's latest build
+espswift monitor [--port] [--idf]          # shows the board's serial output (--idf: ESP-IDF's monitor)
+espswift run [--port] [--last-build]       # builds, flashes and monitors (Cmd+R runs it with --last-build)
 espswift doctor                            # checks ESP-IDF, Swift, Python, CMake, Ninja, the Xcode template and boards
 espswift ports [--first]                   # lists the serial ports of connected boards
 espswift xcode install-template            # installs or updates the Xcode template (macOS)
@@ -41,7 +44,7 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 0. Skeleton: `doctor`, `ports`, `--version`, CI on macOS and Linux. *(done)*
 1. `setup` and `uninstall`, replacing `install.sh` and `uninstall.sh`, with a prompt for the Xcode template *(done)*; a Homebrew tap and a release workflow *(when it's published)*.
 2. `build`, replacing `scripts/build.sh` and the build output filter; projects' `build.sh` calls `espswift build`. *(done)*
-3. `flash`, `monitor` and `run`; the Run scheme starts `espswift run` directly, without the monitor wrapper.
+3. `flash`, `monitor` and `run`; the Run scheme starts `espswift run` directly, without the monitor wrapper. *(done)*
 4. The Python helpers in Swift (the Swift package build, code completion flags), and `add`, `settings` (menuconfig), `update` and `debug`.
 5. `new`: creating projects without Xcode, for Linux and other editors.
 6. Removing `install.sh`, `scripts/` and the SwiftUI installer, and updating the documentation; the template test runs through `espswift`, also on Linux.
@@ -51,3 +54,5 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 `espswift setup` puts espswift at `~/.espswift/bin/espswift`: a link to Homebrew's `bin/espswift` when installed with Homebrew, or to a copy in `~/.espswift/libexec` when built from this repository (`install.sh`). A project's `build.sh`, which Xcode runs on Cmd+B, runs `~/.espswift/bin/espswift build` (or `ESPSWIFT_BIN`, which `tests/test_template.sh` sets to the one it builds).
 
 `espswift build` finds the project from Xcode's settings or the current folder, sets up ESP-IDF's environment (its `export.sh`), sets the chip when `sdkconfig.defaults` names a new one, runs `idf.py` with its output filtered for Xcode (`BuildOutputFilter`), keeps the full output in the build folder (`log/build-output.log`), sets up code completion and records the build for Cmd+R. `--verbose`, or `ESPSWIFT_VERBOSE=1`, shows all of ESP-IDF's output.
+
+Cmd+R (the template's Run scheme) starts `~/.espswift/bin/espswift run --last-build`: Xcode has just built the project, and doesn't tell the program it starts which project that was, so it flashes the build `espswift build` recorded last (`~/.espswift/last-build`). The monitor reads the serial port in Swift (`Monitor`, with a small C target, `CSerialPort`, for the port settings) and waits for the board when it resets or is unplugged.

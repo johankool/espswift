@@ -8,7 +8,10 @@ struct EspSwift: ParsableCommand {
         commandName: "espswift",
         abstract: "Embedded Swift for RISC-V based ESP32 chips.",
         version: espswiftVersion,
-        subcommands: [Setup.self, Build.self, Doctor.self, Ports.self, Xcode.self, Uninstall.self, Internal.self]
+        subcommands: [
+            Setup.self, Build.self, Flash.self, Monitor.self, Run.self, Doctor.self, Ports.self,
+            Xcode.self, Uninstall.self, Internal.self,
+        ]
     )
 }
 
@@ -85,6 +88,102 @@ extension EspSwift {
             } catch let error as EspSwiftError {
                 // As a line Xcode lists in the Issue navigator.
                 print("error: \(error)")
+                throw ExitCode.failure
+            } catch is EspSwiftCore.Build.Failed {
+                throw ExitCode.failure
+            }
+        }
+    }
+
+    struct Flash: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Flashes the project's last build to the board."
+        )
+
+        @Option(help: "The board's serial port; by default, the first one found.")
+        var port: String?
+
+        @Option(help: "The project's folder; by default, the one espswift runs in.")
+        var project: String?
+
+        @Flag(help: "Flash the last build of any project (what Cmd+R flashes).")
+        var lastBuild = false
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                let (source, build) = try buildToFlash(system: system, project: project, lastBuild: lastBuild)
+                try EspSwiftCore.Flash(system: system).run(
+                    sourceFolder: source, buildFolder: build, port: try SerialPorts.choose(port, system: system))
+            }
+        }
+    }
+
+    struct Monitor: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Shows the board's serial output.",
+            discussion: """
+                Waits for the board when it resets or is unplugged. Stop it with Ctrl+C. \
+                With --idf, ESP-IDF's own monitor runs instead, in a terminal: it decodes \
+                crash backtraces and sends what you type to the board.
+                """
+        )
+
+        @Option(help: "The board's serial port; by default, the first one found.")
+        var port: String?
+
+        @Flag(help: "Use ESP-IDF's monitor (idf.py monitor), for a terminal.")
+        var idf = false
+
+        @Option(help: "The project's folder, for --idf; by default, the one espswift runs in.")
+        var project: String?
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                let port = try SerialPorts.choose(port, system: system)
+                if idf {
+                    let project = try Project.find(system: system, start: self.project)
+                    try EspSwiftCore.Monitor.idfMonitor(system: system, port: port, project: project,
+                                                        buildFolder: EspSwiftCore.Flash.buildFolder(for: project, system: system))
+                } else {
+                    try EspSwiftCore.Monitor(system: system, port: port).run()
+                }
+            }
+        }
+    }
+
+    struct Run: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Builds the project, flashes it to the board and shows its serial output.",
+            discussion: """
+                Cmd+R in Xcode runs `espswift run --last-build`: Xcode has just built the \
+                project, so it flashes that build.
+                """
+        )
+
+        @Option(help: "The board's serial port; by default, the first one found.")
+        var port: String?
+
+        @Option(help: "The project's folder; by default, the one espswift runs in.")
+        var project: String?
+
+        @Flag(help: "Don't build; flash the last build of any project (for Cmd+R in Xcode).")
+        var lastBuild = false
+
+        func run() throws {
+            let system = LiveSystem()
+            do {
+                if !lastBuild {
+                    let project = try Project.find(system: system, start: self.project)
+                    try EspSwiftCore.Build(system: system, project: project, verbose: false).run(.build)
+                }
+                let (source, build) = try buildToFlash(system: system, project: project, lastBuild: lastBuild)
+                let port = try SerialPorts.choose(port, system: system)
+                try EspSwiftCore.Flash(system: system).run(sourceFolder: source, buildFolder: build, port: port)
+                try EspSwiftCore.Monitor(system: system, port: port).run()
+            } catch let error as EspSwiftError {
+                printError("Error: \(error)")
                 throw ExitCode.failure
             } catch is EspSwiftCore.Build.Failed {
                 throw ExitCode.failure
@@ -231,4 +330,17 @@ extension EspSwift {
             }
         }
     }
+}
+
+/// The source and build folders to flash: the last build of any project
+/// (--last-build), else the project's latest build.
+func buildToFlash(system: System, project: String?, lastBuild: Bool) throws -> (String, String) {
+    if lastBuild {
+        guard let last = LastBuild.read(system: system) else {
+            throw EspSwiftError("Nothing to flash yet. Build the project first (Cmd+B in Xcode, or espswift build).")
+        }
+        return (last.sourceFolder, last.buildFolder)
+    }
+    let project = try Project.find(system: system, start: project)
+    return (project.sourceFolder, Flash.buildFolder(for: project, system: system))
 }

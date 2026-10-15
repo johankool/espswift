@@ -1,3 +1,4 @@
+import CSerialPort
 import Foundation
 
 /// The operating systems espswift runs on.
@@ -80,6 +81,17 @@ public protocol System: Sendable {
     /// if it couldn't start).
     func runStreaming(_ executable: String, _ arguments: [String], environment: [String: String],
                       onLine: (String) -> Void) -> Int32
+
+    // ── Serial ports ──
+    /// Opens a serial port for reading at a baud rate; returns a handle.
+    func openSerialPort(_ path: String, baudRate: Int) throws -> Int32
+    /// Reads what arrived; nil when the port is gone (the board was
+    /// unplugged or reset).
+    func readSerialPort(_ handle: Int32) -> Data?
+    func closeSerialPort(_ handle: Int32)
+    /// Writes to standard output as is, without a newline.
+    func writeOutput(_ data: Data)
+    func sleep(seconds: Double)
 
     // ── The user ──
     /// Shows a line of progress.
@@ -259,6 +271,36 @@ public struct LiveSystem: System {
         }
         process.waitUntilExit()
         return process.terminationStatus
+    }
+
+    public func openSerialPort(_ path: String, baudRate: Int) throws -> Int32 {
+        let handle = espswift_serial_open(path, Int32(baudRate))
+        guard handle >= 0 else {
+            throw EspSwiftError("Can't open \(path): \(String(cString: strerror(errno))).")
+        }
+        return handle
+    }
+
+    public func readSerialPort(_ handle: Int32) -> Data? {
+        var buffer = [UInt8](repeating: 0, count: 1024)
+        while true {
+            let count = read(handle, &buffer, buffer.count)
+            if count > 0 { return Data(buffer[0..<count]) }
+            if count < 0 && errno == EINTR { continue }
+            return nil
+        }
+    }
+
+    public func closeSerialPort(_ handle: Int32) {
+        close(handle)
+    }
+
+    public func writeOutput(_ data: Data) {
+        FileHandle.standardOutput.write(data)
+    }
+
+    public func sleep(seconds: Double) {
+        Thread.sleep(forTimeInterval: seconds)
     }
 
     public func report(_ message: String) {

@@ -82,13 +82,7 @@ Embedded-Swift-Xcode-Template/
 │   └── build-template.yml           # Runs install.sh and the test in CI
 ├── scripts/
 │   ├── build_package.py             # Builds a project's Swift package with SwiftPM
-│   ├── run.sh                       # Cmd+R: flashes the last build, then starts the monitor
 │   ├── debug.sh                     # Debugs the firmware on the board with LLDB
-│   ├── detect_port.sh               # Auto-detects the connected board
-│   ├── flash.sh                     # Flashes firmware via idf.py
-│   ├── monitor.sh                   # Streams serial output
-│   ├── monitor_wrapper.c            # Native binary wrapper for Xcode
-│   ├── setup_scheme.sh              # Auto-configures Xcode Run scheme
 │   ├── setup_indexing.sh            # Compiler settings for code completion
 │   ├── indexing_flags.py            # (with SwiftPM's flags for the package)
 │   ├── update_project.sh            # Updates projects created from an older template

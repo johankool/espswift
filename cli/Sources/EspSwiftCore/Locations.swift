@@ -11,6 +11,8 @@ public struct Locations: Sendable {
     /// The python3 with the pinned version, which ESP-IDF's environment is
     /// made for.
     public var python: String
+    /// Where projects (and the Run scheme) find espswift; setup links it.
+    public var command: String { "\(espswiftHome)/bin/espswift" }
     /// The file that records the path of the Swift toolchain setup installed.
     public var swiftToolchainRecord: String
     /// The Xcode template, on macOS.

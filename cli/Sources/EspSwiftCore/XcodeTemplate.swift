@@ -46,11 +46,11 @@ public struct XcodeTemplate: Sendable {
         }
         try fillInToolchain(toolchainID, in: "\(template)/TemplateInfo.plist")
 
-        // The Run scheme (Cmd+R) starts the monitor wrapper, by absolute path.
+        // The Run scheme (Cmd+R) starts `espswift run --last-build`, which
+        // needs an absolute path.
         let scheme = "\(template)/scheme.xcscheme"
         if let text = system.readFile(scheme) {
-            try system.writeFile(scheme, text.replacingOccurrences(
-                of: "ESPSWIFT_MONITOR_PATH", with: "\(locations.espswiftHome)/scripts/monitor"))
+            try system.writeFile(scheme, text.replacingOccurrences(of: "ESPSWIFT_COMMAND_PATH", with: locations.command))
         }
         system.report("Installed the Xcode template ESP32 RISC-V. Restart Xcode to see it in File ▸ New ▸ Project.")
     }

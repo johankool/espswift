@@ -15,7 +15,7 @@ This project is being developed as part of the [Swift Mentorship Program](https:
 ## Longer-term
 
 - [ ] `espswift-idf` Swift Package: idiomatic Swift wrappers for ESP-IDF APIs (GPIO, LED, timers, ...), so projects don't call C functions such as `led_strip_new_rmt_device` directly
-- [ ] `espswift` CLI, written in Swift and installed with Homebrew, replacing `install.sh` and the scripts, on macOS and Linux. In progress: see [cli/README.md](cli/README.md) for the plan; so far `setup`, `build`, `doctor`, `ports`, `xcode install-template` and `uninstall`; projects build with `espswift build`.
+- [ ] `espswift` CLI, written in Swift and installed with Homebrew, replacing `install.sh` and the scripts, on macOS and Linux. In progress: see [cli/README.md](cli/README.md) for the plan; so far `setup`, `build`, `flash`, `monitor`, `run`, `doctor`, `ports`, `xcode install-template` and `uninstall`; Cmd+B and Cmd+R run espswift.
 - [ ] Homebrew tap
 - [ ] ESP32-S3 support (needs Xtensa support in Swift)
 
@@ -34,7 +34,7 @@ Not planned yet; worth considering.
 - [ ] **Decode crash backtraces:** turn the addresses in a panic dump into file and line numbers in the Xcode console, as ESP-IDF's monitor does.
 
 **Everyday workflow**
-- [ ] **Choose the serial port** when several boards are connected; `detect_port.sh` picks the first one it finds.
+- [ ] **Choose the serial port** in Xcode when several boards are connected; `espswift run` takes the first one it finds (in Terminal, `--port` chooses).
 - [ ] **Interactive serial input:** Xcode's console is output-only; a "Monitor in Terminal" action could open the serial monitor in Terminal for two-way communication.
 - [ ] **Show the firmware size after each build** (`idf.py size`), so growth is visible before it hits the flash limit.
 - [ ] **Faster builds with ccache,** which ESP-IDF supports for its C code.

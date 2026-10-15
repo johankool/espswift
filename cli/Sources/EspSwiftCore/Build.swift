@@ -94,38 +94,10 @@ public struct Build: Sendable {
         return toolchain
     }
 
-    /// ESP-IDF's environment, as its export.sh sets it up, with the Swift
-    /// toolchain first on PATH and CMake pointed at it.
+    /// ESP-IDF's environment, with the Swift toolchain first on PATH and
+    /// CMake pointed at it.
     func buildEnvironment(toolchain: String) throws -> [String: String] {
-        guard system.isDirectory(locations.idfPath) else {
-            throw EspSwiftError("ESP-IDF wasn't found at \(locations.idfPath). Run: espswift setup")
-        }
-        // Xcode's PATH doesn't include Homebrew; ESP-IDF finds its Python
-        // environment by the first python3 on PATH, ESPSwift's.
-        var base = system.environment
-        base["IDF_PATH"] = locations.idfPath
-        base["PATH"] = ([Resources.parent(of: locations.python)] + system.searchPath).joined(separator: ":")
-        let script = "set -e; . \"$IDF_PATH/export.sh\" > /dev/null 2>&1; env -0"
-        var output = Data()
-        let status = system.runStreaming("/bin/bash", ["-c", script], environment: base) { line in
-            output.append(contentsOf: Array(line.utf8) + [10])
-        }
-        guard status == 0 else {
-            let messages = system.run("/bin/bash", ["-c", ". \"\(locations.idfPath)/export.sh\""])?.output ?? ""
-            throw EspSwiftError("Setting up ESP-IDF failed. Run: espswift doctor\n\(messages)")
-        }
-        // env -0 separates the variables with NUL. Joining the lines again
-        // gives its output back, plus a newline at the end.
-        var environment: [String: String] = [:]
-        let text = String(decoding: output.dropLast(), as: UTF8.self)
-        for entry in text.split(separator: "\0") {
-            guard let equals = entry.firstIndex(of: "=") else { continue }
-            environment[String(entry[..<equals])] = String(entry[entry.index(after: equals)...])
-        }
-        guard environment["IDF_PYTHON_ENV_PATH"] != nil else {
-            throw EspSwiftError("ESP-IDF's environment wasn't set up. Run: espswift doctor")
-        }
-
+        var environment = try ESPIDF(system: system).environment()
         let bin = Setup.path(toolchain, "usr/bin")
         environment["PATH"] = bin + ":" + (environment["PATH"] ?? "")
         environment["CMAKE_Swift_COMPILER"] = "\(bin)/swiftc"
@@ -199,8 +171,8 @@ public struct Build: Sendable {
     /// writing to a terminal, which leaves part of them behind in some
     /// compiler messages.
     func idf(_ arguments: [String], environment: [String: String]) throws {
-        let python = "\(environment["IDF_PYTHON_ENV_PATH"] ?? "")/bin/python"
-        let command = ["\(locations.idfPath)/tools/idf.py", "-C", project.sourceFolder, "-B", buildFolder,
+        let python = ESPIDF.python(environment)
+        let command = [ESPIDF.idfPy(locations), "-C", project.sourceFolder, "-B", buildFolder,
                        "-D", "CMAKE_COLOR_DIAGNOSTICS=OFF"] + arguments
         if verbose || system.environment["ESPSWIFT_VERBOSE"] == "1" {
             guard system.runVisibly(python, command, environment: environment) == 0 else {

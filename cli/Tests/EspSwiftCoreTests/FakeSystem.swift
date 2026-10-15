@@ -98,6 +98,36 @@ final class FakeSystem: System, @unchecked Sendable {
         return effects[executable]?(self, arguments) ?? 0
     }
 
+    // ── Serial ports ──
+    /// What each opening of a port reads, in order: one list of chunks per
+    /// connection, until the port goes away.
+    var serialConnections: [String: [[Data]]] = [:]
+    var openPorts: [Int32: [Data]] = [:]
+    /// What was written to standard output.
+    var output = Data()
+
+    func openSerialPort(_ path: String, baudRate: Int) throws -> Int32 {
+        guard var connections = serialConnections[path], !connections.isEmpty else {
+            throw EspSwiftError("Can't open \(path)")
+        }
+        actions.append("open \(path) \(baudRate)")
+        let handle = Int32(openPorts.count + 3)
+        openPorts[handle] = connections.removeFirst()
+        serialConnections[path] = connections
+        return handle
+    }
+
+    func readSerialPort(_ handle: Int32) -> Data? {
+        guard var chunks = openPorts[handle], !chunks.isEmpty else { return nil }
+        let chunk = chunks.removeFirst()
+        openPorts[handle] = chunks
+        return chunk
+    }
+
+    func closeSerialPort(_ handle: Int32) { actions.append("close") }
+    func writeOutput(_ data: Data) { output.append(data) }
+    func sleep(seconds: Double) { actions.append("sleep") }
+
     func report(_ message: String) { reports.append(message) }
 
     func ask(_ question: String) -> String? { answers.isEmpty ? nil : answers.removeFirst() }
@@ -157,10 +187,9 @@ final class FakeSystem: System, @unchecked Sendable {
         system.directories.formUnion(["\(resources)/Xcode Template/ESP32 RISC-V.xctemplate", "\(resources)/scripts"])
         system.file("\(resources)/Xcode Template/ESP32 RISC-V.xctemplate/build.sh", "")
         system.file("\(resources)/Xcode Template/ESP32 RISC-V.xctemplate/TemplateInfo.plist", Self.templatePlist)
-        system.file("\(resources)/Xcode Template/ESP32 RISC-V.xctemplate/scheme.xcscheme", "FilePath = \"ESPSWIFT_MONITOR_PATH\"")
+        system.file("\(resources)/Xcode Template/ESP32 RISC-V.xctemplate/scheme.xcscheme", "FilePath = \"ESPSWIFT_COMMAND_PATH\"")
         system.file("\(resources)/scripts/build.sh", "")
         system.file("\(resources)/scripts/indexing_flags.py", "")
-        system.file("\(resources)/scripts/monitor_wrapper.c", "")
         system.effects["/opt/homebrew/bin/brew"] = { system, _ in
             for tool in ["python3.14", "cmake", "ninja"] {
                 system.commands["/opt/homebrew/bin/\(tool)"] = CommandResult(status: 0, output: "Python 3.14.8\n")
