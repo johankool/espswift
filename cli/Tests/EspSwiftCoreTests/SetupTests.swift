@@ -71,18 +71,55 @@ import Testing
         #expect(!system.actions.contains { $0.hasPrefix("run ") })
     }
 
-    @Test func needsSwiftlyOnLinux() throws {
+    /// Linux with Python, CMake, Ninja and Git, but no Swift.
+    static func linux() -> FakeSystem {
         let system = FakeSystem.freshMac
         system.operatingSystem = .linux
         system.homeDirectory = "/home/test"
-        for tool in ["python3.14", "cmake", "ninja"] {
+        system.commands["/usr/bin/python3"] = CommandResult(status: 0, output: "Python 3.12.3\n")
+        for tool in ["cmake", "ninja"] {
             system.commands["/usr/bin/\(tool)"] = CommandResult(status: 0, output: "")
         }
+        return system
+    }
+
+    @Test func needsSwiftlyOnLinux() throws {
+        let system = Self.linux()
         let error = #expect(throws: EspSwiftError.self) {
             try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
         }
         #expect(error?.description.contains("swiftly") == true)
-        #expect(Setup(system: system, resources: resources).swiftToolchain == "/home/test/.local/share/swiftly/toolchains/6.4.0")
+        #expect(system.actions.contains("link /home/test/.espswift/python/bin/python3 -> /usr/bin/python3"))
+    }
+
+    @Test func usesTheSwiftOnPathOnLinux() throws {
+        // As in Swift's Docker images: Swift 6.4.1 in /usr.
+        let system = Self.linux()
+        system.commands["/usr/bin/swiftc"] = CommandResult(status: 0, output: "Swift version 6.4.1 (swift-6.4.1-RELEASE)\n")
+        system.directories.insert("/usr/lib/swift/embedded/riscv32-none-none-eabi")
+        try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        #expect(system.readFile("/home/test/.espswift/swift-toolchain") == "/\n")
+        #expect(!system.actions.contains { $0.contains("swiftly") || $0.contains("clang") })
+    }
+
+    @Test func findsSwiftlysNewestToolchainOnLinux() throws {
+        let system = Self.linux()
+        for version in ["6.3.2", "6.4.0", "6.4.1"] {
+            let toolchain = "/home/test/.local/share/swiftly/toolchains/\(version)"
+            system.commands["\(toolchain)/usr/bin/swiftc"] = CommandResult(status: 0, output: "Swift version \(version)\n")
+            system.directories.insert("\(toolchain)/usr/lib/swift/embedded/riscv32-none-none-eabi")
+        }
+        #expect(Setup(system: system, resources: resources).installedSwiftToolchain()
+                == "/home/test/.local/share/swiftly/toolchains/6.4.1")
+    }
+
+    @Test func needsANewEnoughPythonOnLinux() {
+        let system = Self.linux()
+        system.commands["/usr/bin/python3"] = CommandResult(status: 0, output: "Python 3.9.2\n")
+        let error = #expect(throws: EspSwiftError.self) {
+            try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        }
+        #expect(error?.description.contains("3.10") == true)
     }
 }
 

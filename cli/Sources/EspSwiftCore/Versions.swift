@@ -9,13 +9,19 @@ public let espswiftVersion = "0.1.0"
 public enum Pins {
     /// ESP-IDF, the Espressif IoT Development Framework.
     public static let espIDF = Version(6, 1, 0)
-    /// The Swift toolchain. Xcode's own can't be used: it doesn't include
-    /// Embedded Swift for RISC-V.
+    /// The Swift toolchain that's installed (on macOS; on Linux, swiftly
+    /// installs the latest of the series). Xcode's own can't be used: it
+    /// doesn't include Embedded Swift for RISC-V.
     public static let swift = Version(6, 4, 0)
-    /// The Python version ESP-IDF's environment is made for. ESP-IDF finds
-    /// its environment by the version of the first python3 on PATH, so a
-    /// newer Python breaks builds until ESP-IDF supports it.
+    /// The Swift versions that work: any 6.4.x.
+    public static let swiftSeries = Version(6, 4)
+    /// The Python version on macOS. ESP-IDF finds its environment by the
+    /// version of the first python3 on PATH, so Homebrew moving python3 to
+    /// a newer release would break builds; ESPSwift uses this one instead.
     public static let python = Version(3, 14)
+    /// The oldest Python ESP-IDF supports, for Linux, where ESPSwift uses
+    /// the system's python3.
+    public static let minimumPython = Version(3, 10)
     /// The chips the template offers: the RISC-V based ESP32s.
     public static let chips = ["esp32c2", "esp32c3", "esp32c5", "esp32c6", "esp32c61", "esp32h2", "esp32p4"]
 }

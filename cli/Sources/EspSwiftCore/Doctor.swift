@@ -62,16 +62,22 @@ public struct Doctor: Sendable {
 
     // ── Checks ───────────────────────────────────────────────────────
 
+    /// The Python version ESPSwift uses, if it runs.
+    func pythonVersion() -> Version? {
+        system.run(locations.python, ["--version"]).flatMap { VersionParser.python(versionOutput: $0.output) }
+    }
+
     func checkPython() -> Check {
-        let name = "Python \(Pins.python)"
+        // macOS: the pinned version; Linux: the system's, if new enough.
+        let pinned = system.operatingSystem == .macOS
+        let name = pinned ? "Python \(Pins.python)" : "Python"
         guard system.fileExists(locations.python) else {
             return Check(name, .failed, "not found at \(display(locations.python))", fix: Self.setupFix)
         }
-        guard let output = system.run(locations.python, ["--version"])?.output,
-              let version = VersionParser.python(versionOutput: output) else {
+        guard let version = pythonVersion() else {
             return Check(name, .failed, "\(display(locations.python)) doesn't run", fix: Self.setupFix)
         }
-        guard version.satisfies(Pins.python) else {
+        guard pinned ? version.satisfies(Pins.python) : version >= Pins.minimumPython else {
             return Check(name, .failed, "\(display(locations.python)) is Python \(version)", fix: Self.setupFix)
         }
         return Check(name, .ok, "Python \(version)")
@@ -106,7 +112,7 @@ public struct Doctor: Sendable {
     /// version, such as idf6.1_py3.14_env.
     func checkESPIDFEnvironment() -> Check {
         let idf = Pins.espIDF.components
-        let python = Pins.python.components
+        let python = (system.operatingSystem == .macOS ? Pins.python : pythonVersion() ?? Pins.minimumPython).components
         let environment = "\(locations.idfToolsPath)/python_env/idf\(idf[0]).\(idf[1])_py\(python[0]).\(python[1])_env"
         guard system.isDirectory(environment) else {
             return Check("ESP-IDF tools", .failed, "no Python environment at \(display(environment))", fix: Self.setupFix)
@@ -115,11 +121,11 @@ public struct Doctor: Sendable {
     }
 
     func checkSwift() -> Check {
-        let name = "Swift \(Pins.swift)"
+        let name = "Swift \(Pins.swiftSeries)"
         // The toolchain setup installed; on Linux, else the swiftc on PATH
         // (installed with swiftly).
         let recorded = system.readFile(locations.swiftToolchainRecord)?
-            .split(separator: "\n").first.map { "\($0)/usr/bin/swiftc" }
+            .split(separator: "\n").first.map { Setup.path(String($0), "usr/bin/swiftc") }
         let fallback = system.operatingSystem == .linux ? system.findExecutable("swiftc") : nil
         guard let swiftc = recorded ?? fallback, system.fileExists(swiftc) else {
             return Check(name, .failed, "no Swift toolchain for Embedded Swift found", fix: Self.setupFix)
@@ -128,7 +134,7 @@ public struct Doctor: Sendable {
               let version = VersionParser.swift(versionOutput: output) else {
             return Check(name, .failed, "\(display(swiftc)) doesn't run", fix: Self.setupFix)
         }
-        guard version.satisfies(Pins.swift) else {
+        guard version.satisfies(Pins.swiftSeries) else {
             return Check(name, .failed, "\(display(swiftc)) is Swift \(version)", fix: Self.setupFix)
         }
         // usr/bin/swiftc → usr/lib/swift/embedded/riscv32-none-none-eabi

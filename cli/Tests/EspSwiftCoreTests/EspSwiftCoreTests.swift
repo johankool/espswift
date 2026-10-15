@@ -14,6 +14,8 @@ import Testing
         #expect(!Version(3, 15, 0).satisfies(Pins.python))
         #expect(Version(6, 4).satisfies(Pins.swift))  // swiftc reports 6.4 for 6.4.0
         #expect(!Version(6, 4, 1).satisfies(Pins.swift))
+        #expect(Version(6, 4, 1).satisfies(Pins.swiftSeries))
+        #expect(!Version(6, 5).satisfies(Pins.swiftSeries))
     }
 
     @Test func comparesVersions() {
@@ -56,7 +58,7 @@ import Testing
         let checks = Doctor(system: FakeSystem.workingMac).checks()
         #expect(checks.allSatisfy { $0.status == .ok }, "\(checks.filter { $0.status != .ok })")
         #expect(checks.map(\.name) == [
-            "Python 3.14", "CMake", "Ninja", "ESP-IDF 6.1.0", "ESP-IDF tools", "Swift 6.4.0", "Xcode template", "Boards",
+            "Python 3.14", "CMake", "Ninja", "ESP-IDF 6.1.0", "ESP-IDF tools", "Swift 6.4", "Xcode template", "Boards",
         ])
         #expect(checks.last?.detail == "/dev/cu.usbmodem21101")
     }

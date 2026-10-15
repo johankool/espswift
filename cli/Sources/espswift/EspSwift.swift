@@ -92,10 +92,10 @@ extension EspSwift {
                 try reportingErrors {
                     let resources = try Resources.find(system: system)
                     let setup = EspSwiftCore.Setup(system: system, resources: resources)
-                    guard system.fileExists("\(setup.swiftToolchain)/usr/bin/swiftc") else {
+                    guard let toolchain = setup.installedSwiftToolchain() else {
                         throw EspSwiftError("The Swift toolchain isn't installed. Run: espswift setup")
                     }
-                    try XcodeTemplate(system: system).install(from: resources, swiftToolchain: setup.swiftToolchain)
+                    try XcodeTemplate(system: system).install(from: resources, swiftToolchain: toolchain)
                 }
             }
         }

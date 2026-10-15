@@ -3,7 +3,8 @@
 /// scripts.
 ///
 /// 1. Python, CMake, Ninja and Git (with Homebrew on macOS, if missing)
-/// 2. The pinned Python as ~/.espswift/python/bin/python3, for ESP-IDF
+/// 2. Python as ~/.espswift/python/bin/python3, for ESP-IDF (the pinned one
+///    on macOS, the system's on Linux)
 /// 3. ESP-IDF (in ~/.espswift/esp-idf) and its tools for the RISC-V chips
 /// 4. The Swift toolchain, with swiftly, or on macOS swift.org's installer
 /// 5. The Xcode template (macOS, optional)
@@ -19,19 +20,54 @@ public struct Setup: Sendable {
         locations = Locations(system: system)
     }
 
-    /// Where the pinned Swift toolchain is installed.
-    public var swiftToolchain: String {
+    /// The Swift toolchain macOS installs.
+    public var macToolchain: String {
+        "\(system.homeDirectory)/Library/Developer/Toolchains/swift-\(Pins.swift)-RELEASE.xctoolchain"
+    }
+
+    /// swiftly's toolchains folder on Linux (SWIFTLY_TOOLCHAINS_DIR, by
+    /// default in the XDG data folder).
+    var swiftlyToolchains: String {
+        let environment = system.environment
+        let data = environment["XDG_DATA_HOME"] ?? "\(system.homeDirectory)/.local/share"
+        return environment["SWIFTLY_TOOLCHAINS_DIR"] ?? "\(data)/swiftly/toolchains"
+    }
+
+    /// The installed Swift toolchain that works (the folder with usr/bin/swiftc),
+    /// if there is one. On Linux: a swiftc on PATH (such as in Swift's Docker
+    /// images), or the newest of swiftly's toolchains of the series.
+    public func installedSwiftToolchain() -> String? {
         switch system.operatingSystem {
         case .macOS:
-            return "\(system.homeDirectory)/Library/Developer/Toolchains/swift-\(Pins.swift)-RELEASE.xctoolchain"
+            return system.fileExists("\(macToolchain)/usr/bin/swiftc") ? macToolchain : nil
         case .linux:
-            // swiftly's toolchains folder (SWIFTLY_TOOLCHAINS_DIR, by default
-            // in the XDG data folder).
-            let environment = system.environment
-            let data = environment["XDG_DATA_HOME"] ?? "\(system.homeDirectory)/.local/share"
-            let toolchains = environment["SWIFTLY_TOOLCHAINS_DIR"] ?? "\(data)/swiftly/toolchains"
-            return "\(toolchains)/\(Pins.swift)"
+            var candidates: [String] = []
+            if let swiftc = system.findExecutable("swiftc") {
+                candidates.append(Self.toolchain(ofSwiftc: swiftc))
+            }
+            let versions = system.contentsOfDirectory(swiftlyToolchains)
+                .compactMap { name in Version(name).map { (name, $0) } }
+                .filter { $0.1.satisfies(Pins.swiftSeries) }
+                .sorted { $0.1 > $1.1 }
+            candidates += versions.map { "\(swiftlyToolchains)/\($0.0)" }
+            return candidates.first { toolchain in
+                guard let output = system.run(Self.path(toolchain, "usr/bin/swiftc"), ["--version"])?.output,
+                      let version = VersionParser.swift(versionOutput: output) else { return false }
+                return version.satisfies(Pins.swiftSeries)
+                    && system.isDirectory(Self.path(toolchain, "usr/lib/swift/embedded/riscv32-none-none-eabi"))
+            }
         }
+    }
+
+    /// A path in a toolchain folder, which may be "/".
+    public static func path(_ toolchain: String, _ relative: String) -> String {
+        toolchain.hasSuffix("/") ? toolchain + relative : "\(toolchain)/\(relative)"
+    }
+
+    /// The toolchain folder of a swiftc: /usr/bin/swiftc is in "/".
+    static func toolchain(ofSwiftc swiftc: String) -> String {
+        let toolchain = String(swiftc.dropLast("/usr/bin/swiftc".count))
+        return toolchain.isEmpty ? "/" : toolchain
     }
 
     public func run(installXcodeTemplate: Bool) throws {
@@ -39,7 +75,7 @@ public struct Setup: Sendable {
         try installPrerequisites()
         try linkPython()
         try installESPIDF()
-        try installSwift()
+        let swiftToolchain = try installSwift()
         // build.sh and the projects' CMakeLists.txt read which toolchain to use.
         try system.writeFile(locations.swiftToolchainRecord, swiftToolchain + "\n")
         if installXcodeTemplate {
@@ -52,12 +88,16 @@ public struct Setup: Sendable {
 
     // ── 1. Prerequisites ─────────────────────────────────────────────
 
+    /// The Python program: the pinned version on macOS, python3 on Linux.
+    var pythonProgram: String {
+        system.operatingSystem == .macOS ? "python\(Pins.python)" : "python3"
+    }
+
     /// The programs ESP-IDF needs, checked before downloading anything.
     func missingPrerequisites() -> [(program: String, package: String)] {
-        let python = "python\(Pins.python)"
         let linux = system.operatingSystem == .linux
         return [
-            (python, linux ? python : "python@\(Pins.python)"),
+            (pythonProgram, linux ? "python3 python3-venv" : "python@\(Pins.python)"),
             ("cmake", "cmake"),
             ("ninja", linux ? "ninja-build" : "ninja"),
             ("git", "git"),
@@ -84,10 +124,17 @@ public struct Setup: Sendable {
     // ── 2. Python ────────────────────────────────────────────────────
 
     /// ESP-IDF finds its Python environment by the version of the first
-    /// python3 on PATH, so ESPSwift puts the pinned one first.
+    /// python3 on PATH, so ESPSwift puts its own first: the pinned one on
+    /// macOS, the system's (\(Pins.minimumPython) or newer) on Linux.
     func linkPython() throws {
-        guard let python = system.findExecutable("python\(Pins.python)") else {
-            throw EspSwiftError("Python \(Pins.python) wasn't found.")
+        guard let python = system.findExecutable(pythonProgram) else {
+            throw EspSwiftError("\(pythonProgram) wasn't found.")
+        }
+        if system.operatingSystem == .linux {
+            let version = system.run(python, ["--version"]).flatMap { VersionParser.python(versionOutput: $0.output) }
+            guard let version, version >= Pins.minimumPython else {
+                throw EspSwiftError("ESP-IDF needs Python \(Pins.minimumPython) or newer; \(python) is \(version.map { "\($0)" } ?? "of an unknown version").")
+            }
         }
         try system.createDirectory(Resources.parent(of: locations.python))
         try system.createSymbolicLink(at: locations.python, to: python)
@@ -138,13 +185,17 @@ public struct Setup: Sendable {
 
     // ── 4. Swift ─────────────────────────────────────────────────────
 
-    func installSwift() throws {
-        let swiftc = "\(swiftToolchain)/usr/bin/swiftc"
-        guard !system.fileExists(swiftc) else {
-            system.report("Swift \(Pins.swift) is installed.")
-            return
+    /// Installs Swift if there's no toolchain of the series yet; returns the
+    /// toolchain.
+    func installSwift() throws -> String {
+        if let toolchain = installedSwiftToolchain() {
+            system.report("Swift \(Pins.swiftSeries) is installed (\(locations.display(toolchain, home: system.homeDirectory))).")
+            return toolchain
         }
-        system.report("Installing Swift \(Pins.swift)...")
+        // On macOS the exact version, whose toolchain identifier the Xcode
+        // template uses; on Linux, swiftly's latest of the series.
+        let version = system.operatingSystem == .macOS ? "\(Pins.swift)" : "\(Pins.swiftSeries)"
+        system.report("Installing Swift \(version)...")
         // swiftly, if installed (with Homebrew, or swift.org's installer in
         // ~/.swiftly), so the toolchain shows up in `swiftly list`. Without
         // --use, it doesn't change the user's active toolchain.
@@ -152,21 +203,22 @@ public struct Setup: Sendable {
             ?? ["\(system.homeDirectory)/.swiftly/bin/swiftly", "\(system.homeDirectory)/.local/share/swiftly/bin/swiftly"]
                 .first(where: system.fileExists)
         if let swiftly {
-            guard system.runVisibly(swiftly, ["install", "\(Pins.swift)", "--assume-yes"],
+            guard system.runVisibly(swiftly, ["install", version, "--assume-yes"],
                                     environment: system.environment) == 0 else {
-                throw EspSwiftError("swiftly couldn't install Swift \(Pins.swift).")
+                throw EspSwiftError("swiftly couldn't install Swift \(version).")
             }
         } else if system.operatingSystem == .macOS {
             try installSwiftPackage()
         } else {
             throw EspSwiftError("""
-                Swift \(Pins.swift) is installed with swiftly, which wasn't found. \
+                Swift \(Pins.swiftSeries) is installed with swiftly, which wasn't found. \
                 Install it from https://www.swift.org/install/linux/ and run espswift setup again.
                 """)
         }
-        guard system.fileExists(swiftc) else {
-            throw EspSwiftError("Swift \(Pins.swift) wasn't installed at \(swiftToolchain).")
+        guard let toolchain = installedSwiftToolchain() else {
+            throw EspSwiftError("Swift \(version) was installed, but its toolchain wasn't found.")
         }
+        return toolchain
     }
 
     /// swift.org's installer, into ~/Library/Developer/Toolchains (no
