@@ -292,7 +292,7 @@ public struct LiveSystem: System {
 
     public func startInBackground(_ executable: String, _ arguments: [String], environment: [String: String],
                                   output: String) throws -> Int32 {
-        FileManager.default.createFile(atPath: output, contents: nil)
+        _ = FileManager.default.createFile(atPath: output, contents: nil)
         guard let file = FileHandle(forWritingAtPath: output) else {
             throw EspSwiftError("Can't write \(output).")
         }

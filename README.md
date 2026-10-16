@@ -45,6 +45,8 @@ bash install.sh
 `install.sh` builds `espswift`, ESPSwift's command-line tool (in `cli/`, which needs Swift 6, part of Xcode), and runs `espswift setup`, which installs everything else. Installation takes 5–10 minutes (~3GB download).
 
 ### Create a Project
+Without Xcode (or on Linux), create one in Terminal: `~/.espswift/bin/espswift new MyProject --chip esp32c6`, then build it in its folder with `~/.espswift/bin/espswift build`. In Xcode:
+
 1. Restart Xcode
 2. File → New → Project → Other → **ESP32 RISC-V**, and choose your board's chip in the **Chip** pop-up
 3. Connect your board via USB

@@ -9,7 +9,8 @@ struct EspSwift: ParsableCommand {
         abstract: "Embedded Swift for RISC-V based ESP32 chips.",
         version: espswiftVersion,
         subcommands: [
-            Setup.self, Build.self, Flash.self, Monitor.self, Run.self, Debug.self, Add.self, Settings.self, Update.self,
+            Setup.self, New.self, Build.self, Flash.self, Monitor.self, Run.self, Debug.self, Add.self, Settings.self,
+            Update.self,
             Doctor.self, Ports.self, Xcode.self, Uninstall.self, Internal.self,
         ]
     )
@@ -52,6 +53,40 @@ extension EspSwift {
                     throw EspSwiftError("The Xcode template is only for macOS.")
                 }
                 try EspSwiftCore.Setup(system: system, resources: resources).run(installXcodeTemplate: installTemplate)
+            }
+        }
+    }
+
+    struct New: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Creates a project from the template, without Xcode.",
+            discussion: """
+                The project builds with espswift build. It has no Xcode project: on \
+                macOS, create projects for Xcode with File ▸ New ▸ Project ▸ ESP32 RISC-V.
+                """
+        )
+
+        @Argument(help: "The project's name; its folder gets this name.")
+        var name: String
+
+        @Option(help: "The chip: esp32c2, esp32c3, esp32c5, esp32c6, esp32c61, esp32h2 or esp32p4.")
+        var chip = "esp32c6"
+
+        @Option(help: "Where to create the project's folder; by default, the current folder.")
+        var folder: String?
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                let template = try Resources.find(system: system).xcodeTemplate
+                let formatter = DateFormatter()
+                formatter.dateStyle = .short
+                formatter.timeStyle = .none
+                let author = NSFullUserName().isEmpty ? (system.environment["USER"] ?? "") : NSFullUserName()
+                let parent = folder.map { URL(fileURLWithPath: $0).standardizedFileURL.path } ?? system.currentDirectory
+                try NewProject(system: system, template: template)
+                    .run(name: name, chip: chip, in: parent, author: author, date: formatter.string(from: Date()))
+                system.report("Build it with: cd \(name) && \(Locations(system: system).command) build")
             }
         }
     }

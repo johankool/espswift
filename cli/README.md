@@ -6,6 +6,7 @@ It's being built in phases (see below). So far it has:
 
 ```
 espswift setup [--[no-]xcode-template]     # installs ESP-IDF, Swift and the tools they need (replaces install.sh)
+espswift new <name> [--chip] [--folder]    # creates a project from the template, without Xcode (also on Linux)
 espswift build [clean] [--verbose]         # builds the project, showing errors as Xcode issues (projects' build.sh runs it)
 espswift flash [--port] [--last-build]     # flashes the project's latest build
 espswift monitor [--port] [--idf]          # shows the board's serial output (--idf: ESP-IDF's monitor)
@@ -50,7 +51,7 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 2. `build`, replacing `scripts/build.sh` and the build output filter; projects' `build.sh` calls `espswift build`. *(done)*
 3. `flash`, `monitor` and `run`; the Run scheme starts `espswift run` directly, without the monitor wrapper. *(done)*
 4. The Python helpers in Swift (the Swift package build, code completion flags), and `add`, `settings` (menuconfig), `update` and `debug`; `scripts/` is gone. *(done)*
-5. `new`: creating projects without Xcode, for Linux and other editors.
+5. `new`: creating projects without Xcode, for Linux and other editors; the template test creates its projects with it. *(done)*
 6. Removing `install.sh` (once Homebrew installs espswift) and the SwiftUI installer, and updating the documentation; the template test runs on Linux too.
 
 ## How projects use it

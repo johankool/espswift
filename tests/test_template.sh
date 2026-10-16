@@ -4,12 +4,12 @@
 # Creates projects from the Xcode template and builds them, to check that
 # the template works for every chip it offers.
 #
-# Each project is laid out the way Xcode lays out a new project, using the
-# template's TemplateInfo.plist: every file goes to the place its
-# definition names, with Xcode's placeholders (___PROJECTNAME___,
-# ___VARIABLE_chip___, ...) filled in. The project is then built with its
-# own build.sh, without flashing (ESPSWIFT_BUILD_ONLY=1), using this
-# repository's helper scripts. Finally the project's Indexing target, which
+# Each project is created with `espswift new`, which lays it out the way
+# Xcode lays out a new project, using the template's TemplateInfo.plist:
+# every file goes to the place its definition names, with Xcode's
+# placeholders (___PROJECTNAME___, ___VARIABLE_chip___, ...) filled in. The
+# project is then built with its own build.sh, without flashing
+# (ESPSWIFT_BUILD_ONLY=1), with espswift built from this repository. Finally the project's Indexing target, which
 # Xcode uses for code completion, is built with xcodebuild, using the
 # template's settings for it and an Xcode project from tests/fixtures.
 # For the first chip, the build is also checked to report a Swift error
@@ -97,51 +97,13 @@ export ESPSWIFT_BIN
 echo "Testing the template for: ${CHIPS[*]}"
 echo "Working directory: $WORK_DIR"
 
-# Creates a project for a chip in $WORK_DIR/<chip>, laid out like Xcode
-# does it. Fails if a placeholder is left unfilled.
+# Creates a project for a chip in $WORK_DIR/<chip> with `espswift new`,
+# which lays it out as Xcode does and fails if a placeholder is left unfilled.
 create_project() {
-    python3 - "$TEMPLATE" "$WORK_DIR/$1" "$PROJECT_NAME" "$1" <<'EOF'
-import os, plistlib, re, sys
-
-template, root, name, chip = sys.argv[1:]
-plist = plistlib.load(open(os.path.join(template, "TemplateInfo.plist"), "rb"))
-placeholders = {
-    "___PROJECTNAME___": name,
-    "___FULLUSERNAME___": "Template Test",
-    "___DATE___": "today",
-    "___VARIABLE_chip___": chip,
-}
-
-for node in plist["Nodes"]:
-    definition = plist["Definitions"][node]
-    # Files go in the source folder (named after the project), except
-    # top-level ones, which go next to the .xcodeproj.
-    base = root if definition.get("IsTopLevel") else os.path.join(root, name)
-    # Xcode fills in placeholders in file paths as well as in file contents.
-    for placeholder, value in placeholders.items():
-        node = node.replace(placeholder, value)
-    destination = os.path.normpath(os.path.join(base, node))
-    os.makedirs(os.path.dirname(destination), exist_ok=True)
-
-    source = os.path.join(template, definition["Path"])
-    # A folder (such as a Swift package) is copied with everything in it.
-    if os.path.isdir(source):
-        files = [(os.path.join(folder, f), os.path.join(destination, os.path.relpath(folder, source), f))
-                 for folder, _, names in os.walk(source) for f in names]
-    else:
-        files = [(source, destination)]
-    for source, destination in files:
-        os.makedirs(os.path.dirname(destination), exist_ok=True)
-        text = open(source, encoding="utf-8").read()
-        for placeholder, value in placeholders.items():
-            text = text.replace(placeholder, value)
-        leftover = re.findall(r"___[A-Za-z_:]+___", text)
-        if leftover:
-            sys.exit(f"Unfilled placeholder {leftover[0]} in {os.path.relpath(source, template)}")
-        with open(destination, "w", encoding="utf-8") as f:
-            f.write(text)
-        os.chmod(destination, os.stat(source).st_mode)
-EOF
+    local parent="$WORK_DIR/.new-$1"
+    rm -rf "$parent" && mkdir -p "$parent"
+    "$ESPSWIFT_BIN" new "$PROJECT_NAME" --chip "$1" --folder "$parent" > /dev/null \
+        && mv "$parent/$PROJECT_NAME" "$WORK_DIR/$1" && rm -rf "$parent"
 }
 
 # Adds an Xcode project to the generated project, as Xcode would create it
@@ -149,9 +111,12 @@ EOF
 # a project Xcode created (tests/fixtures/project.pbxproj); check_indexing
 # applies the template's current Indexing settings on top of it.
 add_xcode_project() {
-    mkdir -p "$WORK_DIR/$1/$PROJECT_NAME.xcodeproj"
-    sed "s/___PROJECTNAME___/$PROJECT_NAME/g" "$REPO_ROOT/tests/fixtures/project.pbxproj" \
-        > "$WORK_DIR/$1/$PROJECT_NAME.xcodeproj/project.pbxproj"
+    local xcodeproj="$WORK_DIR/$1/$PROJECT_NAME.xcodeproj"
+    mkdir -p "$xcodeproj/xcshareddata/xcschemes"
+    sed "s/___PROJECTNAME___/$PROJECT_NAME/g" "$REPO_ROOT/tests/fixtures/project.pbxproj" > "$xcodeproj/project.pbxproj"
+    # The template's Run scheme, which Xcode puts in the Xcode project.
+    sed "s/___PROJECTNAME___/$PROJECT_NAME/g" "$TEMPLATE/scheme.xcscheme" \
+        > "$xcodeproj/xcshareddata/xcschemes/$PROJECT_NAME.xcscheme"
 }
 
 # Builds the Indexing target with xcodebuild, the way Xcode's indexer
