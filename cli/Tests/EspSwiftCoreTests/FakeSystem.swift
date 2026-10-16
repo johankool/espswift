@@ -44,6 +44,7 @@ final class FakeSystem: System, @unchecked Sendable {
 
     func readFile(_ path: String) -> String? { files[path].map { String(decoding: $0, as: UTF8.self) } }
     func readData(_ path: String) -> Data? { files[path] }
+    func resolvingSymlinks(_ path: String) -> String { path }
 
     func createDirectory(_ path: String) throws {
         actions.append("mkdir \(path)")
@@ -97,6 +98,24 @@ final class FakeSystem: System, @unchecked Sendable {
         streams[executable, default: []].forEach(onLine)
         return effects[executable]?(self, arguments) ?? 0
     }
+
+    // ── Background programs ──
+    /// What a background program writes to its output file when started.
+    var backgroundOutput: [String: String] = [:]
+    var running: Set<Int32> = []
+
+    func startInBackground(_ executable: String, _ arguments: [String], environment: [String: String],
+                           output: String) throws -> Int32 {
+        actions.append((["start", executable] + arguments).joined(separator: " "))
+        file(output, backgroundOutput[executable] ?? "")
+        let process = Int32(1000 + running.count)
+        running.insert(process)
+        return process
+    }
+
+    func isRunning(_ process: Int32) -> Bool { running.contains(process) }
+    func terminate(_ process: Int32) { actions.append("terminate"); running.remove(process) }
+    func ignoreInterrupts(_ ignore: Bool) { actions.append(ignore ? "ignore Ctrl+C" : "allow Ctrl+C") }
 
     // ── Serial ports ──
     /// What each opening of a port reads, in order: one list of chunks per

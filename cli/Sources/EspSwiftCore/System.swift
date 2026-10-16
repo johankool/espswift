@@ -56,6 +56,8 @@ public protocol System: Sendable {
     func contentsOfDirectory(_ path: String) -> [String]
     func readFile(_ path: String) -> String?
     func readData(_ path: String) -> Data?
+    /// The path with symbolic links resolved.
+    func resolvingSymlinks(_ path: String) -> String
 
     // ── Changing ──
     func createDirectory(_ path: String) throws
@@ -81,6 +83,17 @@ public protocol System: Sendable {
     /// if it couldn't start).
     func runStreaming(_ executable: String, _ arguments: [String], environment: [String: String],
                       onLine: (String) -> Void) -> Int32
+
+    // ── Background programs (OpenOCD, while debugging) ──
+    /// Starts a program in the background, with its output going to a
+    /// file; returns its process ID.
+    func startInBackground(_ executable: String, _ arguments: [String], environment: [String: String],
+                           output: String) throws -> Int32
+    func isRunning(_ process: Int32) -> Bool
+    func terminate(_ process: Int32)
+    /// Whether Ctrl+C stops espswift (and the programs it starts from then
+    /// on). Off while a debugger runs, which uses Ctrl+C to pause.
+    func ignoreInterrupts(_ ignore: Bool)
 
     // ── Serial ports ──
     /// Opens a serial port for reading at a baud rate; returns a handle.
@@ -169,6 +182,10 @@ public struct LiveSystem: System {
 
     public func readData(_ path: String) -> Data? {
         FileManager.default.contents(atPath: path)
+    }
+
+    public func resolvingSymlinks(_ path: String) -> String {
+        URL(fileURLWithPath: path).resolvingSymlinksInPath().path
     }
 
     public func createDirectory(_ path: String) throws {
@@ -271,6 +288,34 @@ public struct LiveSystem: System {
         }
         process.waitUntilExit()
         return process.terminationStatus
+    }
+
+    public func startInBackground(_ executable: String, _ arguments: [String], environment: [String: String],
+                                  output: String) throws -> Int32 {
+        FileManager.default.createFile(atPath: output, contents: nil)
+        guard let file = FileHandle(forWritingAtPath: output) else {
+            throw EspSwiftError("Can't write \(output).")
+        }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+        process.environment = environment
+        process.standardOutput = file
+        process.standardError = file
+        try process.run()
+        return process.processIdentifier
+    }
+
+    public func isRunning(_ process: Int32) -> Bool {
+        kill(process, 0) == 0
+    }
+
+    public func terminate(_ process: Int32) {
+        kill(process, SIGTERM)
+    }
+
+    public func ignoreInterrupts(_ ignore: Bool) {
+        signal(SIGINT, ignore ? SIG_IGN : SIG_DFL)
     }
 
     public func openSerialPort(_ path: String, baudRate: Int) throws -> Int32 {

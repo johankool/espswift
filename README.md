@@ -73,17 +73,17 @@ LED: Blue
 
 ## Adding Libraries
 
-To add an ESP-IDF component library, run this in Terminal from your project's source folder, the one containing `build.sh` and `main/`. In Xcode's Project navigator, Control-click that folder (it has your project's name) and choose **Open Terminal at Location** to get there:
+To add an ESP-IDF component library, run this in Terminal in your project's folder. In Xcode's Project navigator, Control-click a folder of the project and choose **Open Terminal at Location** to get there:
 
 ```bash
-~/.espswift/scripts/add_library.sh espressif/button iot_button.h
+~/.espswift/bin/espswift add espressif/button --header iot_button.h
 ```
 
 This automatically updates `main/idf_component.yml` and `Firmware/ESPIDF/include/ESPIDF.h`, the C header Swift code imports with `import ESPIDF`. Press `Cmd+B` to download and build the library.
 
 A project's Swift code is in Swift packages too: the firmware can use Swift packages that support Embedded Swift, such as [swift-mmio](https://github.com/apple/swift-mmio), and code that doesn't use ESP-IDF goes in a package of the project that Xcode tests on the Mac (`Cmd+U`). The project's README explains both.
 
-Every new project also includes a `README.md` that walks through this and other common tasks, such as changing ESP-IDF settings with `idf.py menuconfig`.
+Every new project also includes a `README.md` that walks through this and other common tasks, such as changing ESP-IDF settings with `espswift settings`.
 
 Available libraries: [ESP-IDF Component Registry](https://components.espressif.com)
 
@@ -116,7 +116,7 @@ This is expected. Xcode runs a macOS helper tool on your Mac, which builds and f
 
 ### Can I debug the firmware on the board?
 
-Yes, with LLDB in Terminal: `~/.espswift/scripts/debug.sh` connects to the chip's built-in USB-JTAG (through the board's native USB port) with OpenOCD, and gives you breakpoints in Swift, backtraces and variables. The README in each new project explains it. Xcode's own debugger can't be used: Xcode only debugs Mac programs and Apple devices.
+Yes, with LLDB in Terminal: `~/.espswift/bin/espswift debug` connects to the chip's built-in USB-JTAG (through the board's native USB port) with OpenOCD, and gives you breakpoints in Swift, backtraces and variables. The README in each new project explains it. Xcode's own debugger can't be used: Xcode only debugs Mac programs and Apple devices.
 
 ### Which chips are supported?
 
@@ -128,9 +128,9 @@ To switch an existing project to another chip, change `CONFIG_IDF_TARGET` in `sd
 
 ### Why is there an Indexing target?
 
-Xcode doesn't index the project's main target, because ESP-IDF builds it. The second target, **Indexing**, exists only so Xcode can offer code completion and jump to definition. Every build gives it ESP-IDF's current compiler settings (see `scripts/setup_indexing.sh`), so completion works after the first `Cmd+B`. You never need to build it.
+Xcode doesn't index the project's main target, because ESP-IDF builds it. The second target, **Indexing**, exists only so Xcode can offer code completion and jump to definition. Every build gives it ESP-IDF's current compiler settings (see `cli/Sources/EspSwiftCore/CodeCompletion.swift`), so completion works after the first `Cmd+B`. You never need to build it.
 
-Because Xcode's own toolchain can't compile Embedded Swift, the Indexing target uses the Swift toolchain `install.sh` installed, which `install.sh` writes into the template. Projects keep the toolchain they were created with; after `install.sh` installs a newer Swift version, the build warns about it, and `update_project.sh` (see [Updating ESPSwift](#updating-espswift)) points existing projects at the new toolchain.
+Because Xcode's own toolchain can't compile Embedded Swift, the Indexing target uses the Swift toolchain `install.sh` installed, which `install.sh` writes into the template. Projects keep the toolchain they were created with; after `install.sh` installs a newer Swift version, the build warns about it, and `espswift update` (see [Updating ESPSwift](#updating-espswift)) points existing projects at the new toolchain.
 
 ### Why does the first build take so long?
 
@@ -167,13 +167,6 @@ Embedded-Swift-Xcode-Template/
 ├── cli/                              # espswift, ESPSwift's command-line tool (see cli/README.md)
 ├── tests/
 │   └── test_template.sh             # Builds the template for every chip (also run in CI)
-├── scripts/
-│   ├── build_package.py             # Builds a project's Swift package with SwiftPM
-│   ├── debug.sh                     # Debugs the firmware on the board with LLDB
-│   ├── setup_indexing.sh            # Compiler settings for code completion
-│   ├── indexing_flags.py            # (with SwiftPM's flags for the package)
-│   ├── update_project.sh            # Updates projects created from an older template
-│   └── add_library.sh               # Adds ESP-IDF component libraries
 ├── installer/
 │   ├── build_pkg.sh                 # Builds .pkg installer
 │   └── ESPSwiftInstaller/           # SwiftUI installer app
@@ -187,7 +180,7 @@ Embedded-Swift-Xcode-Template/
 ├── gitignore                # Installed as .gitignore at the project root
 ├── scheme.xcscheme          # Run scheme (Cmd+R: flash and show serial output)
 ├── main/
-│   ├── CMakeLists.txt       # Builds the Swift package (build_package.py) and links it
+│   ├── CMakeLists.txt       # Builds the Swift package (espswift) and links it
 │   ├── idf_component.yml    # ESP-IDF dependencies
 │   └── swift_flags.c        # Empty; provides ESP-IDF's C flags to the Swift package build
 ├── Firmware/                # Next to the .xcodeproj in new projects
@@ -220,7 +213,6 @@ Running `install.sh` or `ESPSwiftInstaller.app` installs the following into your
 |------|----------|
 | `~/.espswift/bin/espswift` | `espswift`, which projects build with |
 | `~/.espswift/esp-idf/` | ESP-IDF 6.1 (~750 MB) |
-| `~/.espswift/scripts/` | Helper scripts (flash, monitor, code completion, etc.) |
 | `~/.espswift/python/` | Link to Python 3.14, the version ESP-IDF's Python environment was made for |
 | `~/.espressif/` | ESP-IDF's compilers, tools and Python environment (~3.5 GB, including ~1 GB of downloaded archives) |
 | `~/Library/Developer/Toolchains/` | Swift 6.4.0 release toolchain (~5 GB), installed with [swiftly](https://www.swift.org/install/macos/) if you have it, otherwise from swift.org's installer |
@@ -236,10 +228,10 @@ Run `install.sh` again from an up-to-date copy of this repository. Each project'
 When an update changes what projects need, the build shows a warning in Xcode's Issue navigator with the command that updates the project. You can also run it yourself, with the folder that contains the project's `.xcodeproj`:
 
 ```bash
-~/.espswift/scripts/update_project.sh ~/Developer/MyProject
+~/.espswift/bin/espswift update --project ~/Developer/MyProject
 ```
 
-It replaces the project's `build.sh` with the template's, points code completion at the Swift version `install.sh` installed, and adds the Run scheme if it's missing; it only changes what needs changing. Projects created before the build warned about this (with the whole build script in their own `build.sh`) need it once too.
+It replaces the project's `build.sh` with the template's and points code completion at the Swift version `install.sh` installed; it only changes what needs changing.
 
 ### Switching ESP-IDF versions
 

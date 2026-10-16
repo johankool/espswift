@@ -1,6 +1,5 @@
 /// Sets up everything ESPSwift needs: `espswift setup`. Running it again
-/// installs only what's missing, and updates the Xcode template and helper
-/// scripts.
+/// installs only what's missing, and updates the Xcode template.
 ///
 /// 1. Python, CMake, Ninja and Git (with Homebrew on macOS, if missing)
 /// 2. Python as ~/.espswift/python/bin/python3, for ESP-IDF (the pinned one
@@ -8,7 +7,7 @@
 /// 3. ESP-IDF (in ~/.espswift/esp-idf) and its tools for the RISC-V chips
 /// 4. The Swift toolchain, with swiftly, or on macOS swift.org's installer
 /// 5. The Xcode template (macOS, optional)
-/// 6. The helper scripts projects use, in ~/.espswift/scripts
+/// 6. espswift as ~/.espswift/bin/espswift, which projects run
 public struct Setup: Sendable {
     public var system: System
     public var locations: Locations
@@ -81,7 +80,7 @@ public struct Setup: Sendable {
         if installXcodeTemplate {
             try XcodeTemplate(system: system).install(from: resources, swiftToolchain: swiftToolchain)
         }
-        try installScripts()
+        try removeOldScripts()
         try linkCommand()
         system.report("")
         system.report("ESPSwift is set up. Check it with: espswift doctor")
@@ -269,17 +268,14 @@ public struct Setup: Sendable {
         try system.createSymbolicLink(at: commandLink, to: destination)
     }
 
-    // ── 6. Helper scripts ────────────────────────────────────────────
+    // ── 6. Earlier versions' helper scripts ──────────────────────────
 
-    /// The scripts projects use (build.sh calls ~/.espswift/scripts/build.sh),
-    /// until espswift's commands replace them.
-    func installScripts() throws {
-        let destination = "\(locations.espswiftHome)/scripts"
-        try system.createDirectory(destination)
-        for file in system.contentsOfDirectory(resources.scripts) where file.hasSuffix(".sh") || file.hasSuffix(".py") {
-            try system.copyContents(of: "\(resources.scripts)/\(file)", to: "\(destination)/\(file)")
-            try system.makeExecutable("\(destination)/\(file)")
+    /// espswift does what the helper scripts did; remove them.
+    func removeOldScripts() throws {
+        let scripts = "\(locations.espswiftHome)/scripts"
+        if system.isDirectory(scripts) {
+            try system.removeItem(scripts)
+            system.report("Removed the helper scripts of earlier versions (espswift does what they did).")
         }
-        system.report("Installed the helper scripts in \(destination).")
     }
 }

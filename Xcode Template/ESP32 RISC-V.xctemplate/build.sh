@@ -10,7 +10,7 @@
 
 # The version of the ESPSwift template this project's files match. When
 # ESPSwift needs projects to change, the build warns about older projects;
-# ~/.espswift/scripts/update_project.sh updates them.
+# `espswift update` updates them.
 export ESPSWIFT_PROJECT_VERSION=1
 
 ESPSWIFT_BIN="${ESPSWIFT_BIN:-$HOME/.espswift/bin/espswift}"

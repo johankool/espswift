@@ -13,24 +13,28 @@ endif()
 # swift_flags.c is empty. Its compile command provides the C flags (ESP-IDF's
 # include paths and definitions) with which Swift imports ESP-IDF's headers.
 # Without REQUIRES, the main component uses every component in the build,
-# including libraries added with add_library.sh.
+# including libraries added with espswift add.
 idf_component_register(SRCS swift_flags.c)
 
 idf_build_get_property(BUILD_DIR BUILD_DIR)
-idf_build_get_property(PYTHON PYTHON)
-if(DEFINED ENV{ESPSWIFT_SCRIPTS})
-    set(ESPSWIFT_SCRIPTS "$ENV{ESPSWIFT_SCRIPTS}")
+# espswift: the one that runs the build (espswift build sets ESPSWIFT_BIN),
+# else the installed one.
+if(DEFINED ENV{ESPSWIFT_BIN})
+    set(ESPSWIFT_BIN "$ENV{ESPSWIFT_BIN}")
 else()
-    set(ESPSWIFT_SCRIPTS "$ENV{HOME}/.espswift/scripts")
+    set(ESPSWIFT_BIN "$ENV{HOME}/.espswift/bin/espswift")
 endif()
 set(SWIFT_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/libFirmware.a")
 
 # Builds the Swift package on every build; SwiftPM decides what to rebuild.
 add_custom_target(swift_package
-    COMMAND "${PYTHON}" "${ESPSWIFT_SCRIPTS}/build_package.py"
-        "${BUILD_DIR}" "${CMAKE_CURRENT_LIST_DIR}/swift_flags.c"
-        "${CMAKE_CURRENT_LIST_DIR}/../.." "${CMAKE_CURRENT_LIST_DIR}/../../Firmware"
-        "${ESPSWIFT_SWIFT_BIN_DIR}" "${SWIFT_LIBRARY}"
+    COMMAND "${ESPSWIFT_BIN}" internal build-package
+        --build-folder "${BUILD_DIR}"
+        --flags-source "${CMAKE_CURRENT_LIST_DIR}/swift_flags.c"
+        --project "${CMAKE_CURRENT_LIST_DIR}/../.."
+        --package "${CMAKE_CURRENT_LIST_DIR}/../../Firmware"
+        --swift-bin "${ESPSWIFT_SWIFT_BIN_DIR}"
+        --output "${SWIFT_LIBRARY}"
         ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}
     # Swift's module hash section isn't needed in the firmware.
     COMMAND "${CMAKE_OBJCOPY}" --remove-section .swift_modhash "${SWIFT_LIBRARY}"

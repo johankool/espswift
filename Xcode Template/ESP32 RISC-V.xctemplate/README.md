@@ -83,7 +83,7 @@ You can stop the firmware at breakpoints in your Swift code and look at the back
 3. In Terminal, run:
 
    ```bash
-   ~/.espswift/scripts/debug.sh
+   ~/.espswift/bin/espswift debug
    ```
 
    It connects to the board, lets the firmware start, and pauses it at the `(lldb)` prompt. For example:
@@ -101,7 +101,7 @@ Up to 4 breakpoints can be set at once (they're hardware breakpoints, as the cod
 
 ## Opening Terminal in the source folder
 
-Some tasks below need Terminal. The commands must run in the source folder, the one that contains `build.sh` and `main/`.
+Some tasks below need Terminal. `espswift` finds the project from any of its folders, such as the one with the `.xcodeproj`.
 
 In Xcode's Project navigator, Control-click the `___PROJECTNAME___` folder and choose **Open Terminal at Location**.
 
@@ -109,25 +109,24 @@ In Xcode's Project navigator, Control-click the `___PROJECTNAME___` folder and c
 
 ESP-IDF libraries (components, written in C) come from the [ESP-IDF Component Registry](https://components.espressif.com). Each library page shows its name, such as `espressif/button`.
 
-In Terminal, in the source folder, run:
+In Terminal, in the project's folder, run:
 
 ```bash
-~/.espswift/scripts/add_library.sh espressif/button iot_button.h
+~/.espswift/bin/espswift add espressif/button --header iot_button.h
 ```
 
-The first argument is the library's name. The second is the C header to include; check the library's documentation for it. If you leave it out, the script guesses it from the name (`button.h` here).
+The first argument is the library's name. `--header` is the C header to include; check the library's documentation for it. If you leave it out, espswift guesses it from the name (`button.h` here).
 
-The script adds the library to `main/idf_component.yml` and the header to `Firmware/ESPIDF/include/ESPIDF.h`. Press `Cmd+B` to download and build it, and then use its functions from Swift.
+It adds the library to `main/idf_component.yml` and the header to `Firmware/ESPIDF/include/ESPIDF.h`. Press `Cmd+B` to download and build it, and then use its functions from Swift.
 
 To remove a library, delete its line from `main/idf_component.yml` and its `#include` from `ESPIDF.h`.
 
 ## Changing ESP-IDF settings
 
-ESP-IDF settings, such as the CPU frequency, logging level or Wi-Fi options, live in `sdkconfig`. To change them with ESP-IDF's settings menu, run in Terminal, in the source folder:
+ESP-IDF settings, such as the CPU frequency, logging level or Wi-Fi options, live in `sdkconfig`. To change them with ESP-IDF's settings menu, run in Terminal, in the project's folder:
 
 ```bash
-source ~/.espswift/esp-idf/export.sh
-idf.py menuconfig
+~/.espswift/bin/espswift settings
 ```
 
 Use the arrow keys and Return to navigate, and press `S` to save and `Q` to quit. Then press `Cmd+B` in Xcode.

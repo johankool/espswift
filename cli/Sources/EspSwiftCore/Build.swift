@@ -42,12 +42,6 @@ public struct Build: Sendable {
         return "\(project.sourceFolder)/build"
     }
 
-    /// The helper scripts (code completion; the Swift package build, which
-    /// main/CMakeLists.txt runs): ESPSWIFT_SCRIPTS, or the installed ones.
-    var scripts: String {
-        system.environment["ESPSWIFT_SCRIPTS"] ?? "\(locations.espswiftHome)/scripts"
-    }
-
     public func run(_ action: Action) throws {
         system.report("=================================================")
         system.report(" ESP32 Embedded Swift Build")
@@ -105,8 +99,8 @@ public struct Build: Sendable {
            let identifier = XcodeTemplate.bundleIdentifier(ofToolchain: toolchain, system: system) {
             environment["TOOLCHAINS"] = identifier
         }
-        // main/CMakeLists.txt runs the Swift package build from here.
-        environment["ESPSWIFT_SCRIPTS"] = scripts
+        // main/CMakeLists.txt runs the Swift package build with espswift.
+        environment["ESPSWIFT_BIN"] = system.executablePath ?? locations.command
         return environment
     }
 
@@ -117,7 +111,7 @@ public struct Build: Sendable {
     /// by the project's build.sh), or code completion uses another Swift
     /// toolchain than the build, e.g. after a Swift upgrade.
     func checkProject(environment: [String: String]) {
-        let update = "~/.espswift/scripts/update_project.sh \"\(project.folder)\""
+        let update = "~/.espswift/bin/espswift update --project \"\(project.folder)\""
         let version = Int(system.environment["ESPSWIFT_PROJECT_VERSION"] ?? "") ?? 0
         if version < Self.currentProjectVersion {
             system.report("warning: This project was created with an older version of the ESPSwift template. To update it, run in Terminal: \(update)")
@@ -211,14 +205,13 @@ public struct Build: Sendable {
     // ── Code completion ──────────────────────────────────────────────
 
     /// Gives the project's Indexing target, which Xcode uses for code
-    /// completion, the compiler settings of this build (setup_indexing.sh).
-    /// A failure here doesn't fail the build.
+    /// completion, the compiler settings of this build (CodeCompletion). A
+    /// failure here doesn't fail the build.
     func setUpCodeCompletion() {
-        let script = "\(scripts)/setup_indexing.sh"
-        guard system.fileExists(script) else { return }
-        let result = system.run("/bin/bash", [script, project.sourceFolder, buildFolder])
-        if result?.status != 0 {
-            system.report("warning: Could not set up code completion. \(result?.output ?? "")")
+        do {
+            try CodeCompletion(system: system, project: project, buildFolder: buildFolder).update()
+        } catch {
+            system.report("warning: Could not set up code completion. \(error)")
         }
     }
 }

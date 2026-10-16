@@ -25,8 +25,15 @@ import Testing
         #expect(system.readFile("\(FakeSystem.template)/scheme.xcscheme") == "FilePath = \"/Users/test/.espswift/bin/espswift\"")
         #expect(system.actions.contains("chmod \(FakeSystem.template)/build.sh"))
 
-        #expect(system.fileExists("/Users/test/.espswift/scripts/build.sh"))
-        #expect(system.fileExists("/Users/test/.espswift/scripts/indexing_flags.py"))
+        #expect(!system.isDirectory("/Users/test/.espswift/scripts"))
+    }
+
+    @Test func removesEarlierVersionsScripts() throws {
+        let system = FakeSystem.workingMac
+        system.file("/Users/test/.espswift/scripts/build.sh", "")
+        system.directories.insert("/Users/test/.espswift/scripts")
+        try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        #expect(system.actions.contains("rm /Users/test/.espswift/scripts"))
     }
 
     @Test func leavesOutTheTemplateWhenAsked() throws {

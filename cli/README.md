@@ -1,6 +1,6 @@
 # espswift
 
-The command-line tool for Embedded Swift on RISC-V based ESP32 chips, written in Swift. It's meant to replace `install.sh` and the scripts in `scripts/`, to be installed with Homebrew, and to run on macOS and Linux; the Xcode template becomes an optional part of it.
+The command-line tool for Embedded Swift on RISC-V based ESP32 chips, written in Swift. It replaces the scripts ESPSwift had (and, later, `install.sh`), is to be installed with Homebrew, and runs on macOS and Linux; the Xcode template becomes an optional part of it.
 
 It's being built in phases (see below). So far it has:
 
@@ -10,6 +10,10 @@ espswift build [clean] [--verbose]         # builds the project, showing errors 
 espswift flash [--port] [--last-build]     # flashes the project's latest build
 espswift monitor [--port] [--idf]          # shows the board's serial output (--idf: ESP-IDF's monitor)
 espswift run [--port] [--last-build]       # builds, flashes and monitors (Cmd+R runs it with --last-build)
+espswift debug                             # debugs the firmware on the board with LLDB (OpenOCD, built-in USB-JTAG)
+espswift add <component> [--header]        # adds an ESP-IDF library (main/idf_component.yml and ESPIDF.h)
+espswift settings                          # ESP-IDF's settings menu (menuconfig)
+espswift update                            # updates a project created from an older template
 espswift doctor                            # checks ESP-IDF, Swift, Python, CMake, Ninja, the Xcode template and boards
 espswift ports [--first]                   # lists the serial ports of connected boards
 espswift xcode install-template            # installs or updates the Xcode template (macOS)
@@ -18,9 +22,9 @@ espswift uninstall [--yes] [--all]         # removes what setup installed (repla
 espswift --version
 ```
 
-`espswift setup` does what `install.sh` used to do (`install.sh` now builds espswift and runs it), and can run again to install what's missing and update the template and scripts. On macOS it asks whether to install the Xcode template (without a terminal, it does). It installs missing prerequisites with Homebrew on macOS; on Linux it says which to install, and installs Swift with [swiftly](https://www.swift.org/install/linux/).
+`espswift setup` does what `install.sh` used to do (`install.sh` now builds espswift and runs it), and can run again to install what's missing and update the template. On macOS it asks whether to install the Xcode template (without a terminal, it does). It installs missing prerequisites with Homebrew on macOS; on Linux it says which to install, and installs Swift with [swiftly](https://www.swift.org/install/linux/).
 
-The template and the helper scripts it installs come from, in order: the folder in `ESPSWIFT_RESOURCES`; `share/espswift` next to the `bin` folder espswift is in (where a Homebrew formula puts them); or, when run from this repository, the repository itself.
+The Xcode template it installs comes from, in order: the folder in `ESPSWIFT_RESOURCES`; `share/espswift` next to the `bin` folder espswift is in (where a Homebrew formula puts them); or, when run from this repository, the repository itself.
 
 ## Building
 
@@ -45,9 +49,9 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 1. `setup` and `uninstall`, replacing `install.sh` and `uninstall.sh`, with a prompt for the Xcode template *(done)*; a Homebrew tap and a release workflow *(when it's published)*.
 2. `build`, replacing `scripts/build.sh` and the build output filter; projects' `build.sh` calls `espswift build`. *(done)*
 3. `flash`, `monitor` and `run`; the Run scheme starts `espswift run` directly, without the monitor wrapper. *(done)*
-4. The Python helpers in Swift (the Swift package build, code completion flags), and `add`, `settings` (menuconfig), `update` and `debug`.
+4. The Python helpers in Swift (the Swift package build, code completion flags), and `add`, `settings` (menuconfig), `update` and `debug`; `scripts/` is gone. *(done)*
 5. `new`: creating projects without Xcode, for Linux and other editors.
-6. Removing `install.sh`, `scripts/` and the SwiftUI installer, and updating the documentation; the template test runs through `espswift`, also on Linux.
+6. Removing `install.sh` (once Homebrew installs espswift) and the SwiftUI installer, and updating the documentation; the template test runs on Linux too.
 
 ## How projects use it
 
@@ -56,3 +60,5 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 `espswift build` finds the project from Xcode's settings or the current folder, sets up ESP-IDF's environment (its `export.sh`), sets the chip when `sdkconfig.defaults` names a new one, runs `idf.py` with its output filtered for Xcode (`BuildOutputFilter`), keeps the full output in the build folder (`log/build-output.log`), sets up code completion and records the build for Cmd+R. `--verbose`, or `ESPSWIFT_VERBOSE=1`, shows all of ESP-IDF's output.
 
 Cmd+R (the template's Run scheme) starts `~/.espswift/bin/espswift run --last-build`: Xcode has just built the project, and doesn't tell the program it starts which project that was, so it flashes the build `espswift build` recorded last (`~/.espswift/last-build`). The monitor reads the serial port in Swift (`Monitor`, with a small C target, `CSerialPort`, for the port settings) and waits for the board when it resets or is unplugged.
+
+The Swift package is built by `espswift internal build-package`, which the project's `main/CMakeLists.txt` runs during ESP-IDF's build (finding espswift through `ESPSWIFT_BIN`, which `espswift build` sets, or `~/.espswift/bin/espswift`). After a build, `espswift build` writes the code completion settings for the Indexing target (`CodeCompletion`).

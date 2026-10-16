@@ -48,6 +48,7 @@ final class SleepCountingSystem: System, @unchecked Sendable {
     func contentsOfDirectory(_ path: String) -> [String] { base.contentsOfDirectory(path) }
     func readFile(_ path: String) -> String? { base.readFile(path) }
     func readData(_ path: String) -> Data? { base.readData(path) }
+    func resolvingSymlinks(_ path: String) -> String { base.resolvingSymlinks(path) }
     func createDirectory(_ path: String) throws { try base.createDirectory(path) }
     func removeItem(_ path: String) throws { try base.removeItem(path) }
     func copyContents(of source: String, to destination: String) throws { try base.copyContents(of: source, to: destination) }
@@ -62,6 +63,13 @@ final class SleepCountingSystem: System, @unchecked Sendable {
                       onLine: (String) -> Void) -> Int32 {
         base.runStreaming(executable, arguments, environment: environment, onLine: onLine)
     }
+    func startInBackground(_ executable: String, _ arguments: [String], environment: [String: String],
+                           output: String) throws -> Int32 {
+        try base.startInBackground(executable, arguments, environment: environment, output: output)
+    }
+    func isRunning(_ process: Int32) -> Bool { base.isRunning(process) }
+    func terminate(_ process: Int32) { base.terminate(process) }
+    func ignoreInterrupts(_ ignore: Bool) { base.ignoreInterrupts(ignore) }
     func openSerialPort(_ path: String, baudRate: Int) throws -> Int32 { try base.openSerialPort(path, baudRate: baudRate) }
     func readSerialPort(_ handle: Int32) -> Data? { base.readSerialPort(handle) }
     func closeSerialPort(_ handle: Int32) { base.closeSerialPort(handle) }

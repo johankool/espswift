@@ -179,7 +179,7 @@ for node, definition in plist["Definitions"].items():
 source_dir = os.path.join(project_dir, name)
 for generated in (".espswift/include-paths.rsp",):
     if not os.path.exists(os.path.join(source_dir, generated)):
-        sys.exit(f"Missing {generated}: setup_indexing.sh didn't run.")
+        sys.exit(f"Missing {generated}: espswift build didn't set up code completion.")
 
 # install.sh replaces the toolchain placeholder with the identifier of the
 # Swift toolchain it installed; do the same with the toolchain the build used.
@@ -262,19 +262,19 @@ check_scheme() {
         || { echo "The template's Run scheme doesn't resolve to the $PROJECT_NAME target."; return 1; }
 }
 
-# Checks scripts/update_project.sh on the project: the test project's
+# Checks `espswift update` on the project: the test project's
 # Indexing target names a placeholder toolchain, so the first run must point
 # it at the installed one, and a second run must find nothing to update.
 check_update() {
-    local update=(env ESPSWIFT_TEMPLATE="$TEMPLATE" bash "$REPO_ROOT/scripts/update_project.sh" "$WORK_DIR/$1")
+    local update=(env ESPSWIFT_TEMPLATE="$TEMPLATE" "$ESPSWIFT_BIN" update --project "$WORK_DIR/$1")
     "${update[@]}" | grep -q "Pointed the Indexing target" \
-        || { echo "update_project.sh didn't update the Indexing target's toolchain."; return 1; }
+        || { echo "espswift update didn't update the Indexing target's toolchain."; return 1; }
     "${update[@]}" | grep -q "Already up to date" \
-        || { echo "update_project.sh changed the project again on a second run."; return 1; }
+        || { echo "espswift update changed the project again on a second run."; return 1; }
 }
 
 # Checks that build errors reach Xcode as issues that jump to their line
-# (see scripts/filter_build_output.sh): breaks the Swift code, then the main
+# (see cli/Sources/EspSwiftCore/BuildOutputFilter.swift): breaks the Swift code, then the main
 # component's CMakeLists.txt, and looks for each error as a "file:line:
 # error:" line in the build output. Each file is restored afterwards.
 check_diagnostics() {
@@ -289,7 +289,7 @@ check_diagnostics() {
             *) echo 'no_such_cmake_command()' >> "$file" ;;
         esac
         line=$(wc -l < "$file" | tr -d ' ')
-        output=$(cd "$source_dir" && ESPSWIFT_BUILD_ONLY=1 ESPSWIFT_SCRIPTS="$REPO_ROOT/scripts" \
+        output=$(cd "$source_dir" && ESPSWIFT_BUILD_ONLY=1 \
             PROJECT_DIR="$project_dir" PROJECT_NAME="$PROJECT_NAME" ./build.sh 2>&1)
         mv "$file.orig" "$file"
 
@@ -337,7 +337,7 @@ for CHIP in "${CHIPS[@]}"; do
     # but without flashing. TARGET_TEMP_DIR is left unset, so the build
     # output goes to the project's build/ folder.
     START=$(date +%s)
-    if (cd "$SOURCE_DIR" && ESPSWIFT_BUILD_ONLY=1 ESPSWIFT_SCRIPTS="$REPO_ROOT/scripts" \
+    if (cd "$SOURCE_DIR" && ESPSWIFT_BUILD_ONLY=1 \
             PROJECT_DIR="$WORK_DIR/$CHIP" PROJECT_NAME="$PROJECT_NAME" ./build.sh) > "$LOG" 2>&1 \
         && [ -f "$SOURCE_DIR/build/$PROJECT_NAME.bin" ]; then
         # The error check builds twice more, and the package's tests don't

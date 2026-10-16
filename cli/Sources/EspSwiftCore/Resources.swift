@@ -1,11 +1,9 @@
-/// The files espswift installs: the Xcode template and the helper scripts
-/// that projects use (until espswift's own commands replace them).
+/// The files espswift installs: the Xcode template.
 public struct Resources: Sendable {
-    /// The folder with "Xcode Template" and "scripts".
+    /// The folder with "Xcode Template".
     public var root: String
 
     public var xcodeTemplate: String { "\(root)/Xcode Template/ESP32 RISC-V.xctemplate" }
-    public var scripts: String { "\(root)/scripts" }
 
     public init(root: String) {
         self.root = root
@@ -32,12 +30,12 @@ public struct Resources: Sendable {
         }
         for candidate in candidates {
             let resources = Resources(root: candidate)
-            if system.isDirectory(resources.xcodeTemplate) && system.isDirectory(resources.scripts) {
+            if system.isDirectory(resources.xcodeTemplate) {
                 return resources
             }
         }
         throw EspSwiftError("""
-            espswift's files (the Xcode template and scripts) weren't found. \
+            espswift's files (the Xcode template) weren't found. \
             Set ESPSWIFT_RESOURCES to the folder that has them.
             """)
     }

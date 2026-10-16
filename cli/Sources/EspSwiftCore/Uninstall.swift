@@ -1,7 +1,7 @@
 /// Removes what `espswift setup` installed: `espswift uninstall`.
 ///
-/// Always removed (used only by ESPSwift): ~/.espswift (ESP-IDF, the helper
-/// scripts, the toolchain record) and the Xcode template.
+/// Always removed (used only by ESPSwift): ~/.espswift (ESP-IDF, espswift's
+/// link, the toolchain record) and the Xcode template.
 ///
 /// Removed only when confirmed, or with --all, because other projects may
 /// use them too: the Swift toolchain, ESP-IDF's tools (~/.espressif) and

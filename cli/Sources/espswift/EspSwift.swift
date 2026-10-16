@@ -9,8 +9,8 @@ struct EspSwift: ParsableCommand {
         abstract: "Embedded Swift for RISC-V based ESP32 chips.",
         version: espswiftVersion,
         subcommands: [
-            Setup.self, Build.self, Flash.self, Monitor.self, Run.self, Doctor.self, Ports.self,
-            Xcode.self, Uninstall.self, Internal.self,
+            Setup.self, Build.self, Flash.self, Monitor.self, Run.self, Debug.self, Add.self, Settings.self, Update.self,
+            Doctor.self, Ports.self, Xcode.self, Uninstall.self, Internal.self,
         ]
     )
 }
@@ -32,7 +32,7 @@ extension EspSwift {
             abstract: "Installs ESP-IDF, the Swift toolchain and the tools they need.",
             discussion: """
                 Running it again installs only what's missing, and updates the Xcode \
-                template and the helper scripts.
+                template.
                 """
         )
 
@@ -191,6 +191,87 @@ extension EspSwift {
         }
     }
 
+    struct Debug: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Debugs the firmware on the board with LLDB.",
+            discussion: """
+                Debugs the build flashed last (Cmd+R, or espswift run), through the chip's \
+                built-in USB-JTAG: connect the board through its native USB port. Up to 4 \
+                breakpoints at once (hardware breakpoints, as the code runs from flash).
+                """
+        )
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                guard let build = LastBuild.read(system: system) else {
+                    throw EspSwiftError("Nothing to debug yet. Build and run the project first (Cmd+R in Xcode, or espswift run).")
+                }
+                try EspSwiftCore.Debug(system: system).run(build: build)
+            }
+        }
+    }
+
+    struct Add: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Adds an ESP-IDF library to the project.",
+            discussion: """
+                Libraries come from the ESP-IDF Component Registry \
+                (https://components.espressif.com). Example: espswift add espressif/button --header iot_button.h
+                """
+        )
+
+        @Argument(help: "The library's name in the registry, e.g. espressif/led_strip.")
+        var component: String
+
+        @Option(help: "The C header to include; by default, the name's last part (led_strip.h).")
+        var header: String?
+
+        @Option(help: "The project's folder; by default, the one espswift runs in.")
+        var project: String?
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                try AddLibrary(system: system, project: try Project.find(system: system, start: project))
+                    .run(component: component, header: header)
+            }
+        }
+    }
+
+    struct Settings: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Opens ESP-IDF's settings menu (menuconfig) for the project."
+        )
+
+        @Option(help: "The project's folder; by default, the one espswift runs in.")
+        var project: String?
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                try EspSwiftCore.Settings(system: system, project: try Project.find(system: system, start: project)).run()
+            }
+        }
+    }
+
+    struct Update: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Updates a project created from an older template.",
+            discussion: "The build warns when a project needs this. Running it again changes nothing."
+        )
+
+        @Option(help: "The project's folder; by default, the one espswift runs in.")
+        var project: String?
+
+        func run() throws {
+            let system = LiveSystem()
+            try reportingErrors {
+                try UpdateProject(system: system, project: try Project.find(system: system, start: project)).run()
+            }
+        }
+    }
+
     struct Uninstall: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Removes what espswift setup installed.",
@@ -309,8 +390,30 @@ extension EspSwift {
         static let configuration = CommandConfiguration(
             abstract: "Commands espswift uses itself.",
             shouldDisplay: false,
-            subcommands: [FilterBuildOutput.self]
+            subcommands: [FilterBuildOutput.self, BuildPackage.self]
         )
+
+        struct BuildPackage: ParsableCommand {
+            static let configuration = CommandConfiguration(
+                abstract: "Builds the firmware package with SwiftPM (run by the project's main/CMakeLists.txt)."
+            )
+
+            @Option(help: "ESP-IDF's build folder.") var buildFolder: String
+            @Option(help: "The C file whose compile command provides ESP-IDF's flags.") var flagsSource: String
+            @Option(help: "The project folder.") var project: String
+            @Option(help: "The folder with the firmware's Package.swift.") var package: String
+            @Option(help: "The Swift toolchain's usr/bin folder.") var swiftBin: String
+            @Option(help: "Where to put libFirmware.a.") var output: String
+            @Argument(help: "The C compiler's own include folders.") var implicitIncludes: [String] = []
+
+            func run() throws {
+                try reportingErrors {
+                    try PackageBuild(system: LiveSystem(), buildFolder: buildFolder, flagsSource: flagsSource,
+                                     projectFolder: project, packageFolder: package, swiftBin: swiftBin,
+                                     output: output, implicitIncludes: implicitIncludes).run()
+                }
+            }
+        }
 
         struct FilterBuildOutput: ParsableCommand {
             static let configuration = CommandConfiguration(
