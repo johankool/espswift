@@ -5,18 +5,15 @@ This project is being developed as part of the [Swift Mentorship Program](https:
 ## Near-term
 
 - [ ] **Code completion with Xcode 26.** Projects build without errors in Xcode 26.6, but code completion and jump to definition don't work there; they're verified with Xcode 27 only, and so is CI. A starting point: compare the compiler arguments the editor gets (`xcodebuild -target Indexing -showBuildSettingsForIndex -json`) in Xcode 26.6 and 27. Testing it in CI would also need a test fixture (`tests/fixtures/project.pbxproj`) created by Xcode 26.
-- [ ] **Build the Swift package with SwiftPM's default build system.** The firmware build uses `swift build --build-system native` (see `cli/Sources/EspSwiftCore/PackageBuild.swift`e.py`): Swift Build, SwiftPM's default since Swift 6.4, links C targets with Apple's linker, which can't link code for the ESP32. SwiftPM warns that the native build system is deprecated and will be removed, so this needs a fix in Swift Build, or a way around it, before then. Worth reporting to the SwiftPM project.
+- [ ] **Build the Swift package with SwiftPM's default build system.** The firmware build uses `swift build --build-system native` (see `cli/Sources/EspSwiftCore/PackageBuild.swift`): Swift Build, SwiftPM's default since Swift 6.4, links C targets with Apple's linker, which can't link code for the ESP32. SwiftPM warns that the native build system is deprecated and will be removed, so this needs a fix in Swift Build, or a way around it, before then. Worth reporting to the SwiftPM project.
 - [ ] **Test the other chips on hardware.** Only the ESP32-C6 has run on a board. The ESP32-C2, C3, C5, C61, H2 and P4 are tested by building only, including the per-chip LED pins and the LED over SPI on the C2 and C61.
 - [ ] **Cache downloads in CI.** Every CI run downloads and installs ESP-IDF, its tools and Swift (about 5 of its 11 minutes). Caching them between runs would make CI faster.
-- [ ] Signed and notarized installer
+- [ ] **Homebrew tap and releases.** A tap (`brew install <tap>/espswift`) whose formula installs prebuilt espswift binaries for macOS and Linux (from a release workflow) with the template in `share/espswift`, and depends on CMake, Ninja, Python and swiftly; the formula's caveats say to run `espswift setup`. Then `install.sh`, which builds espswift from the repository, can go.
 - [ ] GPIO and I2C sensor examples
-- [ ] Installer progress bar improvements ([#4](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template/issues/4))
 
 ## Longer-term
 
 - [ ] `espswift-idf` Swift Package: idiomatic Swift wrappers for ESP-IDF APIs (GPIO, LED, timers, ...), so projects don't call C functions such as `led_strip_new_rmt_device` directly
-- [ ] `espswift` CLI, written in Swift and installed with Homebrew, replacing `install.sh` and the scripts, on macOS and Linux. In progress: see [cli/README.md](cli/README.md) for the plan; it replaces all of `scripts/`, Cmd+B and Cmd+R run it, and `espswift new` creates projects without Xcode (on macOS and Linux). Left: removing the SwiftUI installer, and a Homebrew tap.
-- [ ] Homebrew tap
 - [ ] ESP32-S3 support (needs Xtensa support in Swift)
 
 ## Ideas
@@ -44,7 +41,7 @@ Not planned yet; worth considering.
 - [ ] **Example projects:** Wi-Fi with an HTTP request, BLE, an I2C sensor, deep sleep; each a small project in an `Examples/` folder that CI builds as well.
 
 **Quality and reach**
-- [ ] **More checks in CI:** ShellCheck for the scripts, `uninstall.sh`, and `install.sh`'s swiftly route (CI only uses swift.org's installer).
+- [ ] **More checks in CI:** ShellCheck for `install.sh`, the template's `build.sh` and the test; `espswift setup`'s swiftly route (CI uses swift.org's installer on macOS and Swift's Docker image on Linux); and `espswift uninstall`.
 - [ ] **A VS Code and Cursor guide:** code completion there would need SourceKit-LSP pointed at the firmware build of the Swift package, and the CodeLLDB extension could debug with the same setup as `debug.sh`; also a step toward Linux support.
 - [ ] **A documentation site:** a DocC tutorial ("your first firmware") built around the template.
 
@@ -60,3 +57,5 @@ Not planned yet; worth considering.
 - [x] Projects carry a template version; the build warns when a project is out of date (older template, or code completion on an older Swift), and `espswift update` updates it
 - [x] Build errors and warnings (Swift, C, CMake, `sdkconfig.defaults`) in Xcode's Issue navigator, linked to their line; the build log leaves out ESP-IDF's other output
 - [x] The Swift code is in Swift packages: the firmware can use Embedded-compatible Swift packages (such as `swift-mmio`), and code that doesn't use ESP-IDF is in a package of the project that Xcode tests on the Mac (`Cmd+U`)
+- [x] `espswift`, ESPSwift's command-line tool, in Swift: `setup`, `new`, `build`, `run`, `flash`, `monitor`, `debug`, `add`, `settings`, `update`, `doctor` and `uninstall`, on macOS and Linux; it replaces the shell and Python scripts and the SwiftUI installer (see [cli/README.md](cli/README.md))
+- [x] Linux: espswift sets up, creates, builds and tests projects on Linux; the template test runs there too (a CI job)

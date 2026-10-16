@@ -1,12 +1,13 @@
-# Installs ESPSwift with install.sh and builds a project from the Xcode
-# template for every chip the template offers, using tests/test_template.sh.
+# Sets up ESPSwift and builds a project from the template for every chip the
+# template offers, using tests/test_template.sh, on macOS and on Linux.
 #
-# This checks install.sh (on a runner without swiftly, so it installs Swift
-# from swift.org's .pkg) and that the template builds for each chip. It does
-# not check Xcode itself or flashing.
+# macOS: install.sh (on a runner without swiftly, so it installs Swift from
+# swift.org's .pkg), and the Xcode project's checks (code completion, the Run
+# scheme, Cmd+U). Linux: espswift setup in Swift's Docker image (whose Swift
+# it uses), with ESP-IDF's packages. Neither checks Xcode itself or flashing.
 #
-# Everything runs in one job, so ESP-IDF and Swift are downloaded and
-# installed once; the test then builds the chips one after another.
+# Each job downloads and installs ESP-IDF and Swift once; the test then
+# builds the chips one after another.
 
 name: Build template
 
@@ -37,7 +38,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build template
+    name: Build template (macOS)
     # Xcode 27: the template's Indexing target (code completion) is only
     # verified with it. The default macOS runner has Xcode 26.
     runs-on: xcode-27
@@ -57,5 +58,37 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: build-logs
+          path: ${{ runner.temp }}/template-test/*.log
+          if-no-files-found: ignore
+
+  linux:
+    name: Build template (Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.4-noble
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      # The packages ESP-IDF's tools need (ESP-IDF's Linux setup guide).
+      - name: Install ESP-IDF's prerequisites
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y git wget flex bison gperf python3 python3-pip \
+            python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+
+      - name: Set up ESPSwift
+        run: |
+          swift build --package-path cli
+          cli/.build/debug/espswift setup
+          cli/.build/debug/espswift doctor
+
+      - name: Build the template for every chip
+        run: bash tests/test_template.sh --work-dir "$RUNNER_TEMP/template-test"
+
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-logs-linux
           path: ${{ runner.temp }}/template-test/*.log
           if-no-files-found: ignore

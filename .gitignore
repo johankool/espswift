@@ -1,9 +1,6 @@
 # macOS
 .DS_Store
 
-# ESPSwift installer artifacts
-*.pkg
-
 # ESP-IDF build artifacts
 build/
 
@@ -11,17 +8,6 @@ build/
 *.xcuserstate
 xcuserdata/
 DerivedData/
-
-# Installer build artifacts
-installer/build/
-installer/*.pkg
-
-# Xcode (installer app)
-installer/ESPSwiftInstaller/build/
-installer/ESPSwiftInstaller/**/xcuserdata/
-installer/ESPSwiftInstaller/**/*.xcuserstate
-installer/ESPSwiftInstaller/.DS_Store
-installer/*.dmg
 
 # espswift (cli/) build output
 .build/

@@ -19,6 +19,9 @@
 # Builds use the ESP-IDF and Swift toolchain that install.sh installed, so
 # run install.sh first. Each chip is a full ESP-IDF build of a few minutes.
 #
+# Without Xcode (on Linux), only the builds, their error reporting and the
+# Kit package's tests are checked.
+#
 # Not covered: Xcode itself (how it shows the template, fills in the
 # placeholders and indexes), flashing, and running on a board.
 #
@@ -269,17 +272,36 @@ check_diagnostics() {
     done
 }
 
-# Runs the Kit package's tests on the Mac: with swift test, and with the
-# Test action of the template's scheme (Cmd+U in Xcode), which check_scheme
-# copied to TemplateRunScheme.
+# Runs the Kit package's tests with swift test (on the Mac, or Linux).
 check_package_tests() {
     local kit="$WORK_DIR/$1/Packages/${PROJECT_NAME}Kit"
     (cd "$kit" && swift test 2>&1) | tail -5
     [ "${PIPESTATUS[0]}" -eq 0 ] || { echo "swift test failed in $kit."; return 1; }
+}
+
+# Runs the Kit package's tests with the Test action of the template's scheme
+# (Cmd+U in Xcode), which check_scheme copied to TemplateRunScheme.
+check_scheme_tests() {
     xcodebuild test -project "$WORK_DIR/$1/$PROJECT_NAME.xcodeproj" -scheme TemplateRunScheme \
         -destination "platform=macOS" -derivedDataPath "$WORK_DIR/$1/xcodebuild-test" 2>&1 | tail -5
     [ "${PIPESTATUS[0]}" -eq 0 ] || { echo "The scheme's Test action (Cmd+U) failed."; return 1; }
 }
+
+# The checks of the Xcode project, with Xcode (macOS only): code completion,
+# the Run scheme, espswift update, and for the first chip Cmd+U.
+check_xcode() {
+    check_indexing "$1" && check_scheme "$1" && check_update "$1" \
+        && { [ "$1" != "${CHIPS[0]}" ] || check_scheme_tests "$1"; }
+}
+
+# Without Xcode (on Linux), projects have no Xcode project, so only the
+# build, its error reporting and the Kit's tests are checked.
+if command -v xcodebuild > /dev/null 2>&1; then
+    WITH_XCODE=true
+else
+    WITH_XCODE=false
+    echo "Xcode wasn't found: checking the builds, error reporting and the Kit's tests only."
+fi
 
 FAILED=()
 
@@ -296,7 +318,9 @@ for CHIP in "${CHIPS[@]}"; do
         FAILED+=("$CHIP")
         continue
     fi
-    add_xcode_project "$CHIP"
+    if [ "$WITH_XCODE" = true ]; then
+        add_xcode_project "$CHIP"
+    fi
 
     # Build the way Xcode does (which sets PROJECT_DIR and PROJECT_NAME),
     # but without flashing. TARGET_TEMP_DIR is left unset, so the build
@@ -307,12 +331,11 @@ for CHIP in "${CHIPS[@]}"; do
         && [ -f "$SOURCE_DIR/build/$PROJECT_NAME.bin" ]; then
         # The error check builds twice more, and the package's tests don't
         # depend on the chip, so they run for the first chip only.
-        if check_indexing "$CHIP" >> "$LOG" 2>&1 && check_scheme "$CHIP" >> "$LOG" 2>&1 \
-            && check_update "$CHIP" >> "$LOG" 2>&1 \
+        if { [ "$WITH_XCODE" = false ] || check_xcode "$CHIP" >> "$LOG" 2>&1; } \
             && { [ "$CHIP" != "${CHIPS[0]}" ] || { check_diagnostics "$CHIP" && check_package_tests "$CHIP"; } >> "$LOG" 2>&1; }; then
             echo "Passed in $(( $(date +%s) - START ))s: $(grep -m1 "^$PROJECT_NAME.bin binary size" "$LOG")"
         else
-            echo "Built, but a check of the Xcode project failed. Last lines of $LOG:"
+            echo "Built, but a check failed. Last lines of $LOG:"
             tail -20 "$LOG"
             FAILED+=("$CHIP")
         fi

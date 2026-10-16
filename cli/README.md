@@ -1,6 +1,6 @@
 # espswift
 
-The command-line tool for Embedded Swift on RISC-V based ESP32 chips, written in Swift. It replaces the scripts ESPSwift had (and, later, `install.sh`), is to be installed with Homebrew, and runs on macOS and Linux; the Xcode template becomes an optional part of it.
+The command-line tool for Embedded Swift on RISC-V based ESP32 chips, written in Swift. It replaces the scripts and the installer app ESPSwift had, is to be installed with Homebrew, and runs on macOS and Linux; the Xcode template becomes an optional part of it.
 
 It's being built in phases (see below). So far it has:
 
@@ -52,7 +52,9 @@ It builds with Swift 6 on macOS (Xcode's Swift is fine) and on Linux. CI builds 
 3. `flash`, `monitor` and `run`; the Run scheme starts `espswift run` directly, without the monitor wrapper. *(done)*
 4. The Python helpers in Swift (the Swift package build, code completion flags), and `add`, `settings` (menuconfig), `update` and `debug`; `scripts/` is gone. *(done)*
 5. `new`: creating projects without Xcode, for Linux and other editors; the template test creates its projects with it. *(done)*
-6. Removing `install.sh` (once Homebrew installs espswift) and the SwiftUI installer, and updating the documentation; the template test runs on Linux too.
+6. Removing the SwiftUI installer and `uninstall.sh`, and updating the documentation; the template test runs on Linux too, also in CI. *(done)*
+
+Next: a Homebrew tap and a release workflow, after which `install.sh` can go (see the roadmap).
 
 ## How projects use it
 
