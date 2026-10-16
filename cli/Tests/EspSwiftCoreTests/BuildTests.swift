@@ -74,6 +74,15 @@ import Testing
         #expect(system.reports.contains { $0.hasPrefix("warning: This project was created with an older version") })
     }
 
+    @Test func readsTheVersionFromBuildSh() throws {
+        // As when espswift build runs in Terminal, without build.sh's export.
+        let system = Self.system()
+        system.file("/Users/test/Blink/Blink/build.sh", "#!/bin/bash\nexport ESPSWIFT_PROJECT_VERSION=1\n")
+        let project = try Project.find(system: system, start: "/Users/test/Blink")
+        try Build(system: system, project: project, verbose: false).run(.build)
+        #expect(!system.reports.contains { $0.hasPrefix("warning: This project was created with an older version") })
+    }
+
     @Test func buildsInXcodesDerivedData() throws {
         let system = Self.system()
         system.environment["TARGET_TEMP_DIR"] = "/Users/test/DerivedData/Blink.build"

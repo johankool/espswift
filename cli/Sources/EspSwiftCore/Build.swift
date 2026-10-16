@@ -112,7 +112,7 @@ public struct Build: Sendable {
     /// toolchain than the build, e.g. after a Swift upgrade.
     func checkProject(environment: [String: String]) {
         let update = "~/.espswift/bin/espswift update --project \"\(project.folder)\""
-        let version = Int(system.environment["ESPSWIFT_PROJECT_VERSION"] ?? "") ?? 0
+        let version = projectVersion()
         if version < Self.currentProjectVersion {
             system.report("warning: This project was created with an older version of the ESPSwift template. To update it, run in Terminal: \(update)")
         }
@@ -127,6 +127,17 @@ public struct Build: Sendable {
                 system.report("warning: Code completion uses another Swift toolchain (\(other)) than the build (\(toolchain)). To update the project, run in Terminal: \(update)")
             }
         }
+    }
+
+    /// The template version the project's files match, from the project's
+    /// build.sh (`export ESPSWIFT_PROJECT_VERSION=1`), so it's known however
+    /// the build is started; ESPSWIFT_PROJECT_VERSION if build.sh has none.
+    func projectVersion() -> Int {
+        let prefix = "export ESPSWIFT_PROJECT_VERSION="
+        let line = system.readFile("\(project.sourceFolder)/build.sh")?
+            .split(separator: "\n").first { $0.hasPrefix(prefix) }
+        return line.flatMap { Int($0.dropFirst(prefix.count).trimmingCharacters(in: .whitespaces)) }
+            ?? Int(system.environment["ESPSWIFT_PROJECT_VERSION"] ?? "") ?? 0
     }
 
     // ── Chip ─────────────────────────────────────────────────────────
