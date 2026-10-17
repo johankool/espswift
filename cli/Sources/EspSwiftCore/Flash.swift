@@ -1,5 +1,7 @@
 /// The build Cmd+R flashes: `espswift build` records the source folder and
-/// the build folder of the last build in ~/.espswift/last-build.
+/// the build folder of the last build, of any project in
+/// ~/.espswift/last-build, and of the project in its source folder's
+/// .espswift/last-build.
 public struct LastBuild: Equatable, Sendable {
     public var sourceFolder: String
     public var buildFolder: String
@@ -9,11 +11,33 @@ public struct LastBuild: Equatable, Sendable {
         self.buildFolder = buildFolder
     }
 
+    /// The last build of any project.
     public static func read(system: System) -> LastBuild? {
-        let file = "\(Locations(system: system).espswiftHome)/last-build"
+        read(file: "\(Locations(system: system).espswiftHome)/last-build", system: system)
+    }
+
+    /// The last build of a project.
+    public static func read(of project: Project, system: System) -> LastBuild? {
+        read(file: file(of: project), system: system)
+    }
+
+    /// Where a project's last build is recorded.
+    static func file(of project: Project) -> String {
+        "\(project.sourceFolder)/.espswift/last-build"
+    }
+
+    static func read(file: String, system: System) -> LastBuild? {
         let lines = (system.readFile(file) ?? "").split(separator: "\n").map(String.init)
         guard lines.count >= 2 else { return nil }
         return LastBuild(sourceFolder: lines[0], buildFolder: lines[1])
+    }
+
+    /// Records this as the last build, of any project and of its project.
+    func record(for project: Project, system: System) throws {
+        let text = "\(sourceFolder)\n\(buildFolder)\n"
+        try system.writeFile("\(Locations(system: system).espswiftHome)/last-build", text)
+        try system.createDirectory(Resources.parent(of: Self.file(of: project)))
+        try system.writeFile(Self.file(of: project), text)
     }
 }
 
@@ -25,9 +49,12 @@ public struct Flash: Sendable {
         self.system = system
     }
 
-    /// The build folder to flash for a project: its last build if that was
-    /// this project (which may be in Xcode's DerivedData), else ./build.
+    /// The build folder to flash for a project: its last build (which may
+    /// be in Xcode's DerivedData), else ./build.
     public static func buildFolder(for project: Project, system: System) -> String {
+        if let last = LastBuild.read(of: project, system: system), last.sourceFolder == project.sourceFolder {
+            return last.buildFolder
+        }
         if let last = LastBuild.read(system: system), last.sourceFolder == project.sourceFolder {
             return last.buildFolder
         }

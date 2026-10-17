@@ -10,7 +10,7 @@ Embedded Swift firmware for ___VARIABLE_boardName___ (`___VARIABLE_chip___`), bu
 | `Cmd+R` | Builds, flashes the firmware to the connected board, and shows its serial output in Xcode's console |
 | `Cmd+Shift+K` | Cleans the build |
 
-**Product ▸ Perform Action ▸ Run Without Building** flashes whatever was built last, even if that was another project.
+**Product ▸ Perform Action ▸ Run Without Building** flashes this project's last build again.
 
 Errors and warnings from the build, in Swift, C, `CMakeLists.txt` and `sdkconfig.defaults`, appear in the Issue navigator (`Cmd+5`); click one to jump to its line. The build log shows only those and the firmware size; ESP-IDF's full output is in the build folder, in `log/build-output.log` (the build log names it when a build fails). To see all of it in the build log, add a user-defined build setting `ESPSWIFT_VERBOSE` = `1` to the ___PROJECTNAME___ target.
 

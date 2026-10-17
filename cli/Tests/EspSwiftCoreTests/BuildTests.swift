@@ -68,6 +68,7 @@ import Testing
         #expect(!system.reports.contains("-- Configuring done"))
         #expect(system.readFile("/Users/test/Blink/Blink/build/log/build-output.log")?.contains("-- Configuring done") == true)
         #expect(system.readFile("/Users/test/.espswift/last-build") == "/Users/test/Blink/Blink\n/Users/test/Blink/Blink/build\n")
+        #expect(system.readFile("/Users/test/Blink/Blink/.espswift/last-build") == "/Users/test/Blink/Blink\n/Users/test/Blink/Blink/build\n")
         // The project has no version stamp (its build.sh sets it).
         #expect(system.reports.contains { $0.hasPrefix("warning: This project was created with an older version") })
     }

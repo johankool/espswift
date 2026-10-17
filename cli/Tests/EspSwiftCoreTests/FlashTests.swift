@@ -90,6 +90,11 @@ final class SleepCountingSystem: System, @unchecked Sendable {
         #expect(Flash.buildFolder(for: project, system: system) == "/Users/test/DerivedData/esp-idf")
         system.file("/Users/test/.espswift/last-build", "/Users/test/Other/Other\n/Users/test/DerivedData/other\n")
         #expect(Flash.buildFolder(for: project, system: system) == "/Users/test/Blink/Blink/build")
+        // The project's own record, which another project's build leaves as it is.
+        system.file("/Users/test/Blink/Blink/.espswift/last-build", "/Users/test/Blink/Blink\n/Users/test/DerivedData/blink\n")
+        #expect(Flash.buildFolder(for: project, system: system) == "/Users/test/DerivedData/blink")
+        #expect(LastBuild.read(of: project, system: system)
+                == LastBuild(sourceFolder: "/Users/test/Blink/Blink", buildFolder: "/Users/test/DerivedData/blink"))
     }
 
     @Test func runsIdfFlash() throws {

@@ -239,7 +239,7 @@ espswift/
         ├── CMakeLists.txt           # Root CMake configuration
         ├── sdkconfig.defaults       # ESP-IDF defaults (watchdog off)
         ├── gitignore                # Installed as .gitignore at the project root
-        ├── scheme.xcscheme          # Run scheme (Cmd+R: espswift run --last-build)
+        ├── scheme.xcscheme          # Run scheme (Cmd+R: espswift run --last-build --project ...)
         ├── main/
         │   ├── CMakeLists.txt       # Builds the Swift package (espswift) and links it
         │   ├── idf_component.yml    # ESP-IDF dependencies

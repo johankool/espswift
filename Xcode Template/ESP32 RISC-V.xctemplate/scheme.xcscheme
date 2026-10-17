@@ -57,6 +57,15 @@
          runnableDebuggingMode = "0"
          FilePath = "ESPSWIFT_COMMAND_PATH">
       </PathRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ESPSWIFTPLACEHOLDER00000"
+            BuildableName = "___PROJECTNAME___"
+            BlueprintName = "___PROJECTNAME___"
+            ReferencedContainer = "container:___PROJECTNAME___.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <CommandLineArguments>
          <CommandLineArgument
             argument = "run"
@@ -64,6 +73,14 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--last-build"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--project"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "&quot;$(PROJECT_DIR)&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

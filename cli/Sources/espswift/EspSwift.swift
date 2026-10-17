@@ -186,7 +186,7 @@ extension EspSwift {
         @Option(help: "The project's folder; by default, the one espswift runs in.")
         var project: String?
 
-        @Flag(help: "Flash the last build of any project (what Cmd+R flashes).")
+        @Flag(help: "Flash the project's last build (what Cmd+R flashes); without a project, the last build of any project.")
         var lastBuild = false
 
         func run() throws {
@@ -244,8 +244,8 @@ extension EspSwift {
         static let configuration = CommandConfiguration(
             abstract: "Builds the project, flashes it to the board and shows its serial output.",
             discussion: """
-                Cmd+R in Xcode runs `espswift run --last-build`: Xcode has just built the \
-                project, so it flashes that build.
+                Cmd+R in Xcode runs `espswift run --last-build --project <the project>`: \
+                Xcode has just built the project, so it flashes that build.
                 """
         )
 
@@ -255,7 +255,7 @@ extension EspSwift {
         @Option(help: "The project's folder; by default, the one espswift runs in.")
         var project: String?
 
-        @Flag(help: "Don't build; flash the last build of any project (for Cmd+R in Xcode).")
+        @Flag(help: "Don't build; flash the project's last build (for Cmd+R in Xcode); without a project, the last build of any project.")
         var lastBuild = false
 
         func run() throws {
@@ -523,10 +523,16 @@ extension EspSwift {
     }
 }
 
-/// The source and build folders to flash: the last build of any project
-/// (--last-build), else the project's latest build.
+/// The source and build folders to flash: with --last-build, the project's
+/// last build, else (without a project, or if Xcode didn't fill in its
+/// folder) the last build of any project; without it, the project's latest
+/// build.
 func buildToFlash(system: System, project: String?, lastBuild: Bool) throws -> (String, String) {
     if lastBuild {
+        if let project, let found = try? Project.find(system: system, start: project),
+           let last = LastBuild.read(of: found, system: system) {
+            return (last.sourceFolder, last.buildFolder)
+        }
         guard let last = LastBuild.read(system: system) else {
             throw EspSwiftError("Nothing to flash yet. Build the project first (Cmd+B in Xcode, or espswift build).")
         }

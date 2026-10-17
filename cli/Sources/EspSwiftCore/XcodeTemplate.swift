@@ -46,8 +46,8 @@ public struct XcodeTemplate: Sendable {
         }
         try fillInToolchain(toolchainID, in: "\(template)/TemplateInfo.plist")
 
-        // The Run scheme (Cmd+R) starts `espswift run --last-build`, which
-        // needs an absolute path.
+        // The Run scheme (Cmd+R) starts `espswift run --last-build --project
+        // "$(PROJECT_DIR)"`, from an absolute path.
         let scheme = "\(template)/scheme.xcscheme"
         if let text = system.readFile(scheme) {
             try system.writeFile(scheme, text.replacingOccurrences(of: "ESPSWIFT_COMMAND_PATH", with: locations.command))

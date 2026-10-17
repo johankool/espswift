@@ -67,7 +67,7 @@ public struct Build: Sendable {
             // source folder and the build folder. ESPSWIFT_BUILD_ONLY=1 (for
             // tests) leaves it as it is.
             if system.environment["ESPSWIFT_BUILD_ONLY"] != "1" {
-                try system.writeFile("\(locations.espswiftHome)/last-build", "\(project.sourceFolder)\n\(buildFolder)\n")
+                try LastBuild(sourceFolder: project.sourceFolder, buildFolder: buildFolder).record(for: project, system: system)
             }
         }
 
