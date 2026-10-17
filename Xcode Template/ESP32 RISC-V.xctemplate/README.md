@@ -27,6 +27,8 @@ ___PROJECTNAME___/
 ├── ___PROJECTNAME___.xcodeproj
 ├── Firmware/
 │   ├── Firmware.swift          # Your firmware code starts here (app_main)
+│   ├── Board.swift             # Your board's name and LED
+│   ├── LED.swift               # Drives the LED, whatever kind it is
 │   ├── Package.swift           # The firmware's packages, such as swift-mmio
 │   └── ESPIDF/include/
 │       └── ESPIDF.h            # ESP-IDF's C APIs for Swift: `import ESPIDF`
@@ -159,7 +161,9 @@ CONFIG_IDF_TARGET="___VARIABLE_chip___"
 
 The chip, and the flash size below it, are those of the board you chose when you created the project (___VARIABLE_boardName___). To build for another RISC-V based ESP32 (`esp32c2`, `esp32c3`, `esp32c5`, `esp32c6`, `esp32c61`, `esp32h2` or `esp32p4`), change this line and press `Cmd+B`. The build then reconfigures the project for the new chip, which recreates `sdkconfig` from `sdkconfig.defaults` (the previous one is kept as `sdkconfig.old`).
 
-The example blinks the board's LED: an addressable RGB LED (WS2812), separate red, green and blue LEDs, or a one-colour LED. A board without an LED only prints the colours. The board's LED, its pins and polarity are set in `Firmware/ESPIDF/include/ESPIDF.h` (`BOARD_LED_…`); change them there for another board.
+The example blinks the board's LED: an addressable RGB LED (WS2812), separate red, green and blue LEDs, or a one-colour LED. A board without an LED only prints the colours. The board's LED, its pins and polarity are set in `Firmware/Board.swift`, e.g. `.addressable(pin: 8)` or `.single(pin: 15, activeLow: true)`; change it there for another board. `Firmware/LED.swift` drives it with ESP-IDF's GPIO and led_strip drivers.
+
+Swift code can check ESP-IDF's settings and the chip's features with `#if`, as C code does: each setting that's on in `sdkconfig` is a compilation condition, such as `CONFIG_SOC_RMT_SUPPORTED` or `CONFIG_IDF_TARGET_ESP32C6`. `LED.swift` uses it to pick the RMT or the SPI peripheral for the LED.
 
 ## Building, flashing and watching in Terminal
 

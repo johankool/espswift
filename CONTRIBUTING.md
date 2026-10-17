@@ -101,7 +101,7 @@ espswift/
         ├── CMakeLists.txt
         ├── sdkconfig.defaults
         ├── main_CMakeLists.txt, main_idf_component.yml, main_swift_flags.c   # main/
-        ├── Firmware_Firmware.swift, Firmware_Package.swift                  # Firmware/
+        ├── Firmware_Firmware.swift, Firmware_Board.swift, Firmware_LED.swift, Firmware_Package.swift   # Firmware/
         ├── ESPIDF_ESPIDF.h, ESPIDF_ESPIDF.c                                 # Firmware/ESPIDF/
         └── Kit/                     # Packages/<Project>Kit
             ├── Package.swift

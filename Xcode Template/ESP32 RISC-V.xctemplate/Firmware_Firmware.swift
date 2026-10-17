@@ -6,11 +6,10 @@
 //
 
 // Embedded Swift entry point.
-// This example blinks the board's LED: red, green, blue and off. The board
-// chosen when the project was created sets which LED that is, in
-// ESPIDF/include/ESPIDF.h: an addressable RGB LED (WS2812), separate red,
-// green and blue LEDs, or a one-colour LED (on for any colour). Without an
-// LED, it only prints the colours.
+// This example blinks the board's LED: red, green, blue and off. Board.swift
+// says which LED the board has, and LED.swift drives it: an addressable RGB
+// LED (WS2812), separate red, green and blue LEDs, or a one-colour LED (on for
+// any colour). Without an LED, it only prints the colours.
 
 import Blink
 import ESPIDF
@@ -19,20 +18,9 @@ import ESPIDF
 public func app_main() {
     print("Hello from Embedded Swift on ESP32!")
 
-    // ── LED Configuration ────────────────────────────────────
-    // board_led_new() in ESPIDF.h sets up the board's LED: for
-    // an addressable one, the led_strip driver, with the
-    // peripheral that generates the precise timing pulses WS2812
-    // LEDs need (RMT, or SPI on chips without RMT); otherwise
-    // plain GPIO pins.
-
-    var led = board_led_t()
-    let hasLED = board_led_new(&led) == ESP_OK
-
-    if hasLED {
-        print("Blinking the LED on GPIO \(BOARD_LED_PIN).")
-    } else {
-        print("This board has no LED to blink; printing the colours instead.")
+    let led = LED(Board.led)
+    if led == nil {
+        print("\(Board.name) has no LED to blink; printing the colours instead.")
     }
 
     // ── Animation Loop ───────────────────────────────────────
@@ -44,10 +32,7 @@ public func app_main() {
         // The color for this step: red, green, blue or off (see Blink.swift).
         let step = blinkStep(colorIndex)
 
-        if hasLED {
-            board_led_set(&led, step.red, step.green, step.blue)
-        }
-
+        led?.show(red: step.red, green: step.green, blue: step.blue)
         print("LED: \(step.name)")
 
         // Wait 1 second using FreeRTOS task delay.

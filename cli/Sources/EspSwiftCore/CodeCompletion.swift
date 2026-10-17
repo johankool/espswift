@@ -11,7 +11,8 @@ import Foundation
 /// the flags SwiftPM compiled the Firmware target with (PackageBuild), from
 /// its build manifest. These are ESP-IDF's include paths and definitions, the
 /// ESPIDF module, the modules of the package's dependencies (such as the
-/// project's Kit package), and the macro plugins those use.
+/// project's Kit package), the macro plugins those use, and the compilation
+/// conditions for ESP-IDF's settings.
 ///
 /// The Indexing target passes the file to the Swift frontend with
 /// -Xfrontend @file, which only accepts the joined form of -I (-I<path>)
@@ -83,6 +84,12 @@ public struct CodeCompletion: Sendable {
             } else if argument == "-Xcc" && (value.hasPrefix("-D") || value.hasPrefix("-fmodule-map-file=")) && !forTheMac(value) {
                 flags += ["-Xcc", value]
                 i += 2
+            } else if argument == "-D" && !value.isEmpty {
+                flags.append("-D" + value)  // Compilation conditions, such as CONFIG_SOC_RMT_SUPPORTED
+                i += 2
+            } else if argument.hasPrefix("-D") && argument.count > 2 {
+                flags.append(argument)
+                i += 1
             } else if argument == "-Xfrontend" && ["-load-plugin-executable", "-load-plugin-library"].contains(value)
                         && i + 3 < arguments.count && arguments[i + 2] == "-Xfrontend" {
                 // Macros, such as swift-mmio's: -Xfrontend <flag> -Xfrontend <path>.

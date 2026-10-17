@@ -10,6 +10,9 @@ import Foundation
 /// the compile command of an empty C file in the main component
 /// (compile_commands.json, which CMake writes before the build starts), and
 /// go into a SwiftPM toolset file together with the flags Embedded Swift needs.
+/// The ESP-IDF settings enabled in sdkconfig become Swift compilation
+/// conditions (CONFIG_SOC_RMT_SUPPORTED, CONFIG_IDF_TARGET_ESP32C6, ...), so
+/// Swift code can check them with #if, as C code does.
 public struct PackageBuild: Sendable {
     public var system: System
     /// ESP-IDF's build folder.
@@ -124,6 +127,18 @@ public struct PackageBuild: Sendable {
         }
     }
 
+    /// The settings enabled in sdkconfig, as Swift compilation conditions:
+    /// -D CONFIG_<name> for each one that's on. ESP-IDF writes them to
+    /// config/sdkconfig.json in the build folder when it configures.
+    func swiftConditions() throws -> [String] {
+        let file = "\(buildFolder)/config/sdkconfig.json"
+        guard let data = system.readData(file),
+              let settings = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw EspSwiftError("ESP-IDF's settings weren't found in \(file).")
+        }
+        return settings.filter { ($0.value as? Bool) == true }.keys.sorted().flatMap { ["-D", "CONFIG_\($0)"] }
+    }
+
     func toolsetJSON() throws -> Data {
         let toolset: [String: Any] = [
             "schemaVersion": "1.0",
@@ -132,7 +147,7 @@ public struct PackageBuild: Sendable {
             // Swift compiler's C importer itself.
             "swiftCompiler": ["extraCLIOptions": [
                 "-enable-experimental-feature", "Embedded", "-wmo", "-Osize", "-g", "-Xfrontend", "-function-sections",
-            ]],
+            ] + (try swiftConditions())],
             "cCompiler": ["extraCLIOptions": try cFlags()],
             // An ELF archiver. SwiftPM would otherwise use Xcode's libtool,
             // which makes Mach-O archives (and Xcode 27's fails SwiftPM's

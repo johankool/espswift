@@ -171,7 +171,7 @@ The RISC-V based ESP32 chips: ESP32-C2, C3, C5, C6, C61, H2 and P4. Choose your 
 
 The Xtensa based chips (the original ESP32, ESP32-S2 and ESP32-S3, found for example on ESP32 DevKitV1 boards) are not supported: Swift doesn't support Xtensa.
 
-To switch an existing project to another chip, change `CONFIG_IDF_TARGET` in `sdkconfig.defaults` and build again. The example's LED pin is set per chip in `Firmware/ESPIDF/include/ESPIDF.h`, for Espressif's DevKit boards.
+To switch an existing project to another chip, change `CONFIG_IDF_TARGET` in `sdkconfig.defaults` and build again. The example's LED is set in `Firmware/Board.swift`, for the board chosen when the project was created.
 
 ### Why is there an Indexing target?
 
@@ -227,6 +227,8 @@ espswift/
         │   └── swift_flags.c        # Empty; provides ESP-IDF's C flags to the Swift package build
         ├── Firmware/                # Next to the .xcodeproj in new projects
         │   ├── Firmware.swift       # Firmware entry point (app_main)
+        │   ├── Board.swift          # The board's name and LED, from the Board pop-up
+        │   ├── LED.swift            # Drives the board's LED, whatever kind it is
         │   ├── Package.swift        # The firmware package, built by ESP-IDF with SwiftPM
         │   └── ESPIDF/include/ESPIDF.h   # ESP-IDF's C APIs for Swift (import ESPIDF)
         └── Kit/                     # Packages/<Project>Kit: plain Swift, tested on the Mac (Cmd+U)

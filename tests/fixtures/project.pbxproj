@@ -8,12 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		C78364A330803249000D72CC /* Firmware.swift in Sources */ = {isa = PBXBuildFile; fileRef = C783649930803249000D72CC /* Firmware.swift */; };
+		C78364B130803249000D72CC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B030803249000D72CC /* Board.swift */; };
+		C78364B330803249000D72CC /* LED.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B230803249000D72CC /* LED.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		C783648D30803249000D72CC /* libIndexing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIndexing.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C783649030803249000D72CC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		C783649930803249000D72CC /* Firmware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Firmware.swift; sourceTree = "<group>"; };
+		C78364B030803249000D72CC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		C78364B230803249000D72CC /* LED.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LED.swift; sourceTree = "<group>"; };
 		C783649A30803249000D72CC /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		C783649D30803249000D72CC /* ESPIDF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ESPIDF.h; sourceTree = "<group>"; };
 		C783649E30803249000D72CC /* ESPIDF.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ESPIDF.c; sourceTree = "<group>"; };
@@ -65,6 +69,8 @@
 			isa = PBXGroup;
 			children = (
 				C783649930803249000D72CC /* Firmware.swift */,
+				C78364B030803249000D72CC /* Board.swift */,
+				C78364B230803249000D72CC /* LED.swift */,
 				C783649A30803249000D72CC /* Package.swift */,
 				C783649B30803249000D72CC /* ESPIDF */,
 			);
@@ -173,6 +179,8 @@
 			isa = PBXSourcesBuildPhase;
 			files = (
 				C78364A330803249000D72CC /* Firmware.swift in Sources */,
+				C78364B130803249000D72CC /* Board.swift in Sources */,
+				C78364B330803249000D72CC /* LED.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
