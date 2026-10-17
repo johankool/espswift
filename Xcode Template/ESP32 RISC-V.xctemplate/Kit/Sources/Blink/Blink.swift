@@ -2,22 +2,11 @@
 // tested on the Mac (see Tests/BlinkTests: Cmd+U).
 
 /// One step of the blink pattern: a color for the LED and its name.
-public struct BlinkStep: Equatable {
+public struct BlinkStep {
     public var red: UInt32
     public var green: UInt32
     public var blue: UInt32
     public var name: StaticString
-
-    public init(red: UInt32, green: UInt32, blue: UInt32, name: StaticString) {
-        self.red = red
-        self.green = green
-        self.blue = blue
-        self.name = name
-    }
-
-    public static func == (lhs: BlinkStep, rhs: BlinkStep) -> Bool {
-        lhs.red == rhs.red && lhs.green == rhs.green && lhs.blue == rhs.blue
-    }
 }
 
 /// Cycles through red, green, blue and off.

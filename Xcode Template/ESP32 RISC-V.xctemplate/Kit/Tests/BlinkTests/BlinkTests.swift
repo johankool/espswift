@@ -5,15 +5,18 @@ import Blink
 import Testing
 
 @Test func cyclesThroughRedGreenBlueAndOff() {
-    #expect(blinkStep(0) == BlinkStep(red: 32, green: 0, blue: 0, name: "Red"))
-    #expect(blinkStep(1) == BlinkStep(red: 0, green: 32, blue: 0, name: "Green"))
-    #expect(blinkStep(2) == BlinkStep(red: 0, green: 0, blue: 32, name: "Blue"))
-    #expect(blinkStep(3) == BlinkStep(red: 0, green: 0, blue: 0, name: "Off"))
+    let steps = (0..<4).map { blinkStep($0) }
+    #expect(steps.map(\.red) == [32, 0, 0, 0])
+    #expect(steps.map(\.green) == [0, 32, 0, 0])
+    #expect(steps.map(\.blue) == [0, 0, 32, 0])
+    #expect(steps.map { "\($0.name)" } == ["Red", "Green", "Blue", "Off"])
 }
 
 @Test(arguments: [0, 1, 2, 3] as [UInt32])
 func repeatsEveryFourSteps(index: UInt32) {
-    #expect(blinkStep(index) == blinkStep(index + 4))
+    let step = blinkStep(index)
+    let next = blinkStep(index + 4)
+    #expect([step.red, step.green, step.blue] == [next.red, next.green, next.blue])
 }
 
 @Test func usesTheGivenBrightness() {
