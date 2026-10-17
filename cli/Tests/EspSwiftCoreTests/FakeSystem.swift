@@ -156,36 +156,58 @@ final class FakeSystem: System, @unchecked Sendable {
     // ── Systems ──────────────────────────────────────────────────────
 
     static let toolchain = "/Users/test/Library/Developer/Toolchains/swift-6.4.0-RELEASE.xctoolchain"
+    /// ESP-IDF as EIM installs it, and the Python of its environment.
+    static let idf = "/Users/test/.espressif/v6.1/esp-idf"
+    static let idfPython = "/Users/test/.espressif/tools/python/v6.1/venv/bin/python"
+
+    /// Records an ESP-IDF installation in EIM's eim_idf.json, and its
+    /// activation script's environment (what `-e` prints).
+    func installESPIDFWithEIM(environment: [String: String] = [:]) {
+        let home = homeDirectory
+        file("\(home)/.espressif/tools/eim_idf.json", """
+            {"idfInstalled": [{"activationScript": "\(home)/.espressif/tools/activate_idf_v6.1.sh", "id": "esp-idf-1",
+              "name": "v6.1", "path": "\(home)/.espressif/v6.1/esp-idf", "status": "finished"}],
+             "idfSelectedId": "esp-idf-1", "version": "3.0"}
+            """)
+        file("\(home)/.espressif/v6.1/esp-idf/tools/cmake/version.cmake",
+             "set(IDF_VERSION_MAJOR 6)\nset(IDF_VERSION_MINOR 1)\nset(IDF_VERSION_PATCH 0)\n")
+        directories.insert("\(home)/.espressif/v6.1/esp-idf")
+        setIDFEnvironment([
+            "PATH": "/idf/tools", "IDF_PATH": "\(home)/.espressif/v6.1/esp-idf",
+            "IDF_PYTHON_ENV_PATH": "\(home)/.espressif/tools/python/v6.1/venv",
+        ].merging(environment) { $1 })
+        commands["\(home)/.espressif/tools/python/v6.1/venv/bin/python"] = CommandResult(status: 0, output: "Python 3.14.8\n")
+    }
+
+    /// What EIM's activation script prints with -e.
+    func setIDFEnvironment(_ environment: [String: String]) {
+        let output = environment.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)\n" }.joined()
+        commands["/bin/bash"] = CommandResult(status: 0, output: output)
+    }
     static let template = "/Users/test/Library/Developer/Xcode/Templates/Project Templates/Other/ESP32 RISC-V.xctemplate"
 
     /// A Mac with everything ESPSwift needs installed and a board connected.
     static var workingMac: FakeSystem {
         let system = FakeSystem()
         system.file("/Users/test/.espswift/swift-toolchain", toolchain + "\n")
-        system.file("/Users/test/.espswift/esp-idf/tools/cmake/version.cmake", """
-            set(IDF_VERSION_MAJOR 6)
-            set(IDF_VERSION_MINOR 1)
-            set(IDF_VERSION_PATCH 0)
-            """)
         system.file("\(template)/TemplateInfo.plist", "<string>org.swift.640202609131a</string>")
         system.file("/dev/cu.usbmodem21101", "")
         system.file("/dev/cu.Bluetooth-Incoming-Port", "")
         system.directories = [
             "/Users/test/.espswift",
-            "/Users/test/.espswift/esp-idf",
-            "/Users/test/.espressif/python_env/idf6.1_py3.14_env",
             "\(toolchain)/usr/lib/swift/embedded/riscv32-none-none-eabi",
             template,
         ]
         system.commands = [
             "/Users/test/.espswift/python/bin/python3": CommandResult(status: 0, output: "Python 3.14.8\n"),
             "/opt/homebrew/bin/python3.14": CommandResult(status: 0, output: "Python 3.14.8\n"),
+            "/opt/homebrew/bin/eim": CommandResult(status: 0, output: "eim 0.20.1\n"),
             "/opt/homebrew/bin/cmake": CommandResult(status: 0, output: "cmake version 4.4.4\n"),
-            "/opt/homebrew/bin/ninja": CommandResult(status: 0, output: "1.13.2\n"),
             "/usr/bin/git": CommandResult(status: 0, output: ""),
             "\(toolchain)/usr/bin/swiftc": CommandResult(
                 status: 0, output: "Apple Swift version 6.4 (swift-6.4-RELEASE)\nTarget: arm64-apple-macosx27.0.0\n"),
         ]
+        system.installESPIDFWithEIM()
         return system
     }
 
@@ -195,6 +217,7 @@ final class FakeSystem: System, @unchecked Sendable {
         let system = FakeSystem()
         system.commands = [
             "/opt/homebrew/bin/brew": CommandResult(status: 0, output: ""),
+            "/opt/homebrew/bin/eim": CommandResult(status: 0, output: "eim 0.20.1\n"),
             "/usr/bin/git": CommandResult(status: 0, output: ""),
             "/usr/bin/xcode-select": CommandResult(status: 0, output: "/Applications/Xcode.app/Contents/Developer\n"),
         ]
@@ -210,15 +233,12 @@ final class FakeSystem: System, @unchecked Sendable {
         system.file("\(resources)/scripts/build.sh", "")
         system.file("\(resources)/scripts/indexing_flags.py", "")
         system.effects["/opt/homebrew/bin/brew"] = { system, _ in
-            for tool in ["python3.14", "cmake", "ninja"] {
-                system.commands["/opt/homebrew/bin/\(tool)"] = CommandResult(status: 0, output: "Python 3.14.8\n")
-            }
+            system.commands["/opt/homebrew/bin/python3.14"] = CommandResult(status: 0, output: "Python 3.14.8\n")
+            system.commands["/opt/homebrew/bin/cmake"] = CommandResult(status: 0, output: "cmake version 4.4.4\n")
             return 0
         }
-        system.effects["/usr/bin/git"] = { system, arguments in
-            try? system.createDirectory(arguments.last!)
-            system.file("\(arguments.last!)/tools/cmake/version.cmake",
-                        "set(IDF_VERSION_MAJOR 6)\nset(IDF_VERSION_MINOR 1)\nset(IDF_VERSION_PATCH 0)\n")
+        system.effects["/opt/homebrew/bin/eim"] = { system, _ in
+            system.installESPIDFWithEIM()
             return 0
         }
         system.effects["/usr/sbin/installer"] = { system, _ in

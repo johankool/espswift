@@ -3,10 +3,11 @@
 public struct Locations: Sendable {
     /// ESPSwift's own folder, ~/.espswift.
     public var espswiftHome: String
-    /// ESP-IDF: ~/.espswift/esp-idf, or IDF_PATH if it's set.
+    /// ESP-IDF: IDF_PATH if it's set, else the pinned version EIM installed
+    /// (by default in ~/.espressif/v6.1/esp-idf).
     public var idfPath: String
-    /// ESP-IDF's tools and Python environments: ~/.espressif, or
-    /// IDF_TOOLS_PATH if it's set.
+    /// ESP-IDF's tools and Python environments: ~/.espressif/tools (EIM's),
+    /// or IDF_TOOLS_PATH if it's set.
     public var idfToolsPath: String
     /// The python3 with the pinned version, which ESP-IDF's environment is
     /// made for.
@@ -21,8 +22,10 @@ public struct Locations: Sendable {
     public init(system: System) {
         let home = system.homeDirectory
         espswiftHome = "\(home)/.espswift"
-        idfPath = system.environment["IDF_PATH"] ?? "\(espswiftHome)/esp-idf"
-        idfToolsPath = system.environment["IDF_TOOLS_PATH"] ?? "\(home)/.espressif"
+        let idf = Pins.espIDF.components
+        idfPath = system.environment["IDF_PATH"] ?? EIM(system: system).pinnedInstallation()?.path
+            ?? "\(home)/.espressif/v\(idf[0]).\(idf[1])/esp-idf"
+        idfToolsPath = system.environment["IDF_TOOLS_PATH"] ?? "\(home)/.espressif/tools"
         python = "\(espswiftHome)/python/bin/python3"
         swiftToolchainRecord = "\(espswiftHome)/swift-toolchain"
         xcodeTemplate = system.operatingSystem == .macOS

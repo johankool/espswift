@@ -10,9 +10,8 @@ import Testing
         try Setup(system: system, resources: resources).run(installXcodeTemplate: true)
         let runs = system.actions.filter { $0.hasPrefix("run ") }
         #expect(runs == [
-            "run /opt/homebrew/bin/brew install python@3.14 cmake ninja",
-            "run /usr/bin/git clone --recursive --branch v6.1 --depth 1 --shallow-submodules https://github.com/espressif/esp-idf.git /Users/test/.espswift/esp-idf",
-            "run /Users/test/.espswift/esp-idf/install.sh esp32c2,esp32c3,esp32c5,esp32c6,esp32c61,esp32h2,esp32p4",
+            "run /opt/homebrew/bin/brew install python@3.14 cmake",
+            "run /opt/homebrew/bin/eim install --idf-versions v6.1 --target esp32c2,esp32c3,esp32c5,esp32c6,esp32c61,esp32h2,esp32p4 --non-interactive true --do-not-track true --cleanup true",
             "run /usr/bin/curl -fL https://download.swift.org/swift-6.4.0-release/xcode/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE-osx.pkg -o /Users/test/.espswift/swift-6.4.0-RELEASE-osx.pkg",
             "run /usr/sbin/installer -pkg /Users/test/.espswift/swift-6.4.0-RELEASE-osx.pkg -target CurrentUserHomeDirectory",
         ])
@@ -45,11 +44,18 @@ import Testing
     @Test func installsOnlyWhatsMissing() throws {
         let system = FakeSystem.workingMac
         try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
-        let runs = system.actions.filter { $0.hasPrefix("run ") }
-        // ESP-IDF's installer runs again (it only adds what's missing); no
-        // Homebrew, download or Swift installer.
-        #expect(runs.count == 1)
-        #expect(runs[0].hasPrefix("run /Users/test/.espswift/esp-idf/install.sh "))
+        // No Homebrew, EIM, download or Swift installer.
+        #expect(!system.actions.contains { $0.hasPrefix("run ") })
+    }
+
+    @Test func explainsHowToInstallEIM() {
+        let system = FakeSystem.freshMac
+        system.commands["/opt/homebrew/bin/eim"] = nil
+        system.effects["/opt/homebrew/bin/eim"] = nil
+        let error = #expect(throws: EspSwiftError.self) {
+            try Setup(system: system, resources: resources).run(installXcodeTemplate: false)
+        }
+        #expect(error?.description.contains("brew install eim") == true)
     }
 
     @Test func usesSwiftlyWhenInstalled() throws {
@@ -74,15 +80,13 @@ import Testing
         #expect(!system.actions.contains { $0.hasPrefix("run ") })
     }
 
-    /// Linux with Python, CMake, Ninja and Git, but no Swift.
+    /// Linux with Python, CMake, Git and EIM, but no Swift.
     static func linux() -> FakeSystem {
         let system = FakeSystem.freshMac
         system.operatingSystem = .linux
         system.homeDirectory = "/home/test"
         system.commands["/usr/bin/python3"] = CommandResult(status: 0, output: "Python 3.12.3\n")
-        for tool in ["cmake", "ninja"] {
-            system.commands["/usr/bin/\(tool)"] = CommandResult(status: 0, output: "")
-        }
+        system.commands["/usr/bin/cmake"] = CommandResult(status: 0, output: "")
         return system
     }
 
@@ -129,19 +133,19 @@ import Testing
 @Suite struct UninstallTests {
     @Test func removesEverythingWithAll() throws {
         let system = FakeSystem.workingMac
-        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif"])
+        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif/tools"])
         try Uninstall(system: system).run(assumeYes: true, all: true)
         #expect(system.actions == [
             "rm /Users/test/.espswift",
             "rm \(FakeSystem.template)",
             "rm \(FakeSystem.toolchain)",
-            "rm /Users/test/.espressif",
+            "rm /Users/test/.espressif/tools",
         ])
     }
 
     @Test func keepsSharedItemsWithoutConfirmation() throws {
         let system = FakeSystem.workingMac
-        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif"])
+        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif/tools"])
         try Uninstall(system: system).run(assumeYes: true, all: false)
         #expect(system.actions == ["rm /Users/test/.espswift", "rm \(FakeSystem.template)"])
     }

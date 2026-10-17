@@ -1,6 +1,8 @@
 import Foundation
 
-/// Running ESP-IDF's tools (idf.py) the way its export.sh sets them up.
+/// Running ESP-IDF's tools (idf.py) in ESP-IDF's environment: the one
+/// EIM's activation script sets up, or for an ESP-IDF elsewhere (IDF_PATH),
+/// its export.sh's.
 public struct ESPIDF: Sendable {
     public var system: System
     public var locations: Locations
@@ -10,11 +12,29 @@ public struct ESPIDF: Sendable {
         locations = Locations(system: system)
     }
 
-    /// ESP-IDF's environment, as its export.sh sets it up: its tools and
-    /// Python environment first on PATH. ESP-IDF finds its Python
-    /// environment by the first python3 on PATH, ESPSwift's; Xcode's PATH
-    /// doesn't include Homebrew, which the search path adds.
+    /// ESP-IDF's environment: its tools and Python environment first on
+    /// PATH. Xcode's PATH doesn't include Homebrew, which the search path
+    /// adds.
     public func environment() throws -> [String: String] {
+        if system.environment["IDF_PATH"] == nil {
+            let eim = EIM(system: system)
+            guard let installation = eim.pinnedInstallation() else {
+                throw EspSwiftError("ESP-IDF \(Pins.espIDF) wasn't found among EIM's installations (eim list). Run: espswift setup")
+            }
+            guard let idf = eim.environment(of: installation) else {
+                throw EspSwiftError("Setting up ESP-IDF's environment (EIM's \(installation.activationScript)) failed. Run: eim fix \(installation.name)")
+            }
+            var environment = system.environment.merging(idf) { $1 }
+            environment["PATH"] = ((idf["PATH"].map { [$0] } ?? []) + system.searchPath).joined(separator: ":")
+            return environment
+        }
+        return try exportEnvironment()
+    }
+
+    /// The environment ESP-IDF's export.sh sets up, for an ESP-IDF that EIM
+    /// didn't install (IDF_PATH). It finds its Python environment by the
+    /// first python3 on PATH, ESPSwift's.
+    func exportEnvironment() throws -> [String: String] {
         guard system.isDirectory(locations.idfPath) else {
             throw EspSwiftError("ESP-IDF wasn't found at \(locations.idfPath). Run: espswift setup")
         }

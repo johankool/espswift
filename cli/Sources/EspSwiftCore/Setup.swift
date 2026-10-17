@@ -1,10 +1,11 @@
 /// Sets up everything ESPSwift needs: `espswift setup`. Running it again
 /// installs only what's missing, and updates the Xcode template.
 ///
-/// 1. Python, CMake, Ninja and Git (with Homebrew on macOS, if missing)
+/// 1. Python, CMake and Git (with Homebrew on macOS, if missing), and EIM, Espressif's
+///    ESP-IDF Installation Manager
 /// 2. Python as ~/.espswift/python/bin/python3, for ESP-IDF (the pinned one
 ///    on macOS, the system's on Linux)
-/// 3. ESP-IDF (in ~/.espswift/esp-idf) and its tools for the RISC-V chips
+/// 3. ESP-IDF and its tools for the RISC-V chips, with EIM (in ~/.espressif)
 /// 4. The Swift toolchain, with swiftly, or on macOS swift.org's installer
 /// 5. The Xcode template (macOS, optional)
 /// 6. espswift as ~/.espswift/bin/espswift, which projects run
@@ -102,8 +103,8 @@ public struct Setup: Sendable {
         let linux = system.operatingSystem == .linux
         return [
             (pythonProgram, linux ? "python3 python3-venv" : "python@\(Pins.python)"),
+            // EIM checks for CMake, though it installs its own (and Ninja).
             ("cmake", "cmake"),
-            ("ninja", linux ? "ninja-build" : "ninja"),
             ("git", "git"),
         ].filter { system.findExecutable($0.0) == nil }
     }
@@ -154,37 +155,37 @@ public struct Setup: Sendable {
 
     // ── 3. ESP-IDF ───────────────────────────────────────────────────
 
-    func installESPIDF() throws {
-        let idf = locations.idfPath
-        let tag = "v\(Pins.espIDF.components[0]).\(Pins.espIDF.components[1])"
-        if system.isDirectory(idf) {
-            // An existing ESP-IDF is never replaced automatically.
-            let installed = system.readFile("\(idf)/tools/cmake/version.cmake").flatMap(VersionParser.espIDF)
-            if let installed, installed.satisfies(Pins.espIDF) {
-                system.report("ESP-IDF \(installed) is installed.")
-            } else {
-                system.report("""
-                    Warning: ESP-IDF in \(idf) is \(installed.map(String.init(describing:)) ?? "of an unknown version"), \
-                    not \(Pins.espIDF). To switch, remove that folder and run espswift setup again.
-                    """)
-            }
-        } else {
-            system.report("Downloading ESP-IDF \(tag)...")
-            guard let git = system.findExecutable("git") else { throw EspSwiftError("Git wasn't found.") }
-            // Only the release, without its history, which is much smaller.
-            let status = system.runVisibly(git, [
-                "clone", "--recursive", "--branch", tag, "--depth", "1", "--shallow-submodules",
-                "https://github.com/espressif/esp-idf.git", idf,
-            ], environment: system.environment)
-            guard status == 0 else { throw EspSwiftError("Downloading ESP-IDF failed.") }
-        }
+    /// The pinned ESP-IDF version as EIM names it, such as v6.1 (v6.1.2 for
+    /// a patch release).
+    static var eimVersion: String {
+        let idf = Pins.espIDF.components
+        return idf[2] == 0 ? "v\(idf[0]).\(idf[1])" : "v\(idf[0]).\(idf[1]).\(idf[2])"
+    }
 
-        // ESP-IDF's tools and Python environment. This also runs when ESP-IDF
-        // was installed already: it installs only what's missing. Only the
-        // RISC-V chips' tools, which share one compiler.
-        system.report("Installing ESP-IDF's tools...")
-        let status = system.runVisibly("\(idf)/install.sh", [Pins.chips.joined(separator: ",")], environment: idfEnvironment)
-        guard status == 0 else { throw EspSwiftError("Installing ESP-IDF's tools failed.") }
+    /// How to install EIM, which ESPSwift doesn't do itself: Homebrew asks
+    /// you to trust Espressif's tap first.
+    static func eimInstructions(_ operatingSystem: OperatingSystem) -> String {
+        operatingSystem == .macOS
+            ? "Install it with Homebrew: brew tap espressif/eim && brew trust --formula espressif/eim/eim && brew install eim"
+            : "Install it from Espressif's package repository (see https://docs.espressif.com/projects/idf-im-ui/en/latest/), or with Homebrew on Linux: brew tap espressif/eim && brew install eim"
+    }
+
+    func installESPIDF() throws {
+        if let installation = EIM(system: system).pinnedInstallation() {
+            system.report("ESP-IDF \(Pins.espIDF) is installed (\(locations.display(installation.path, home: system.homeDirectory))).")
+            return
+        }
+        guard let eim = system.findExecutable("eim") else {
+            throw EspSwiftError("ESPSwift installs ESP-IDF with EIM, Espressif's ESP-IDF Installation Manager, which wasn't found. \(Self.eimInstructions(system.operatingSystem)) Then run espswift setup again.")
+        }
+        // Only the RISC-V chips' tools, which share one compiler. EIM checks
+        // Python by the first python3 on PATH: ESPSwift's.
+        system.report("Installing ESP-IDF \(Self.eimVersion) and its tools with EIM...")
+        let status = system.runVisibly(eim, [
+            "install", "--idf-versions", Self.eimVersion, "--target", Pins.chips.joined(separator: ","),
+            "--non-interactive", "true", "--do-not-track", "true", "--cleanup", "true",
+        ], environment: idfEnvironment)
+        guard status == 0 else { throw EspSwiftError("EIM couldn't install ESP-IDF \(Self.eimVersion).") }
     }
 
     // ── 4. Swift ─────────────────────────────────────────────────────

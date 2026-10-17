@@ -36,18 +36,17 @@ import Testing
 }
 
 @Suite struct BuildTests {
-    /// The test project, with ESP-IDF's environment (export.sh's) and a build
+    /// The test project, with ESP-IDF's environment (EIM's) and a build
     /// whose output has an error.
     static func system() -> FakeSystem {
         let system = ProjectTests.system()
         system.file("/Users/test/Blink/Blink/sdkconfig.defaults", "CONFIG_IDF_TARGET=\"esp32c6\"\n")
-        system.streams["/bin/bash"] = ["PATH=/idf/tools\0IDF_PYTHON_ENV_PATH=/Users/test/.espressif/python_env/idf6.1_py3.14_env\0"]
-        system.streams["/Users/test/.espressif/python_env/idf6.1_py3.14_env/bin/python"] = [
+        system.streams[FakeSystem.idfPython] = [
             "-- Configuring done",
             "/Users/test/Blink/Firmware/Firmware.swift:3:1: error: oops",
         ]
         // idf.py creates the build folder (-B).
-        system.effects["/Users/test/.espressif/python_env/idf6.1_py3.14_env/bin/python"] = { system, arguments in
+        system.effects[FakeSystem.idfPython] = { system, arguments in
             try? system.createDirectory(arguments[arguments.firstIndex(of: "-B")! + 1])
             return 0
         }
@@ -59,9 +58,8 @@ import Testing
         let project = try Project.find(system: system, start: "/Users/test/Blink")
         try Build(system: system, project: project, verbose: false).run(.build)
 
-        let idf = "run /Users/test/.espressif/python_env/idf6.1_py3.14_env/bin/python /Users/test/.espswift/esp-idf/tools/idf.py -C /Users/test/Blink/Blink -B /Users/test/Blink/Blink/build -D CMAKE_COLOR_DIAGNOSTICS=OFF"
+        let idf = "run \(FakeSystem.idfPython) \(FakeSystem.idf)/tools/idf.py -C /Users/test/Blink/Blink -B /Users/test/Blink/Blink/build -D CMAKE_COLOR_DIAGNOSTICS=OFF"
         #expect(system.actions.filter { $0.hasPrefix("run ") } == [
-            "run /bin/bash -c set -e; . \"$IDF_PATH/export.sh\" > /dev/null 2>&1; env -0",
             "\(idf) set-target esp32c6",
             "\(idf) build",
         ])
@@ -99,7 +97,7 @@ import Testing
 
     @Test func failsAfterShowingTheErrors() throws {
         let system = Self.system()
-        system.effects["/Users/test/.espressif/python_env/idf6.1_py3.14_env/bin/python"] = { system, arguments in
+        system.effects[FakeSystem.idfPython] = { system, arguments in
             try? system.createDirectory(arguments[arguments.firstIndex(of: "-B")! + 1])
             return arguments.last == "build" ? 1 : 0
         }

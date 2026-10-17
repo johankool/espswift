@@ -48,7 +48,8 @@ import Testing
 @Suite struct DebugTests {
     static func system() -> FakeSystem {
         let system = BuildTests.system()
-        system.streams["/bin/bash"] = ["PATH=/idf/openocd/bin\0IDF_PYTHON_ENV_PATH=/env\0OPENOCD_SCRIPTS=/idf/openocd/share\0"]
+        system.setIDFEnvironment(["PATH": "/idf/openocd/bin", "IDF_PATH": FakeSystem.idf, "IDF_PYTHON_ENV_PATH": "/env",
+                                  "OPENOCD_SCRIPTS": "/idf/openocd/share"])
         system.file("/idf/openocd/bin/openocd", "")
         system.file("/idf/openocd/share/board/esp32c6-builtin.cfg", "")
         system.file("/b/project_description.json", #"{"app_elf": "Blink.elf"}"#)
@@ -63,15 +64,14 @@ import Testing
         let system = Self.system()
         try Debug(system: system).run(build: LastBuild(sourceFolder: "/Users/test/Blink/Blink", buildFolder: "/b"))
         let steps = system.actions.filter { !$0.hasPrefix("mkdir") && !$0.hasPrefix("write") && !$0.hasPrefix("rm") }
-        #expect(steps.first == "run /bin/bash -c set -e; . \"$IDF_PATH/export.sh\" > /dev/null 2>&1; env -0")
-        #expect(Array(steps.dropFirst()) == [
+        #expect(steps == [
             "ignore Ctrl+C",
             "start /idf/openocd/bin/openocd -f board/esp32c6-builtin.cfg",
-            steps[3],
+            steps[2],
             "terminate",
             "allow Ctrl+C",
         ])
-        #expect(steps[3].hasPrefix("run \(FakeSystem.toolchain)/usr/bin/lldb -o settings set target.require-hardware-breakpoint true -o target create \"/b/Blink.elf\""))
+        #expect(steps[2].hasPrefix("run \(FakeSystem.toolchain)/usr/bin/lldb -o settings set target.require-hardware-breakpoint true -o target create \"/b/Blink.elf\""))
     }
 
     @Test func explainsChipsWithoutBuiltInJTAG() {

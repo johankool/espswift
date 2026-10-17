@@ -58,18 +58,18 @@ import Testing
         let checks = Doctor(system: FakeSystem.workingMac).checks()
         #expect(checks.allSatisfy { $0.status == .ok }, "\(checks.filter { $0.status != .ok })")
         #expect(checks.map(\.name) == [
-            "Python 3.14", "CMake", "Ninja", "ESP-IDF 6.1.0", "ESP-IDF tools", "Swift 6.4", "Xcode template", "Boards",
+            "Python 3.14", "EIM", "ESP-IDF 6.1.0", "ESP-IDF tools", "Swift 6.4", "Xcode template", "Boards",
         ])
         #expect(checks.last?.detail == "/dev/cu.usbmodem21101")
     }
 
     @Test func failsWithoutESPIDF() {
         let system = FakeSystem.workingMac
-        system.files["/Users/test/.espswift/esp-idf/tools/cmake/version.cmake"] = nil
+        system.files["\(FakeSystem.idf)/tools/cmake/version.cmake"] = nil
         let checks = Doctor(system: system).checks()
         let check = checks.first { $0.name.hasPrefix("ESP-IDF 6") }
         #expect(check?.status == .failed)
-        #expect(check?.detail == "not found at ~/.espswift/esp-idf")
+        #expect(check?.detail == "not found at ~/.espressif/v6.1/esp-idf")
         #expect(check?.fix != nil)
         #expect(!Doctor.passed(checks))
     }

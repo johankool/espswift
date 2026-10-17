@@ -97,7 +97,7 @@ final class SleepCountingSystem: System, @unchecked Sendable {
         system.file("/Users/test/Blink/Blink/build/flasher_args.json", "{}")
         try Flash(system: system).run(sourceFolder: "/Users/test/Blink/Blink", buildFolder: "/Users/test/Blink/Blink/build",
                                       port: "/dev/cu.usbmodem1")
-        #expect(system.actions.contains("run /Users/test/.espressif/python_env/idf6.1_py3.14_env/bin/python /Users/test/.espswift/esp-idf/tools/idf.py -C /Users/test/Blink/Blink -B /Users/test/Blink/Blink/build -p /dev/cu.usbmodem1 flash"))
+        #expect(system.actions.contains("run \(FakeSystem.idfPython) \(FakeSystem.idf)/tools/idf.py -C /Users/test/Blink/Blink -B /Users/test/Blink/Blink/build -p /dev/cu.usbmodem1 flash"))
     }
 
     @Test func needsABuild() {

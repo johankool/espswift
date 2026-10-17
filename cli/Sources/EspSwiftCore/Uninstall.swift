@@ -82,7 +82,8 @@ public struct Uninstall: Sendable {
 
         system.report("")
         system.report("""
-            Not removed: Homebrew's packages (Python, CMake, Ninja), swiftly, espswift itself \
+            Not removed: ESP-IDF, which EIM installed (eim remove \(Setup.eimVersion), or eim purge for all \
+            versions), Homebrew's packages (Python, EIM), swiftly, espswift itself \
             (brew uninstall espswift), and your projects.
             """)
     }

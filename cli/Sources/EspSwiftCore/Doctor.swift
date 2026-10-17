@@ -42,8 +42,7 @@ public struct Doctor: Sendable {
     public func checks() -> [Check] {
         var checks = [
             checkPython(),
-            checkTool("CMake", "cmake", ["--version"]),
-            checkTool("Ninja", "ninja", ["--version"]),
+            checkEIM(),
             checkESPIDF(),
             checkESPIDFEnvironment(),
             checkSwift(),
@@ -94,6 +93,16 @@ public struct Doctor: Sendable {
         return Check(name, .ok, version.map { "\($0) (\(display(path)))" } ?? display(path))
     }
 
+    /// EIM, which installs ESP-IDF; only needed for espswift setup.
+    func checkEIM() -> Check {
+        guard let eim = system.findExecutable("eim") else {
+            return Check("EIM", .warning, "not found; espswift setup needs it to install ESP-IDF",
+                         fix: Setup.eimInstructions(system.operatingSystem))
+        }
+        let version = system.run(eim, ["--version"]).flatMap { VersionParser.firstVersion(in: $0.output) }
+        return Check("EIM", .ok, version.map { "\($0) (\(display(eim)))" } ?? display(eim))
+    }
+
     func checkESPIDF() -> Check {
         let name = "ESP-IDF \(Pins.espIDF)"
         guard let text = system.readFile("\(locations.idfPath)/tools/cmake/version.cmake") else {
@@ -108,16 +117,22 @@ public struct Doctor: Sendable {
         return Check(name, .ok, "\(version) (\(display(locations.idfPath)))")
     }
 
-    /// ESP-IDF's tools install a Python environment per ESP-IDF and Python
-    /// version, such as idf6.1_py3.14_env.
+    /// ESP-IDF's environment (EIM's activation script, or export.sh) and
+    /// the Python environment in it, which runs idf.py.
     func checkESPIDFEnvironment() -> Check {
-        let idf = Pins.espIDF.components
-        let python = (system.operatingSystem == .macOS ? Pins.python : pythonVersion() ?? Pins.minimumPython).components
-        let environment = "\(locations.idfToolsPath)/python_env/idf\(idf[0]).\(idf[1])_py\(python[0]).\(python[1])_env"
-        guard system.isDirectory(environment) else {
-            return Check("ESP-IDF tools", .failed, "no Python environment at \(display(environment))", fix: Self.setupFix)
+        let name = "ESP-IDF tools"
+        guard let environment = try? ESPIDF(system: system).environment() else {
+            let fix = EIM(system: system).pinnedInstallation().map { "Run: eim fix \($0.name)" } ?? Self.setupFix
+            return Check(name, .failed, "ESP-IDF's environment can't be set up", fix: fix)
         }
-        return Check("ESP-IDF tools", .ok, display(environment))
+        let python = ESPIDF.python(environment)
+        guard let version = system.run(python, ["--version"]).flatMap({ VersionParser.python(versionOutput: $0.output) }) else {
+            // A Python environment breaks when the Python it was made with
+            // is removed, e.g. by a Homebrew upgrade.
+            let fix = EIM(system: system).pinnedInstallation().map { "Run: eim fix \($0.name)" } ?? Self.setupFix
+            return Check(name, .failed, "\(display(python)) doesn't run", fix: fix)
+        }
+        return Check(name, .ok, "Python \(version) (\(display(environment["IDF_PYTHON_ENV_PATH"] ?? python)))")
     }
 
     func checkSwift() -> Check {
