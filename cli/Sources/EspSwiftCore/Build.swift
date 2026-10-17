@@ -108,8 +108,10 @@ public struct Build: Sendable {
 
     /// Warns (in Xcode's Issue navigator) when the project needs updating:
     /// its files are older than the template (ESPSWIFT_PROJECT_VERSION, set
-    /// by the project's build.sh), or code completion uses another Swift
-    /// toolchain than the build, e.g. after a Swift upgrade.
+    /// by the project's build.sh), code completion uses another Swift
+    /// toolchain than the build, e.g. after a Swift upgrade, or the Run
+    /// scheme doesn't know where espswift is (in a project from elsewhere,
+    /// such as ESPSwift's examples).
     func checkProject(environment: [String: String]) {
         let update = "~/.espswift/bin/espswift update --project \"\(project.folder)\""
         let version = projectVersion()
@@ -126,6 +128,12 @@ public struct Build: Sendable {
             if let other = used.first(where: { $0 != toolchain }) {
                 system.report("warning: Code completion uses another Swift toolchain (\(other)) than the build (\(toolchain)). To update the project, run in Terminal: \(update)")
             }
+        }
+        let schemes = "\(project.folder)/\(project.name).xcodeproj/xcshareddata/xcschemes"
+        if system.operatingSystem == .macOS, system.contentsOfDirectory(schemes).contains(where: {
+            system.readFile("\(schemes)/\($0)")?.contains(XcodeTemplate.commandPlaceholder) == true
+        }) {
+            system.report("warning: The Run scheme (Cmd+R) doesn't know where espswift is yet. To set it up, run in Terminal: \(update)")
         }
     }
 

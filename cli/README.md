@@ -14,7 +14,7 @@ espswift run [--port] [--last-build]       # builds, flashes and monitors (Cmd+R
 espswift debug                             # debugs the firmware on the board with LLDB (OpenOCD, built-in USB-JTAG)
 espswift add <component> [--header]        # adds an ESP-IDF library (main/idf_component.yml and ESPIDF.h)
 espswift settings                          # ESP-IDF's settings menu (menuconfig)
-espswift update                            # updates a project created from an older template
+espswift update                            # updates a project created from an older template, or sets up an example
 espswift doctor                            # checks Python, EIM, ESP-IDF and its tools, Swift, the Xcode template and boards
 espswift ports [--first]                   # lists the serial ports of connected boards
 espswift xcode install-template            # installs or updates the Xcode template (macOS)

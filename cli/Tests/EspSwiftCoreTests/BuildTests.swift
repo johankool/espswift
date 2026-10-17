@@ -81,6 +81,17 @@ import Testing
         #expect(!system.reports.contains { $0.hasPrefix("warning: This project was created with an older version") })
     }
 
+    @Test func warnsWhenTheRunSchemeDoesNotKnowEspswift() throws {
+        // As in an example project from ESPSwift's repository.
+        let system = Self.system()
+        system.environment["ESPSWIFT_PROJECT_VERSION"] = "1"
+        system.file("/Users/test/Blink/Blink.xcodeproj/xcshareddata/xcschemes/Blink.xcscheme",
+                    "<PathRunnable FilePath = \"ESPSWIFT_COMMAND_PATH\">")
+        let project = try Project.find(system: system, start: "/Users/test/Blink")
+        try Build(system: system, project: project, verbose: false).run(.build)
+        #expect(system.reports.contains { $0.hasPrefix("warning: The Run scheme (Cmd+R) doesn't know where espswift is yet.") })
+    }
+
     @Test func buildsInXcodesDerivedData() throws {
         let system = Self.system()
         system.environment["TARGET_TEMP_DIR"] = "/Users/test/DerivedData/Blink.build"

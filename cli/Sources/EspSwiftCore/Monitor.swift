@@ -71,7 +71,7 @@ public struct Monitor: Sendable {
             guard remaining > 0 else { return }
             remaining -= 1
             system.report("")
-            system.report("(\(port) went away; the board reset or was unplugged.)")
+            system.report("(\(port) went away: the board reset, went into deep sleep or was unplugged.)")
         }
     }
 

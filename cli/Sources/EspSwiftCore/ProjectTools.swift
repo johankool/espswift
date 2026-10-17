@@ -63,6 +63,9 @@ public struct AddLibrary: Sendable {
 ///    template version.
 /// 2. Points the Indexing target, which code completion uses, at the Swift
 ///    toolchain setup installed, e.g. after a Swift upgrade.
+/// 3. Points the Run scheme (Cmd+R) at espswift, in a project that doesn't
+///    know where it is: one that wasn't created on this Mac, such as the
+///    examples in ESPSwift's repository.
 public struct UpdateProject: Sendable {
     public var system: System
     public var project: Project
@@ -116,6 +119,18 @@ public struct UpdateProject: Sendable {
                 changed = true
             } else if !text.contains("TOOLCHAINS = ") {
                 system.report("  Note: This project has no Indexing target, so it doesn't get code completion.")
+            }
+        }
+
+        // ── 3. espswift in the Run scheme (macOS) ──
+        let schemes = "\(project.folder)/\(project.name).xcodeproj/xcshareddata/xcschemes"
+        for name in system.contentsOfDirectory(schemes) where name.hasSuffix(".xcscheme") {
+            let scheme = "\(schemes)/\(name)"
+            if let text = system.readFile(scheme), text.contains(XcodeTemplate.commandPlaceholder) {
+                let command = Locations(system: system).command
+                try system.writeFile(scheme, text.replacingOccurrences(of: XcodeTemplate.commandPlaceholder, with: command))
+                system.report("  Pointed the scheme \(name.dropLast(".xcscheme".count)) (Cmd+R) at \(command).")
+                changed = true
             }
         }
 
