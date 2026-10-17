@@ -9,6 +9,8 @@ Write firmware for RISC-V based ESP32 chips in Swift — build and flash directl
 
 > ⚠️ **Experimental Preview** — This project is in active development. Commands and installation paths may change without notice. Tested on macOS 27 with Apple Silicon, and on Ubuntu 24.04.
 
+ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template) by Gibeom Ko.
+
 > 🤖 **AI-assisted development** — This project was built with significant help from Claude (Anthropic) as a pair programming tool. Architecture decisions, debugging, and hardware validation were done by the author.
 
 ## Features
@@ -34,9 +36,23 @@ Write firmware for RISC-V based ESP32 chips in Swift — build and flash directl
 ## Quick Start
 
 ### Install
+With [Homebrew](https://brew.sh):
+
 ```bash
-git clone https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template.git
-cd Embedded-Swift-Xcode-Template
+brew tap johankool/espswift
+brew trust --tap johankool/espswift
+brew trust --formula espressif/eim/eim
+brew install --HEAD espswift
+espswift setup
+```
+
+Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose EIM installs ESP-IDF. Until ESPSwift has releases, Homebrew builds `espswift` from the main branch (`--HEAD`); update it with `brew upgrade --fetch-HEAD espswift`.
+
+Or from a copy of this repository:
+
+```bash
+git clone https://github.com/johankool/espswift.git
+cd espswift
 bash install.sh
 ```
 
@@ -187,7 +203,7 @@ CH340-based boards may need a driver on macOS: [WCH CH340 Driver](https://www.wc
 ## Architecture
 
 ```
-Embedded-Swift-Xcode-Template/
+espswift/
 ├── install.sh                        # Builds espswift and runs espswift setup
 ├── cli/                              # espswift, ESPSwift's command-line tool (see cli/README.md)
 │   ├── Sources/espswift/            # The commands (swift-argument-parser)
@@ -296,7 +312,7 @@ This project is being developed as part of the [Swift Mentorship Program](https:
 - The firmware package is built with SwiftPM's deprecated `--build-system native` (see [ROADMAP.md](ROADMAP.md))
 - The very first lines a board prints after flashing can be missing in the serial output; press the board's RESET button to see them
 
-See all open issues: [GitHub Issues](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template/issues)
+See all open issues: [GitHub Issues](https://github.com/johankool/espswift/issues)
 
 ---
 

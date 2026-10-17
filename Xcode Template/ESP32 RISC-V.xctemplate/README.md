@@ -163,4 +163,4 @@ The serial output starts when the monitor connects, just after the board starts,
 
 ## More help
 
-See the [Embedded Swift Xcode Template](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template) README for troubleshooting.
+See the [ESPSwift](https://github.com/johankool/espswift) README for troubleshooting.

@@ -17,8 +17,8 @@ Thank you for your interest in contributing! This project aims to make Embedded 
 ### 1. Fork and clone
 
 ```bash
-git clone https://github.com/<your-username>/Embedded-Swift-Xcode-Template.git
-cd Embedded-Swift-Xcode-Template
+git clone https://github.com/<your-username>/espswift.git
+cd espswift
 ```
 
 ### 2. Set up your environment
@@ -78,7 +78,7 @@ Then open a PR on GitHub against the `main` branch.
 ## Project Structure
 
 ```
-Embedded-Swift-Xcode-Template/
+espswift/
 ├── install.sh                        # Builds espswift and runs espswift setup
 ├── cli/                              # espswift, ESPSwift's command-line tool (see cli/README.md)
 │   ├── Package.swift
@@ -172,7 +172,7 @@ Before contributing, it helps to know the current limitations:
 - Embedded Swift is experimental — not all Swift standard library features work
 - Xcode's debug console is read-only (no serial input)
 
-See all open issues: [GitHub Issues](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template/issues)
+See all open issues: [GitHub Issues](https://github.com/johankool/espswift/issues)
 
 ---
 
