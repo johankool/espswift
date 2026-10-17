@@ -16,14 +16,17 @@ public struct NewProject: Sendable {
         self.template = template
     }
 
-    /// The template's definitions and its pop-up, Board.
+    /// The template's definitions and its pop-ups, Board and Example.
     struct TemplateInfo {
         var nodes: [String]
         var definitions: [String: [String: Any]]
         var options: [[String: Any]]
 
-        var boardOption: [String: Any]? {
-            options.first { $0["Identifier"] as? String == "board" }
+        var boardOption: [String: Any]? { option("board") }
+        var exampleOption: [String: Any]? { option("example") }
+
+        func option(_ identifier: String) -> [String: Any]? {
+            options.first { $0["Identifier"] as? String == identifier }
         }
 
         /// The boards, in the pop-up's order, with their titles and chips
@@ -35,6 +38,14 @@ public struct NewProject: Sendable {
             let variables = option["Variables"] as? [String: [String: String]] ?? [:]
             return zip(values, titles).map { Board(value: $0, title: $1, chip: variables[$0]?["chip"] ?? "") }
         }
+
+        /// The examples, in the pop-up's order, with their titles.
+        var examples: [Example] {
+            guard let option = exampleOption else { return [] }
+            let values = option["Values"] as? [String] ?? []
+            let titles = option["ValueTitles"] as? [String] ?? values
+            return zip(values, titles).map { Example(value: $0, title: $1) }
+        }
     }
 
     /// A board the template offers.
@@ -42,6 +53,12 @@ public struct NewProject: Sendable {
         public var value: String
         public var title: String
         public var chip: String
+    }
+
+    /// An example the template starts projects from.
+    public struct Example: Sendable, Equatable {
+        public var value: String
+        public var title: String
     }
 
     func templateInfo() throws -> TemplateInfo {
@@ -57,6 +74,33 @@ public struct NewProject: Sendable {
     /// The boards the template offers, in its Board pop-up's order.
     public func boards() throws -> [Board] {
         try templateInfo().boards
+    }
+
+    /// The examples the template offers, in its Example pop-up's order.
+    public func examples() throws -> [Example] {
+        try templateInfo().examples
+    }
+
+    /// The board the template's Board pop-up starts with.
+    public func defaultBoard() throws -> String {
+        try board(nil, chip: nil)
+    }
+
+    /// The example to use: the given one, if the template has it, else the
+    /// pop-up's default.
+    public func example(_ example: String?) throws -> String {
+        let info = try templateInfo()
+        let examples = info.examples
+        if let example {
+            guard examples.contains(where: { $0.value == example }) else {
+                throw EspSwiftError("The template has no example \(example); see espswift new --list-examples.")
+            }
+            return example
+        }
+        guard let fallback = info.exampleOption?["Default"] as? String ?? examples.first?.value else {
+            throw EspSwiftError("The template has no examples to choose from.")
+        }
+        return fallback
     }
 
     /// The board to use for a chip and a board, either of which can be
@@ -87,17 +131,18 @@ public struct NewProject: Sendable {
         return fallback
     }
 
-    /// Creates the project `name` for `board` (else the template's default)
-    /// in `parent` (the project folder is parent/name); returns the project
-    /// folder.
+    /// Creates the project `name` for `board`, from `example` (else the
+    /// template's defaults) in `parent` (the project folder is parent/name);
+    /// returns the project folder.
     @discardableResult
-    public func run(name: String, board: String? = nil, in parent: String, author: String,
-                    date: String) throws -> String {
+    public func run(name: String, board: String? = nil, example: String? = nil, in parent: String,
+                    author: String, date: String) throws -> String {
         guard !name.isEmpty, !name.contains("/"), !name.hasPrefix("."), name.allSatisfy({ !$0.isWhitespace }) else {
             throw EspSwiftError("\"\(name)\" can't be a project name: use letters, digits, - or _, without spaces.")
         }
         let info = try templateInfo()
         let board = try self.board(board, chip: nil)
+        let example = try self.example(example)
         let root = "\(parent)/\(name)"
         guard !system.fileExists(root) else {
             throw EspSwiftError("\(root) exists already.")
@@ -107,25 +152,33 @@ public struct NewProject: Sendable {
             "___FULLUSERNAME___": author,
             "___DATE___": date,
         ]
-        // Each pop-up's value (the board, or its default) and the variables
-        // that value sets (Variables, such as the board's chip), as
-        // ___VARIABLE_<name>___.
+        // Each pop-up's value (the board, the example, or its default) and
+        // the variables that value sets (Variables, such as the board's
+        // chip), as ___VARIABLE_<name>___; and the files that value adds
+        // (its Units: the example's files).
+        var nodes = info.nodes
+        var definitions = info.definitions
         for option in info.options {
             guard let identifier = option["Identifier"] as? String else { continue }
             let values = option["Values"] as? [String] ?? []
-            guard let value = identifier == "board" ? board : option["Default"] as? String ?? values.first else { continue }
+            let chosen = ["board": board, "example": example][identifier]
+            guard let value = chosen ?? option["Default"] as? String ?? values.first else { continue }
             placeholders["___VARIABLE_\(identifier)___"] = value
             for (variable, text) in (option["Variables"] as? [String: [String: String]])?[value] ?? [:] {
                 placeholders["___VARIABLE_\(variable)___"] = text
+            }
+            if let unit = (option["Units"] as? [String: [String: Any]])?[value] {
+                nodes += unit["Nodes"] as? [String] ?? []
+                definitions.merge(unit["Definitions"] as? [String: [String: Any]] ?? [:]) { $1 }
             }
         }
         func fillIn(_ text: String) -> String {
             placeholders.reduce(text) { $0.replacingOccurrences(of: $1.key, with: $1.value) }
         }
 
-        for node in info.nodes {
+        for node in nodes {
             // The Xcode project's files (its scheme) are only for Xcode.
-            guard !node.contains(".xcodeproj/"), let definition = info.definitions[node],
+            guard !node.contains(".xcodeproj/"), let definition = definitions[node],
                   let path = definition["Path"] as? String else { continue }
             // Files go in the source folder (named after the project), except
             // top-level ones, which go next to the Xcode project.
@@ -145,7 +198,8 @@ public struct NewProject: Sendable {
                 if to.hasSuffix(".sh") { try system.makeExecutable(to) }
             }
         }
-        system.report("Created \(name) in \(root), for \(placeholders["___VARIABLE_boardName___"] ?? board).")
+        let exampleTitle = placeholders["___VARIABLE_exampleTitle___"].map { ", from the \($0) example" } ?? ""
+        system.report("Created \(name) in \(root), for \(placeholders["___VARIABLE_boardName___"] ?? board)\(exampleTitle).")
         return root
     }
 

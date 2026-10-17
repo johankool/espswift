@@ -139,6 +139,23 @@ extension System {
             .trimmingCharacters(in: .whitespaces).lowercased() ?? ""
         return answer.isEmpty ? defaultAnswer : answer.hasPrefix("y")
     }
+
+    /// Asks to choose one of a list, numbered from 1; returns its index.
+    /// Without a terminal, or with an empty answer, it's the default.
+    public func choose(_ question: String, from choices: [String], default defaultIndex: Int) -> Int {
+        guard isInteractive, !choices.isEmpty else { return defaultIndex }
+        report(question)
+        for (index, choice) in choices.enumerated() {
+            report("  \(index + 1). \(choice)")
+        }
+        while true {
+            guard let answer = ask("Choose 1–\(choices.count) [\(defaultIndex + 1)]: ")?
+                .trimmingCharacters(in: .whitespaces) else { return defaultIndex }
+            if answer.isEmpty { return defaultIndex }
+            if let number = Int(answer), choices.indices.contains(number - 1) { return number - 1 }
+            report("Choose a number from 1 to \(choices.count).")
+        }
+    }
 }
 
 /// The system espswift runs on.

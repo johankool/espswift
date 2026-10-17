@@ -25,7 +25,7 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
 ✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
-✅ **Example Projects** — a button, an I2C sensor, Wi-Fi with HTTPS, Bluetooth LE and deep sleep, in [Examples](Examples)  
+✅ **Examples to Start From** — Blink, a button, an I2C sensor, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
 
 ---
 
@@ -66,14 +66,14 @@ On Linux, install ESP-IDF's prerequisites (on Ubuntu: `sudo apt install git wget
 
 ### Create a Project in Xcode
 1. Restart Xcode
-2. File → New → Project → Choose Template… → Other → **ESP32 RISC-V**, and choose your board in the **Board** pop-up (or Other, with its chip)
+2. File → New → Project → Choose Template… → Other → **ESP32 RISC-V**, choose your board in the **Board** pop-up (or Other, with its chip), and what to start from in the **Example** pop-up (see [Examples](#examples))
 3. Connect your board via USB
 4. Press `Cmd+B` — builds the firmware
 5. Press `Cmd+R` — flashes it to the board and shows its serial output in Xcode's console
 
 ### Create a Project in Terminal
 ```bash
-~/.espswift/bin/espswift new MyProject --board esp32-c6-devkitc-1   # see --list-boards
+~/.espswift/bin/espswift new MyProject   # asks for your board and an example
 cd MyProject
 ~/.espswift/bin/espswift run        # build, flash and show the serial output
 ```
@@ -151,7 +151,22 @@ public func app_main() {
 }
 ```
 
-More examples, each a project to open in Xcode, are in [Examples](Examples): reading a button, an I2C temperature sensor, Wi-Fi with an HTTPS request, a Bluetooth LE light and deep sleep.
+---
+
+## Examples
+
+A new project starts from one of the template's examples: the **Example** pop-up in Xcode, or `espswift new --example` (see `--list-examples`). Each works on every board in the Board pop-up; the pins it uses are those of your board. The comments at the top of the project's `Firmware/Firmware.swift` explain it, and what to wire.
+
+| Example | What it does | What it shows |
+| --- | --- | --- |
+| Blink (`blink`) | Blinks the LED: red, green, blue, off | The board's LED, whatever kind it is |
+| Button input (`button-input`) | The BOOT button changes the LED's colour; holding it turns the LED off | Reading a GPIO pin, with debouncing tested on the Mac |
+| I2C sensor (`i2c-sensor`) | Reads a Sensirion SHT4x temperature and humidity sensor, and shows the temperature on the LED | ESP-IDF's I2C driver; checksums and conversions tested on the Mac |
+| Wi-Fi and HTTPS (`wifi-request`) | Connects to your Wi-Fi network and requests a web page over HTTPS; until you set your network in `Credentials.swift`, lists the networks nearby | ESP-IDF's Wi-Fi, events and HTTP client, with its certificate bundle |
+| Bluetooth LE light (`ble-light`) | A phone (with an app such as nRF Connect or LightBlue) connects and writes the LED's colour: three bytes, such as `200000` for red | A GATT server with NimBLE, and C callbacks in Swift |
+| Deep sleep (`deep-sleep`) | Shows a colour, sleeps for 10 seconds, wakes up with the next one | Deep sleep, a timer wake-up, and a variable in RTC memory (`@section(".rtc.data")`) |
+
+The ESP32-H2 and ESP32-P4 have no Wi-Fi, and the ESP32-P4 has no Bluetooth; there, those examples say so. A board in deep sleep isn't connected over USB: to flash it, hold BOOT while pressing RESET.
 
 ---
 
@@ -213,10 +228,9 @@ espswift/
 │   ├── Sources/espswift/            # The commands (swift-argument-parser)
 │   ├── Sources/EspSwiftCore/        # What they do: setup, build, flash, monitor, debug, ...
 │   └── Tests/EspSwiftCoreTests/     # Unit tests (swift test)
-├── Examples/                        # Example projects: button, I2C sensor, Wi-Fi, Bluetooth LE, deep sleep
 ├── tests/
-│   ├── test_template.sh             # Builds the template for every chip, and the examples (also run in CI, on macOS and Linux)
-│   └── xcode_project.py             # Writes the examples' Xcode projects
+│   ├── test_template.sh             # Builds the template for every chip, and its examples (also run in CI, on macOS and Linux)
+│   └── xcode_project.py             # Writes a test project's Xcode project, as Xcode would
 └── Xcode Template/
     └── ESP32 RISC-V.xctemplate/
         ├── TemplateInfo.plist       # Xcode template configuration

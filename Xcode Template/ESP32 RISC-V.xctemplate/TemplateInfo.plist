@@ -38,21 +38,6 @@
 			<key>TargetIndices</key>
 			<array/>
 		</dict>
-		<key>Firmware/Firmware.swift</key>
-		<dict>
-			<key>Group</key>
-			<array>
-				<string>Firmware</string>
-			</array>
-			<key>IsTopLevel</key>
-			<true/>
-			<key>Path</key>
-			<string>Firmware_Firmware.swift</string>
-			<key>TargetIdentifiers</key>
-			<array>
-				<string>com.espswift.target.indexing</string>
-			</array>
-		</dict>
 		<key>Firmware/Board.swift</key>
 		<dict>
 			<key>Group</key>
@@ -111,21 +96,6 @@
 			<key>TargetIndices</key>
 			<array/>
 		</dict>
-		<key>Firmware/ESPIDF/include/ESPIDF.h</key>
-		<dict>
-			<key>Group</key>
-			<array>
-				<string>Firmware</string>
-				<string>ESPIDF</string>
-				<string>include</string>
-			</array>
-			<key>IsTopLevel</key>
-			<true/>
-			<key>Path</key>
-			<string>ESPIDF_ESPIDF.h</string>
-			<key>TargetIndices</key>
-			<array/>
-		</dict>
 		<key>Firmware/ESPIDF/ESPIDF.c</key>
 		<dict>
 			<key>Group</key>
@@ -137,19 +107,6 @@
 			<true/>
 			<key>Path</key>
 			<string>ESPIDF_ESPIDF.c</string>
-			<key>TargetIndices</key>
-			<array/>
-		</dict>
-		<key>Packages/___PROJECTNAME___Kit</key>
-		<dict>
-			<key>Group</key>
-			<string>Packages</string>
-			<key>IsPackageReference</key>
-			<true/>
-			<key>IsTopLevel</key>
-			<true/>
-			<key>Path</key>
-			<string>Kit</string>
 			<key>TargetIndices</key>
 			<array/>
 		</dict>
@@ -216,14 +173,11 @@
 		<string>main/CMakeLists.txt</string>
 		<string>main/idf_component.yml</string>
 		<string>main/swift_flags.c</string>
-		<string>Firmware/Firmware.swift</string>
 		<string>Firmware/Board.swift</string>
 		<string>Firmware/LED.swift</string>
 		<string>Firmware/FreeRTOS.swift</string>
 		<string>Firmware/Package.swift</string>
-		<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 		<string>Firmware/ESPIDF/ESPIDF.c</string>
-		<string>Packages/___PROJECTNAME___Kit</string>
 		<string>../.gitignore</string>
 		<string>../___PROJECTNAME___.xcodeproj/xcshareddata/xcschemes/___PROJECTNAME___.xcscheme</string>
 	</array>
@@ -314,6 +268,12 @@
 					<string>ESP32-C3-DevKitM-1</string>
 					<key>chip</key>
 					<string>esp32c3</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>esp32-c5-devkitc-1</key>
 				<dict>
@@ -325,6 +285,12 @@
 					<string>ESP32-C5-DevKitC-1</string>
 					<key>chip</key>
 					<string>esp32c5</string>
+					<key>boardButton</key>
+					<string>28</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>esp32-c6-devkitc-1</key>
 				<dict>
@@ -336,6 +302,12 @@
 					<string>ESP32-C6-DevKitC-1</string>
 					<key>chip</key>
 					<string>esp32c6</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>22</string>
+					<key>boardI2CSCL</key>
+					<string>23</string>
 				</dict>
 				<key>esp32-c6-devkitm-1</key>
 				<dict>
@@ -347,6 +319,12 @@
 					<string>ESP32-C6-DevKitM-1</string>
 					<key>chip</key>
 					<string>esp32c6</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>22</string>
+					<key>boardI2CSCL</key>
+					<string>23</string>
 				</dict>
 				<key>esp32-c61-devkitc-1</key>
 				<dict>
@@ -358,6 +336,12 @@
 					<string>ESP32-C61-DevKitC-1</string>
 					<key>chip</key>
 					<string>esp32c61</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>esp32-h2-devkitm-1</key>
 				<dict>
@@ -369,6 +353,12 @@
 					<string>ESP32-H2-DevKitM-1</string>
 					<key>chip</key>
 					<string>esp32h2</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>esp32-p4-function-ev-board</key>
 				<dict>
@@ -380,6 +370,12 @@
 					<string>ESP32-P4-Function-EV-Board</string>
 					<key>chip</key>
 					<string>esp32p4</string>
+					<key>boardButton</key>
+					<string>35</string>
+					<key>boardI2CSDA</key>
+					<string>7</string>
+					<key>boardI2CSCL</key>
+					<string>8</string>
 				</dict>
 				<key>esp8684-devkitm-1</key>
 				<dict>
@@ -391,6 +387,12 @@
 					<string>ESP8684-DevKitM-1 (ESP32-C2)</string>
 					<key>chip</key>
 					<string>esp32c2</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>m5stack-nanoc6</key>
 				<dict>
@@ -402,6 +404,12 @@
 					<string>M5Stack NanoC6</string>
 					<key>chip</key>
 					<string>esp32c6</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>2</string>
+					<key>boardI2CSCL</key>
+					<string>1</string>
 				</dict>
 				<key>other-esp32c2</key>
 				<dict>
@@ -413,6 +421,12 @@
 					<string>an ESP32-C2 board</string>
 					<key>chip</key>
 					<string>esp32c2</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>other-esp32c3</key>
 				<dict>
@@ -424,6 +438,12 @@
 					<string>an ESP32-C3 board</string>
 					<key>chip</key>
 					<string>esp32c3</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>other-esp32c5</key>
 				<dict>
@@ -435,6 +455,12 @@
 					<string>an ESP32-C5 board</string>
 					<key>chip</key>
 					<string>esp32c5</string>
+					<key>boardButton</key>
+					<string>28</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>other-esp32c6</key>
 				<dict>
@@ -446,6 +472,12 @@
 					<string>an ESP32-C6 board</string>
 					<key>chip</key>
 					<string>esp32c6</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>22</string>
+					<key>boardI2CSCL</key>
+					<string>23</string>
 				</dict>
 				<key>other-esp32c61</key>
 				<dict>
@@ -457,6 +489,12 @@
 					<string>an ESP32-C61 board</string>
 					<key>chip</key>
 					<string>esp32c61</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>other-esp32h2</key>
 				<dict>
@@ -468,6 +506,12 @@
 					<string>an ESP32-H2 board</string>
 					<key>chip</key>
 					<string>esp32h2</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>4</string>
+					<key>boardI2CSCL</key>
+					<string>5</string>
 				</dict>
 				<key>other-esp32p4</key>
 				<dict>
@@ -479,6 +523,12 @@
 					<string>an ESP32-P4 board</string>
 					<key>chip</key>
 					<string>esp32p4</string>
+					<key>boardButton</key>
+					<string>35</string>
+					<key>boardI2CSDA</key>
+					<string>7</string>
+					<key>boardI2CSCL</key>
+					<string>8</string>
 				</dict>
 				<key>seeed-xiao-esp32c6</key>
 				<dict>
@@ -490,6 +540,516 @@
 					<string>Seeed Studio XIAO ESP32C6</string>
 					<key>chip</key>
 					<string>esp32c6</string>
+					<key>boardButton</key>
+					<string>9</string>
+					<key>boardI2CSDA</key>
+					<string>22</string>
+					<key>boardI2CSCL</key>
+					<string>23</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>blink</string>
+			<key>Description</key>
+			<string>The example the project starts from.</string>
+			<key>Identifier</key>
+			<string>example</string>
+			<key>Name</key>
+			<string>Example:</string>
+			<key>Required</key>
+			<true/>
+			<key>SortOrder</key>
+			<integer>101</integer>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Units</key>
+			<dict>
+				<key>blink</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+				<key>button-input</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>ButtonInput/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>ButtonInput/Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+				<key>i2c-sensor</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CSensor/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CSensor/ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CSensor/Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+				<key>wifi-request</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>WiFiRequest/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>WiFiRequest/ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>WiFiRequest/Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Firmware/WiFi.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>WiFiRequest/Firmware_WiFi.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/HTTPS.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>WiFiRequest/Firmware_HTTPS.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/Credentials.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>WiFiRequest/Firmware_Credentials.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/WiFi.swift</string>
+						<string>Firmware/HTTPS.swift</string>
+						<string>Firmware/Credentials.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+				<key>ble-light</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>BLELight/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>BLELight/ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>BLELight/Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Firmware/Bluetooth.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>BLELight/Firmware_Bluetooth.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/Bluetooth.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+				<key>deep-sleep</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>DeepSleep/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>DeepSleep/ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+			</dict>
+			<key>ValueTitles</key>
+			<array>
+				<string>Blink</string>
+				<string>Button input</string>
+				<string>I2C sensor</string>
+				<string>Wi-Fi and HTTPS</string>
+				<string>Bluetooth LE light</string>
+				<string>Deep sleep</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>blink</string>
+				<string>button-input</string>
+				<string>i2c-sensor</string>
+				<string>wifi-request</string>
+				<string>ble-light</string>
+				<string>deep-sleep</string>
+			</array>
+			<key>Variables</key>
+			<dict>
+				<key>blink</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>Blink</string>
+					<key>exampleModule</key>
+					<string>Blink</string>
+					<key>exampleSummary</key>
+					<string>it blinks the board's LED: red, green, blue and off, a colour a second.</string>
+					<key>exampleSettings</key>
+					<string># The Blink example needs no other settings.</string>
+				</dict>
+				<key>button-input</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>Button input</string>
+					<key>exampleModule</key>
+					<string>Button</string>
+					<key>exampleSummary</key>
+					<string>each press of the board's BOOT button shows the next colour on the LED, and holding it turns the LED off.</string>
+					<key>exampleSettings</key>
+					<string># The Button input example needs no other settings.</string>
+				</dict>
+				<key>i2c-sensor</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>I2C sensor</string>
+					<key>exampleModule</key>
+					<string>SHT4x</string>
+					<key>exampleSummary</key>
+					<string>it reads a Sensirion SHT4x temperature and humidity sensor over I2C, and shows the temperature on the LED.</string>
+					<key>exampleSettings</key>
+					<string># The I2C sensor example needs no other settings.</string>
+				</dict>
+				<key>wifi-request</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>Wi-Fi and HTTPS</string>
+					<key>exampleModule</key>
+					<string>Network</string>
+					<key>exampleSummary</key>
+					<string>it connects to your Wi-Fi network (set it in `Firmware/Credentials.swift`) and requests a web page over HTTPS; until then, it lists the networks nearby.</string>
+					<key>exampleSettings</key>
+					<string># Wi-Fi and HTTPS make the firmware larger than the default 1 MB app
+# partition allows: use a partition table with a 1.5 MB one.
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y</string>
+				</dict>
+				<key>ble-light</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>Bluetooth LE light</string>
+					<key>exampleModule</key>
+					<string>Light</string>
+					<key>exampleSummary</key>
+					<string>a phone connects to it over Bluetooth LE and sets the LED's colour.</string>
+					<key>exampleSettings</key>
+					<string># Bluetooth LE, with the NimBLE stack.
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y</string>
+				</dict>
+				<key>deep-sleep</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>Deep sleep</string>
+					<key>exampleModule</key>
+					<string>Blink</string>
+					<key>exampleSummary</key>
+					<string>it shows a colour on the LED for a second, sleeps in deep sleep for 10 seconds, and wakes up with the next colour.</string>
+					<key>exampleSettings</key>
+					<string># The Deep sleep example needs no other settings.</string>
 				</dict>
 			</dict>
 		</dict>

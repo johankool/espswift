@@ -1,6 +1,6 @@
 # ___PROJECTNAME___
 
-Embedded Swift firmware for ___VARIABLE_boardName___ (`___VARIABLE_chip___`), built with ESP-IDF.
+Embedded Swift firmware for ___VARIABLE_boardName___ (`___VARIABLE_chip___`), built with ESP-IDF. It starts as the **___VARIABLE_exampleTitle___** example: ___VARIABLE_exampleSummary___ The comments at the top of `Firmware/Firmware.swift` explain it, and what to wire.
 
 ## Everyday use in Xcode
 
@@ -19,15 +19,15 @@ Errors and warnings from the build, in Swift, C, `CMakeLists.txt` and `sdkconfig
 Your Swift code is in two Swift packages:
 
 - **Firmware**: the firmware itself, `app_main` and the code that uses ESP-IDF. ESP-IDF builds it (with the Swift Package Manager) into the firmware. Xcode gives it code completion for ESP-IDF's C APIs (see below).
-- **___PROJECTNAME___Kit**, in `Packages/`: plain Swift code that doesn't use ESP-IDF, such as the blink pattern in `Blink`, and its tests. The firmware uses it, and Xcode builds and tests it on the Mac (`Cmd+U`).
+- **___PROJECTNAME___Kit**, in `Packages/`: plain Swift code that doesn't use ESP-IDF, such as the example's `___VARIABLE_exampleModule___` module, and its tests. The firmware uses it, and Xcode builds and tests it on the Mac (`Cmd+U`).
 
 ```
 ___PROJECTNAME___/
 ├── README.md                   # This file
 ├── ___PROJECTNAME___.xcodeproj
 ├── Firmware/
-│   ├── Firmware.swift          # Your firmware code starts here (app_main)
-│   ├── Board.swift             # Your board's name and LED
+│   ├── Firmware.swift          # Your firmware code starts here (app_main); some examples have more files
+│   ├── Board.swift             # Your board's name, LED and button
 │   ├── LED.swift               # Drives the LED, whatever kind it is
 │   ├── FreeRTOS.swift          # Swift versions of FreeRTOS's macros, such as pdMS_TO_TICKS
 │   ├── Package.swift           # The firmware's packages, such as swift-mmio
@@ -36,8 +36,8 @@ ___PROJECTNAME___/
 ├── Packages/
 │   └── ___PROJECTNAME___Kit/    # Plain Swift code, tested on the Mac
 │       ├── Package.swift
-│       ├── Sources/Blink/      # The blink pattern
-│       └── Tests/BlinkTests/   # Its tests: Cmd+U
+│       ├── Sources/            # Its modules, such as ___VARIABLE_exampleModule___
+│       └── Tests/              # Their tests: Cmd+U
 └── ___PROJECTNAME___/           # The ESP-IDF project (the "source folder")
     ├── build.sh                # Run by Xcode on Cmd+B: runs espswift build
     ├── CMakeLists.txt          # ESP-IDF project file
@@ -51,7 +51,7 @@ ___PROJECTNAME___/
 
 To add Swift code to the firmware, create a file in `Firmware/` (also in a subfolder), and tick the **Indexing** target in the dialog for the new file so it gets code completion (see below). It's compiled into your firmware on the next `Cmd+B`; there's no list of files to update.
 
-Code that doesn't need ESP-IDF can go in the Kit package instead, where you can test it. Create files in a folder in its `Sources/`, such as `Sources/Blink/`, with File ▸ New ▸ File from Template in Xcode. A new folder there is a new module: add it to the Kit's `Package.swift`, next to `Blink`, and to the Firmware package's `Package.swift`, next to `Blink`, to use it in the firmware. Code in the Kit package is built into the firmware too, so it must work in Embedded Swift.
+Code that doesn't need ESP-IDF can go in the Kit package instead, where you can test it. Create files in a folder in its `Sources/`, such as `Sources/___VARIABLE_exampleModule___/`, with File ▸ New ▸ File from Template in Xcode. A new folder there is a new module: add it to the Kit's `Package.swift`, next to `___VARIABLE_exampleModule___`, and to the Firmware package's `Package.swift`, next to `___VARIABLE_exampleModule___`, to use it in the firmware. Code in the Kit package is built into the firmware too, so it must work in Embedded Swift.
 
 Xcode keeps the build output in DerivedData, like any other Xcode project. **Product ▸ Show Build Folder in Finder** takes you there.
 
@@ -162,7 +162,7 @@ CONFIG_IDF_TARGET="___VARIABLE_chip___"
 
 The chip, and the flash size below it, are those of the board you chose when you created the project (___VARIABLE_boardName___). To build for another RISC-V based ESP32 (`esp32c2`, `esp32c3`, `esp32c5`, `esp32c6`, `esp32c61`, `esp32h2` or `esp32p4`), change this line and press `Cmd+B`. The build then reconfigures the project for the new chip, which recreates `sdkconfig` from `sdkconfig.defaults` (the previous one is kept as `sdkconfig.old`).
 
-The example blinks the board's LED: an addressable RGB LED (WS2812), separate red, green and blue LEDs, or a one-colour LED. A board without an LED only prints the colours. The board's LED, its pins and polarity are set in `Firmware/Board.swift`, e.g. `.addressable(pin: 8)` or `.single(pin: 15, activeLow: true)`; change it there for another board. `Firmware/LED.swift` drives it with ESP-IDF's GPIO and led_strip drivers.
+The examples use the board's LED: an addressable RGB LED (WS2812), separate red, green and blue LEDs, or a one-colour LED. A board without an LED only prints the colours. The board's LED, its pins and polarity are set in `Firmware/Board.swift`, e.g. `.addressable(pin: 8)` or `.single(pin: 15, activeLow: true)`, and so is its BOOT button's pin; change them there for another board. `Firmware/LED.swift` drives it with ESP-IDF's GPIO and led_strip drivers.
 
 Swift code can check ESP-IDF's settings and the chip's features with `#if`, as C code does: each setting that's on in `sdkconfig` is a compilation condition, such as `CONFIG_SOC_RMT_SUPPORTED` or `CONFIG_IDF_TARGET_ESP32C6`. `LED.swift` uses it to pick the RMT or the SPI peripheral for the LED.
 

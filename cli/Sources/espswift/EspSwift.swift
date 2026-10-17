@@ -61,9 +61,11 @@ extension EspSwift {
         static let configuration = CommandConfiguration(
             abstract: "Creates a project from the template, without Xcode.",
             discussion: """
-                The project builds with espswift build. It has no Xcode project: on \
-                macOS, create projects for Xcode with File ▸ New ▸ Project ▸ Choose Template… ▸ \
-                ESP32 RISC-V.
+                The project starts from one of the template's examples, for your board. \
+                Without --board (or --chip) and --example, espswift asks for them (in a \
+                terminal). The project builds with espswift build. It has no Xcode project: \
+                on macOS, create projects for Xcode with File ▸ New ▸ Project ▸ Choose \
+                Template… ▸ ESP32 RISC-V.
                 """
         )
 
@@ -79,6 +81,12 @@ extension EspSwift {
         @Flag(help: "List the boards (for --chip, if given), and stop.")
         var listBoards = false
 
+        @Option(help: "The example the project starts from (see --list-examples); by default, Blink.")
+        var example: String?
+
+        @Flag(help: "List the examples, and stop.")
+        var listExamples = false
+
         @Option(help: "Where to create the project's folder; by default, the current folder.")
         var folder: String?
 
@@ -93,14 +101,35 @@ extension EspSwift {
                     }
                     return
                 }
-                let board = try new.board(self.board, chip: chip)
+                if listExamples {
+                    for example in try new.examples() {
+                        system.report("\(example.value)\t\(example.title)")
+                    }
+                    return
+                }
+                guard let name else { throw EspSwiftError("Name the project: espswift new <name>") }
+
+                // Without a board or chip, or an example, ask (in a terminal).
+                var board = try new.board(self.board, chip: chip)
+                if self.board == nil && chip == nil {
+                    let boards = try new.boards()
+                    let index = system.choose("Which board is it for?", from: boards.map(\.title),
+                                              default: boards.firstIndex { $0.value == board } ?? 0)
+                    board = boards[index].value
+                }
+                var example = try new.example(self.example)
+                if self.example == nil {
+                    let examples = try new.examples()
+                    let index = system.choose("Which example does it start from?", from: examples.map(\.title),
+                                              default: examples.firstIndex { $0.value == example } ?? 0)
+                    example = examples[index].value
+                }
                 let formatter = DateFormatter()
                 formatter.dateStyle = .short
                 formatter.timeStyle = .none
                 let author = NSFullUserName().isEmpty ? (system.environment["USER"] ?? "") : NSFullUserName()
                 let parent = folder.map { URL(fileURLWithPath: $0).standardizedFileURL.path } ?? system.currentDirectory
-                guard let name else { throw EspSwiftError("Name the project: espswift new <name>") }
-                try new.run(name: name, board: board, in: parent, author: author,
+                try new.run(name: name, board: board, example: example, in: parent, author: author,
                          date: formatter.string(from: Date()))
                 system.report("Build it with: cd \(name) && \(Locations(system: system).command) build")
             }

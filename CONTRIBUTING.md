@@ -50,14 +50,15 @@ bash tests/test_template.sh            # all chips
 bash tests/test_template.sh esp32c6    # one chip
 ```
 
-If you changed the template, `espswift` or an example, also build the examples in `Examples/` and run their tests:
+If you changed the template or `espswift`, also build the template's examples (the Example pop-up) and run their tests:
 
 ```bash
-bash tests/test_template.sh --examples              # all examples
-bash tests/test_template.sh --examples DeepSleep    # one example
+bash tests/test_template.sh --examples                       # every example, and some on other chips
+bash tests/test_template.sh --examples deep-sleep            # one example, on the default board
+bash tests/test_template.sh --examples deep-sleep@esp32c2    # one example, on a chip
 ```
 
-It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. With `--examples` it copies each example instead, and also checks that its build has no warnings and that its Xcode project is up to date. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
+It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. With `--examples` it creates a project from each example instead (other than Blink, which every chip is built with), and also checks that its build has no warnings. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
 
 The test doesn't cover Xcode or hardware, so for changes there, also check by hand:
 - After running `install.sh` and restarting Xcode, **ESP32 RISC-V** appears under File → New → Project → Choose Template… → Other, with the **Board** pop-up.
@@ -67,13 +68,11 @@ The test doesn't cover Xcode or hardware, so for changes there, also check by ha
 
 ### Examples
 
-The examples in `Examples/` are projects as the template creates them (made with `espswift new <name> --board esp32-c6-devkitc-1 --folder Examples`), with their own code. Only Xcode creates Xcode projects from the template, so theirs are written by a script, from the test fixture:
+The template's **Example** pop-up chooses what a new project starts from. Each example is a value of the pop-up, in `TemplateInfo.plist`, with:
+- its files (its *Units*: nodes and definitions, which only that value adds): `Firmware/Firmware.swift`, the Kit package and `ESPIDF.h`, and any other files in `Firmware/`. Blink's are the template's own files; the other examples' are in a folder of their own, such as `ButtonInput/`, named as the template names files (`Firmware_WiFi.swift` for `Firmware/WiFi.swift`);
+- its variables: its title, its Kit module (`exampleModule`, which the Firmware package and the scheme's tests use), a one-sentence summary for the README and its lines for `sdkconfig.defaults`.
 
-```bash
-python3 tests/xcode_project.py Examples/*
-```
-
-Run it after adding or removing a Swift file in an example's `Firmware/` or a test target in its Kit package, and after changing the template's Indexing target or Run scheme; the examples test fails until you do. When the template changes the project's files (such as `build.sh`), run `espswift update --project Examples/<name>` for each example. Each example's README starts with its own part, followed by the template's README; keep that part in step with the template's.
+The board's variables give an example its pins: `boardButton` (in `Board.swift`), and `boardI2CSDA` and `boardI2CSCL`. An example that needs something a chip lacks checks for it with `#if` (such as `CONFIG_SOC_WIFI_SUPPORTED`) and says so. Add a combination such as `wifi-request@esp32h2` to `EXAMPLE_COMBINATIONS` in `tests/test_template.sh` for a new one.
 
 ### 5. Commit
 
@@ -103,10 +102,9 @@ espswift/
 │   ├── Sources/EspSwiftCore/        # What they do, through the System protocol
 │   ├── Sources/CSerialPort/         # Opening serial ports (needs C)
 │   └── Tests/EspSwiftCoreTests/     # Unit tests, with a fake System
-├── Examples/                         # Example projects, each with its own README
 ├── tests/
-│   ├── test_template.sh             # Builds the template for every chip, or the examples (--examples)
-│   ├── xcode_project.py             # Writes the examples' Xcode projects
+│   ├── test_template.sh             # Builds the template for every chip, or its examples (--examples)
+│   ├── xcode_project.py             # Writes a test project's Xcode project, from the fixture
 │   └── fixtures/project.pbxproj     # An Xcode project Xcode made from the template
 ├── .github/workflows/
 │   ├── cli.yml                      # Builds and tests espswift, on macOS and Linux

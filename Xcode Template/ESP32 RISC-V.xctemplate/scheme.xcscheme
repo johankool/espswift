@@ -34,9 +34,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BlinkTests"
-               BuildableName = "BlinkTests"
-               BlueprintName = "BlinkTests"
+               BlueprintIdentifier = "___VARIABLE_exampleModule___Tests"
+               BuildableName = "___VARIABLE_exampleModule___Tests"
+               BlueprintName = "___VARIABLE_exampleModule___Tests"
                ReferencedContainer = "container:Packages/___PROJECTNAME___Kit">
             </BuildableReference>
          </TestableReference>

@@ -17,3 +17,5 @@ CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ=240
 
 # Optional: Reduce binary size
 CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+
+___VARIABLE_exampleSettings___

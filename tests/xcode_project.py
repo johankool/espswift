@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
 
 # xcode_project.py
-# Writes the Xcode project of a project that wasn't created by Xcode, such
-# as the examples in Examples/: what Xcode would create from the template,
-# for the project's own files.
+# Writes the Xcode project of a project created with `espswift new`, for
+# tests/test_template.sh: what Xcode would create from the template, for the
+# project's own files.
 #
 # Only Xcode creates projects from the template, so this starts from a
 # project Xcode created (tests/fixtures/project.pbxproj) and applies:
 #   - the project's name;
 #   - the template's settings for the Indexing target (code completion),
 #     with its placeholder toolchain, which `espswift update` fills in;
-#   - the Swift files in Firmware/, in the Indexing target;
-#   - the template's Run scheme, with espswift's path as a placeholder,
-#     which `espswift update` fills in too, and the Kit package's test
-#     targets in its Test action (Cmd+U).
+#   - the Swift files in Firmware/, in the Indexing target (the examples
+#     have files of their own);
+#   - the template's Run scheme, with the Kit package's test target in its
+#     Test action (Cmd+U).
 #
-# Usage: python3 tests/xcode_project.py [--check] PROJECT_DIR...
-#   PROJECT_DIR  A project folder, such as Examples/ButtonInput; the project
-#                is named after it.
-#   --check      Don't write anything; fail if a project's Xcode project
-#                differs from what this script writes (e.g. after a change
-#                to the template or a new file in Firmware/).
+# Usage: python3 tests/xcode_project.py PROJECT_DIR [NAME]
+#   PROJECT_DIR  The project's folder.
+#   NAME         The project's name; by default, the folder's name.
 
 import os
 import plistlib
@@ -128,42 +125,29 @@ def pbxproj(project_dir, name):
 
 
 def scheme(project_dir, name):
-    text = open(os.path.join(TEMPLATE, "scheme.xcscheme")).read().replace("___PROJECTNAME___", name)
-    # The Kit package's test targets, in the Test action.
+    """The template's Run scheme, with the Kit's test target (the template
+    names it after the example's module, ___VARIABLE_exampleModule___Tests),
+    and espswift's path left as its placeholder."""
     manifest = open(os.path.join(project_dir, "Packages", f"{name}Kit", "Package.swift")).read()
-    tests = re.findall(r'\.testTarget\(\s*name:\s*"([^"]+)"', manifest)
-    testable = re.search(r"( *)<TestableReference\b.*?</TestableReference>\n", text, flags=re.S)
-    blocks = [testable.group(0).replace('"BlinkTests"', f'"{test}"') for test in tests]
-    return text[:testable.start()] + "".join(blocks) + text[testable.end():]
+    test = re.search(r'\.testTarget\(\s*name:\s*"([^"]+)"', manifest).group(1)
+    text = open(os.path.join(TEMPLATE, "scheme.xcscheme")).read()
+    return text.replace("___VARIABLE_exampleModule___Tests", test).replace("___PROJECTNAME___", name)
 
 
 def main(arguments):
-    check = "--check" in arguments
-    projects = [a for a in arguments if a != "--check"]
-    if not projects:
-        sys.exit("Usage: python3 tests/xcode_project.py [--check] PROJECT_DIR...")
-    differ = []
-    for project_dir in projects:
-        project_dir = os.path.abspath(project_dir)
-        name = os.path.basename(project_dir)
-        xcodeproj = os.path.join(project_dir, f"{name}.xcodeproj")
-        files = {
-            os.path.join(xcodeproj, "project.pbxproj"): pbxproj(project_dir, name),
-            os.path.join(xcodeproj, "xcshareddata", "xcschemes", f"{name}.xcscheme"): scheme(project_dir, name),
-        }
-        for path, content in files.items():
-            if check:
-                current = open(path).read() if os.path.exists(path) else None
-                if current != content:
-                    differ.append(os.path.relpath(path))
-            else:
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-                with open(path, "w") as f:
-                    f.write(content)
-        if not check:
-            print(f"Wrote {os.path.relpath(xcodeproj)}")
-    if differ:
-        sys.exit("Out of date (run: python3 tests/xcode_project.py " + " ".join(projects) + "):\n  " + "\n  ".join(differ))
+    if len(arguments) not in (1, 2):
+        sys.exit("Usage: python3 tests/xcode_project.py PROJECT_DIR [NAME]")
+    project_dir = os.path.abspath(arguments[0])
+    name = arguments[1] if len(arguments) == 2 else os.path.basename(project_dir)
+    xcodeproj = os.path.join(project_dir, f"{name}.xcodeproj")
+    files = {
+        os.path.join(xcodeproj, "project.pbxproj"): pbxproj(project_dir, name),
+        os.path.join(xcodeproj, "xcshareddata", "xcschemes", f"{name}.xcscheme"): scheme(project_dir, name),
+    }
+    for path, content in files.items():
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
 
 
 if __name__ == "__main__":

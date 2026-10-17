@@ -24,7 +24,7 @@ let package = Package(
             name: "Firmware",
             dependencies: [
                 "ESPIDF",
-                .product(name: "Blink", package: "___PROJECTNAME___Kit"),
+                .product(name: "___VARIABLE_exampleModule___", package: "___PROJECTNAME___Kit"),
                 // .product(name: "MMIO", package: "swift-mmio"),
             ],
             path: ".",

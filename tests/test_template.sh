@@ -22,20 +22,23 @@
 # Without Xcode (on Linux), only the builds, their error reporting and the
 # Kit package's tests are checked.
 #
-# With --examples, it tests the example projects in Examples/ instead: each
-# is copied, built, and checked the same way (except the error reporting),
-# its Kit package's tests run, and its Xcode project must be the one
-# tests/xcode_project.py writes for it. Their builds must have no warnings
-# (other than those `espswift update` resolves).
+# With --examples, it tests the template's examples instead (its Example
+# pop-up): each is created for the default board, built and checked the
+# same way (except the error reporting), and its Kit package's tests run.
+# Their builds must have no warnings (other than that the Xcode project's
+# toolchain is a placeholder). An example can also be built for a chip, as
+# <example>@<chip>, such as wifi-request@esp32h2, which has no Wi-Fi; by
+# default, a few such combinations are built too.
 #
 # Not covered: Xcode itself (how it shows the template, fills in the
 # placeholders and indexes), flashing, and running on a board.
 #
 # Usage: bash tests/test_template.sh [--keep] [--work-dir DIR] [--examples] [name ...]
 #   name            One or more chips of the template's boards, e.g.
-#                   esp32c6, or with --examples, examples, e.g. DeepSleep.
-#                   Default: all of them.
-#   --examples      Test the examples in Examples/ instead of the template.
+#                   esp32c6, or with --examples, examples, e.g. deep-sleep
+#                   or deep-sleep@esp32c2. Default: all of them.
+#   --examples      Test the template's examples (other than Blink, which
+#                   the chips are tested with).
 #   --keep          Keep the generated projects and build logs. They are
 #                   always kept when a build fails, or with --work-dir.
 #   --work-dir DIR  Where to create the projects and logs (<name>.log).
@@ -81,27 +84,46 @@ chips = [board["Variables"][value]["chip"] for value in board["Values"]]
 print(" ".join(dict.fromkeys(chips)))
 ' "$TEMPLATE/TemplateInfo.plist")) || exit 1
 
-# The examples: the folders in Examples/ with a project of the same name.
-ALL_EXAMPLES=()
-for dir in "$REPO_ROOT"/Examples/*/; do
-    name=$(basename "$dir")
-    [ -d "$dir/$name.xcodeproj" ] && ALL_EXAMPLES+=("$name")
-done
+# The board the Board pop-up starts with, which the examples are made for.
+DEFAULT_BOARD=$(python3 -c '
+import plistlib, sys
+plist = plistlib.load(open(sys.argv[1], "rb"))
+print(next(o for o in plist["Options"] if o["Identifier"] == "board")["Default"])
+' "$TEMPLATE/TemplateInfo.plist") || exit 1
+
+# The examples the template offers (its Example pop-up), but Blink, which
+# every chip is tested with.
+ALL_EXAMPLES=($(python3 -c '
+import plistlib, sys
+plist = plistlib.load(open(sys.argv[1], "rb"))
+example = next(o for o in plist["Options"] if o["Identifier"] == "example")
+print(" ".join(v for v in example["Values"] if v != example["Default"]))
+' "$TEMPLATE/TemplateInfo.plist")) || exit 1
+# Examples on chips that lack what they use (they say so instead), or that
+# build differently there, tested by default too.
+EXAMPLE_COMBINATIONS=(wifi-request@esp32h2 wifi-request@esp32c2 ble-light@esp32p4 ble-light@esp32c3
+                      deep-sleep@esp32c2 i2c-sensor@esp32p4)
 
 if [ "$EXAMPLES" = true ]; then
-    ALL_ITEMS=("${ALL_EXAMPLES[@]}")
     KIND="example"
+    [ ${#ITEMS[@]} -eq 0 ] && ITEMS=("${ALL_EXAMPLES[@]}" "${EXAMPLE_COMBINATIONS[@]}")
 else
-    ALL_ITEMS=("${ALL_CHIPS[@]}")
     KIND="chip"
-fi
-if [ ${#ITEMS[@]} -eq 0 ]; then
-    ITEMS=("${ALL_ITEMS[@]}")
+    [ ${#ITEMS[@]} -eq 0 ] && ITEMS=("${ALL_CHIPS[@]}")
 fi
 
 for ITEM in "${ITEMS[@]}"; do
-    if [[ ! " ${ALL_ITEMS[*]} " =~ " $ITEM " ]]; then
-        echo "Error: '$ITEM' is not one of the ${KIND}s (${ALL_ITEMS[*]})." >&2
+    if [ "$EXAMPLES" = true ]; then
+        example="${ITEM%@*}"
+        chip=""
+        [[ "$ITEM" == *@* ]] && chip="${ITEM#*@}"
+        if [[ ! " ${ALL_EXAMPLES[*]} " =~ " $example " ]] \
+            || { [ -n "$chip" ] && [[ ! " ${ALL_CHIPS[*]} " =~ " $chip " ]]; }; then
+            echo "Error: '$ITEM' isn't an example (${ALL_EXAMPLES[*]}), or one on a chip (${ALL_CHIPS[*]})." >&2
+            exit 1
+        fi
+    elif [[ ! " ${ALL_CHIPS[*]} " =~ " $ITEM " ]]; then
+        echo "Error: '$ITEM' is not one of the chips (${ALL_CHIPS[*]})." >&2
         exit 1
     fi
 done
@@ -129,37 +151,31 @@ else
 fi
 echo "Working directory: $WORK_DIR"
 
-# Creates a project for a chip in $WORK_DIR/<chip> with `espswift new`,
-# which lays it out as Xcode does and fails if a placeholder is left unfilled.
+# Creates a project in $WORK_DIR/<item> with `espswift new`, which lays it
+# out as Xcode does and fails if a placeholder is left unfilled: for a chip,
+# from the Blink example; for an example, on the default board, or on a
+# chip (<example>@<chip>).
 create_project() {
     local parent="$WORK_DIR/.new-$1"
+    local options=(--chip "$1" --example blink)
+    if [ "$EXAMPLES" = true ]; then
+        options=(--example "${1%@*}")
+        if [[ "$1" == *@* ]]; then
+            options+=(--chip "${1#*@}")
+        else
+            options+=(--board "$DEFAULT_BOARD")
+        fi
+    fi
     rm -rf "$parent" && mkdir -p "$parent"
-    "$ESPSWIFT_BIN" new "$PROJECT_NAME" --chip "$1" --folder "$parent" > /dev/null \
+    "$ESPSWIFT_BIN" new "$PROJECT_NAME" "${options[@]}" --folder "$parent" > /dev/null < /dev/null \
         && mv "$parent/$PROJECT_NAME" "$WORK_DIR/$1" && rm -rf "$parent"
 }
 
-# Copies an example to $WORK_DIR/<example>, without what its builds left
-# in the repository's copy.
-copy_example() {
-    rm -rf "$WORK_DIR/$1" && mkdir -p "$WORK_DIR/$1" || return 1
-    tar -C "$REPO_ROOT/Examples/$1" -cf - --exclude build --exclude .build --exclude .swiftpm \
-        --exclude .espswift --exclude managed_components --exclude sdkconfig --exclude sdkconfig.old \
-        --exclude xcuserdata . | tar -C "$WORK_DIR/$1" -xf -
-}
-
-# Checks an example's Xcode project is the one tests/xcode_project.py
-# writes for it: with the template's current settings and the example's
-# files.
-check_example_xcode_project() {
-    python3 "$REPO_ROOT/tests/xcode_project.py" --check "$REPO_ROOT/Examples/$1"
-}
-
-# Checks the build had no warnings, other than those that `espswift update`
-# resolves in a project that wasn't created on this Mac.
+# Checks the build had no warnings, other than that code completion's
+# toolchain is the test project's placeholder.
 check_no_warnings() {
     local warnings
-    warnings=$(grep "warning:" "$2" | grep -v -e "Code completion uses another Swift toolchain" \
-        -e "The Run scheme (Cmd+R) doesn't know where espswift is")
+    warnings=$(grep "warning:" "$2" | grep -v -e "Code completion uses another Swift toolchain")
     if [ -n "$warnings" ]; then
         echo "The build of $1 has warnings:"
         echo "$warnings"
@@ -169,15 +185,11 @@ check_no_warnings() {
 
 # Adds an Xcode project to the generated project, as Xcode would create it
 # from the template. Only Xcode can create one from a template, so this is
-# a project Xcode created (tests/fixtures/project.pbxproj); check_indexing
-# applies the template's current Indexing settings on top of it.
+# a project Xcode created (tests/fixtures/project.pbxproj), with the
+# project's own files in Firmware/ (see tests/xcode_project.py); and the
+# template's Run scheme, which Xcode puts in the Xcode project.
 add_xcode_project() {
-    local xcodeproj="$WORK_DIR/$1/$PROJECT_NAME.xcodeproj"
-    mkdir -p "$xcodeproj/xcshareddata/xcschemes"
-    sed "s/___PROJECTNAME___/$PROJECT_NAME/g" "$REPO_ROOT/tests/fixtures/project.pbxproj" > "$xcodeproj/project.pbxproj"
-    # The template's Run scheme, which Xcode puts in the Xcode project.
-    sed "s/___PROJECTNAME___/$PROJECT_NAME/g" "$TEMPLATE/scheme.xcscheme" \
-        > "$xcodeproj/xcshareddata/xcschemes/$PROJECT_NAME.xcscheme"
+    python3 "$REPO_ROOT/tests/xcode_project.py" "$WORK_DIR/$1" "$PROJECT_NAME"
 }
 
 # Builds the Indexing target with xcodebuild, the way Xcode's indexer
@@ -186,7 +198,7 @@ add_xcode_project() {
 # Swift files of the Firmware target, as SwiftPM built it.
 check_indexing() {
     python3 - "$TEMPLATE" "$WORK_DIR/$1" "$PROJECT_NAME" <<'EOF'
-import json, os, plistlib, shutil, subprocess, sys
+import json, os, plistlib, re, shutil, subprocess, sys
 
 template, project_dir, name = sys.argv[1:]
 plist = plistlib.load(open(os.path.join(template, "TemplateInfo.plist"), "rb"))
@@ -239,7 +251,10 @@ build_dirs = ["SYMROOT=" + os.path.join(output, "Products"), "OBJROOT=" + os.pat
 
 # Xcode also builds the Kit package, for the Mac, into the same build
 # folder. The Indexing target must not import the Mac's modules from there.
-kit = subprocess.run(["xcodebuild", "-project", xcodeproj, "-scheme", "Blink", "-destination", "platform=macOS",
+# (The Kit's scheme is its library's, such as Blink.)
+manifest = open(os.path.join(project_dir, "Packages", name + "Kit", "Package.swift")).read()
+library = re.search(r'\.library\(\s*name:\s*"([^"]+)"', manifest).group(1)
+kit = subprocess.run(["xcodebuild", "-project", xcodeproj, "-scheme", library, "-destination", "platform=macOS",
                       *build_dirs, "build"], capture_output=True, text=True)
 if kit.returncode != 0:
     sys.exit("Building the Kit package for the Mac failed:\n" + "\n".join((kit.stdout + kit.stderr).splitlines()[-20:]))
@@ -382,25 +397,14 @@ for ITEM in "${ITEMS[@]}"; do
     echo "================================================="
 
     LOG="$WORK_DIR/$ITEM.log"
-    # An example's project is named after it.
-    if [ "$EXAMPLES" = true ]; then
-        PROJECT_NAME="$ITEM"
-    fi
     SOURCE_DIR="$WORK_DIR/$ITEM/$PROJECT_NAME"
 
-    if [ "$EXAMPLES" = true ]; then
-        if ! check_example_xcode_project "$ITEM" || ! copy_example "$ITEM"; then
-            FAILED+=("$ITEM")
-            continue
-        fi
-    else
-        if ! create_project "$ITEM"; then
-            FAILED+=("$ITEM")
-            continue
-        fi
-        if [ "$WITH_XCODE" = true ]; then
-            add_xcode_project "$ITEM"
-        fi
+    if ! create_project "$ITEM"; then
+        FAILED+=("$ITEM")
+        continue
+    fi
+    if [ "$WITH_XCODE" = true ]; then
+        add_xcode_project "$ITEM"
     fi
 
     # Build the way Xcode does (which sets PROJECT_DIR and PROJECT_NAME),
@@ -412,8 +416,9 @@ for ITEM in "${ITEMS[@]}"; do
         && [ -f "$SOURCE_DIR/build/$PROJECT_NAME.bin" ]; then
         # The error check builds twice more, and the package's tests don't
         # depend on the chip, so they run for the first chip only (and for
-        # every example, which has tests of its own).
-        if { [ "$EXAMPLES" = false ] || check_no_warnings "$ITEM" "$LOG"; } \
+        # every example, which has tests of its own). An example on another
+        # chip may warn about settings that chip doesn't have.
+        if { [ "$EXAMPLES" = false ] || [[ "$ITEM" == *@* ]] || check_no_warnings "$ITEM" "$LOG"; } \
             && { [ "$WITH_XCODE" = false ] || check_xcode "$ITEM" >> "$LOG" 2>&1; } \
             && { [ "$EXAMPLES" = true ] || [ "$ITEM" != "${ITEMS[0]}" ] || check_diagnostics "$ITEM" >> "$LOG" 2>&1; } \
             && { ! is_first_or_example "$ITEM" || check_package_tests "$ITEM" >> "$LOG" 2>&1; }; then

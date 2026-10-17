@@ -6,7 +6,7 @@ It's being built in phases (see below). So far it has:
 
 ```
 espswift setup [--[no-]xcode-template]     # installs ESP-IDF (with EIM), Swift and the tools they need
-espswift new <name> [--board] [--folder]   # creates a project from the template, without Xcode (also on Linux)
+espswift new <name> [--board] [--example]   # creates a project from the template and an example, without Xcode (also on Linux)
 espswift build [clean] [--verbose]         # builds the project, showing errors as Xcode issues (projects' build.sh runs it)
 espswift flash [--port] [--last-build]     # flashes the project's latest build
 espswift monitor [--port] [--idf]          # shows the board's serial output, with crashes' backtraces (--idf: ESP-IDF's monitor)
