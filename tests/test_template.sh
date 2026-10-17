@@ -22,24 +22,34 @@
 # Without Xcode (on Linux), only the builds, their error reporting and the
 # Kit package's tests are checked.
 #
+# With --examples, it tests the example projects in Examples/ instead: each
+# is copied, built, and checked the same way (except the error reporting),
+# its Kit package's tests run, and its Xcode project must be the one
+# tests/xcode_project.py writes for it. Their builds must have no warnings
+# (other than those `espswift update` resolves).
+#
 # Not covered: Xcode itself (how it shows the template, fills in the
 # placeholders and indexes), flashing, and running on a board.
 #
-# Usage: bash tests/test_template.sh [--keep] [--work-dir DIR] [chip ...]
-#   chip            One or more chips of the template's boards,
-#                   e.g. esp32c6. Default: all of them.
+# Usage: bash tests/test_template.sh [--keep] [--work-dir DIR] [--examples] [name ...]
+#   name            One or more chips of the template's boards, e.g.
+#                   esp32c6, or with --examples, examples, e.g. DeepSleep.
+#                   Default: all of them.
+#   --examples      Test the examples in Examples/ instead of the template.
 #   --keep          Keep the generated projects and build logs. They are
 #                   always kept when a build fails, or with --work-dir.
-#   --work-dir DIR  Where to create the projects and logs (<chip>.log).
+#   --work-dir DIR  Where to create the projects and logs (<name>.log).
 #                   Default: a new temporary directory.
 
 KEEP=false
+EXAMPLES=false
 WORK_DIR=""
-CHIPS=()
+ITEMS=()
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --keep) KEEP=true ;;
+        --examples) EXAMPLES=true ;;
         --work-dir)
             WORK_DIR="$2"
             shift
@@ -53,7 +63,7 @@ while [ $# -gt 0 ]; do
             echo "Unknown option: $1" >&2
             exit 1
             ;;
-        *) CHIPS+=("$1") ;;
+        *) ITEMS+=("$1") ;;
     esac
     shift
 done
@@ -71,13 +81,27 @@ chips = [board["Variables"][value]["chip"] for value in board["Values"]]
 print(" ".join(dict.fromkeys(chips)))
 ' "$TEMPLATE/TemplateInfo.plist")) || exit 1
 
-if [ ${#CHIPS[@]} -eq 0 ]; then
-    CHIPS=("${ALL_CHIPS[@]}")
+# The examples: the folders in Examples/ with a project of the same name.
+ALL_EXAMPLES=()
+for dir in "$REPO_ROOT"/Examples/*/; do
+    name=$(basename "$dir")
+    [ -d "$dir/$name.xcodeproj" ] && ALL_EXAMPLES+=("$name")
+done
+
+if [ "$EXAMPLES" = true ]; then
+    ALL_ITEMS=("${ALL_EXAMPLES[@]}")
+    KIND="example"
+else
+    ALL_ITEMS=("${ALL_CHIPS[@]}")
+    KIND="chip"
+fi
+if [ ${#ITEMS[@]} -eq 0 ]; then
+    ITEMS=("${ALL_ITEMS[@]}")
 fi
 
-for CHIP in "${CHIPS[@]}"; do
-    if [[ ! " ${ALL_CHIPS[*]} " =~ " $CHIP " ]]; then
-        echo "Error: '$CHIP' is not offered by the template (${ALL_CHIPS[*]})." >&2
+for ITEM in "${ITEMS[@]}"; do
+    if [[ ! " ${ALL_ITEMS[*]} " =~ " $ITEM " ]]; then
+        echo "Error: '$ITEM' is not one of the ${KIND}s (${ALL_ITEMS[*]})." >&2
         exit 1
     fi
 done
@@ -98,7 +122,11 @@ if [ -z "$ESPSWIFT_BIN" ]; then
 fi
 export ESPSWIFT_BIN
 
-echo "Testing the template for: ${CHIPS[*]}"
+if [ "$EXAMPLES" = true ]; then
+    echo "Testing the examples: ${ITEMS[*]}"
+else
+    echo "Testing the template for: ${ITEMS[*]}"
+fi
 echo "Working directory: $WORK_DIR"
 
 # Creates a project for a chip in $WORK_DIR/<chip> with `espswift new`,
@@ -108,6 +136,35 @@ create_project() {
     rm -rf "$parent" && mkdir -p "$parent"
     "$ESPSWIFT_BIN" new "$PROJECT_NAME" --chip "$1" --folder "$parent" > /dev/null \
         && mv "$parent/$PROJECT_NAME" "$WORK_DIR/$1" && rm -rf "$parent"
+}
+
+# Copies an example to $WORK_DIR/<example>, without what its builds left
+# in the repository's copy.
+copy_example() {
+    rm -rf "$WORK_DIR/$1" && mkdir -p "$WORK_DIR/$1" || return 1
+    tar -C "$REPO_ROOT/Examples/$1" -cf - --exclude build --exclude .build --exclude .swiftpm \
+        --exclude .espswift --exclude managed_components --exclude sdkconfig --exclude sdkconfig.old \
+        --exclude xcuserdata . | tar -C "$WORK_DIR/$1" -xf -
+}
+
+# Checks an example's Xcode project is the one tests/xcode_project.py
+# writes for it: with the template's current settings and the example's
+# files.
+check_example_xcode_project() {
+    python3 "$REPO_ROOT/tests/xcode_project.py" --check "$REPO_ROOT/Examples/$1"
+}
+
+# Checks the build had no warnings, other than those that `espswift update`
+# resolves in a project that wasn't created on this Mac.
+check_no_warnings() {
+    local warnings
+    warnings=$(grep "warning:" "$2" | grep -v -e "Code completion uses another Swift toolchain" \
+        -e "The Run scheme (Cmd+R) doesn't know where espswift is")
+    if [ -n "$warnings" ]; then
+        echo "The build of $1 has warnings:"
+        echo "$warnings"
+        return 1
+    fi
 }
 
 # Adds an Xcode project to the generated project, as Xcode would create it
@@ -236,10 +293,15 @@ check_scheme() {
 # it at the installed one, and a second run must find nothing to update.
 check_update() {
     local update=(env ESPSWIFT_TEMPLATE="$TEMPLATE" "$ESPSWIFT_BIN" update --project "$WORK_DIR/$1")
-    "${update[@]}" | grep -q "Pointed the Indexing target" \
+    # The output is read once update is done: grep -q stops reading at the
+    # first match, which would stop update before it's done.
+    local output
+    output=$("${update[@]}")
+    echo "$output" | grep -q "Pointed the Indexing target" \
         || { echo "espswift update didn't update the Indexing target's toolchain."; return 1; }
-    "${update[@]}" | grep -q "Already up to date" \
-        || { echo "espswift update changed the project again on a second run."; return 1; }
+    output=$("${update[@]}")
+    echo "$output" | grep -q "Already up to date" \
+        || { echo "espswift update changed the project again on a second run:"; echo "$output"; return 1; }
 }
 
 # Checks that build errors reach Xcode as issues that jump to their line
@@ -288,11 +350,18 @@ check_scheme_tests() {
     [ "${PIPESTATUS[0]}" -eq 0 ] || { echo "The scheme's Test action (Cmd+U) failed."; return 1; }
 }
 
+# Whether a project gets the checks that don't depend on the chip: the first
+# chip's, and every example's (each has tests of its own).
+is_first_or_example() {
+    [ "$EXAMPLES" = true ] || [ "$1" = "${ITEMS[0]}" ]
+}
+
 # The checks of the Xcode project, with Xcode (macOS only): code completion,
-# the Run scheme, espswift update, and for the first chip Cmd+U.
+# the Run scheme, espswift update, and for the first chip and the examples
+# Cmd+U.
 check_xcode() {
     check_indexing "$1" && check_scheme "$1" && check_update "$1" \
-        && { [ "$1" != "${CHIPS[0]}" ] || check_scheme_tests "$1"; }
+        && { ! is_first_or_example "$1" || check_scheme_tests "$1"; }
 }
 
 # Without Xcode (on Linux), projects have no Xcode project, so only the
@@ -306,21 +375,32 @@ fi
 
 FAILED=()
 
-for CHIP in "${CHIPS[@]}"; do
+for ITEM in "${ITEMS[@]}"; do
     echo ""
     echo "================================================="
-    echo " $CHIP"
+    echo " $ITEM"
     echo "================================================="
 
-    LOG="$WORK_DIR/$CHIP.log"
-    SOURCE_DIR="$WORK_DIR/$CHIP/$PROJECT_NAME"
-
-    if ! create_project "$CHIP"; then
-        FAILED+=("$CHIP")
-        continue
+    LOG="$WORK_DIR/$ITEM.log"
+    # An example's project is named after it.
+    if [ "$EXAMPLES" = true ]; then
+        PROJECT_NAME="$ITEM"
     fi
-    if [ "$WITH_XCODE" = true ]; then
-        add_xcode_project "$CHIP"
+    SOURCE_DIR="$WORK_DIR/$ITEM/$PROJECT_NAME"
+
+    if [ "$EXAMPLES" = true ]; then
+        if ! check_example_xcode_project "$ITEM" || ! copy_example "$ITEM"; then
+            FAILED+=("$ITEM")
+            continue
+        fi
+    else
+        if ! create_project "$ITEM"; then
+            FAILED+=("$ITEM")
+            continue
+        fi
+        if [ "$WITH_XCODE" = true ]; then
+            add_xcode_project "$ITEM"
+        fi
     fi
 
     # Build the way Xcode does (which sets PROJECT_DIR and PROJECT_NAME),
@@ -328,29 +408,32 @@ for CHIP in "${CHIPS[@]}"; do
     # output goes to the project's build/ folder.
     START=$(date +%s)
     if (cd "$SOURCE_DIR" && ESPSWIFT_BUILD_ONLY=1 \
-            PROJECT_DIR="$WORK_DIR/$CHIP" PROJECT_NAME="$PROJECT_NAME" ./build.sh) > "$LOG" 2>&1 \
+            PROJECT_DIR="$WORK_DIR/$ITEM" PROJECT_NAME="$PROJECT_NAME" ./build.sh) > "$LOG" 2>&1 \
         && [ -f "$SOURCE_DIR/build/$PROJECT_NAME.bin" ]; then
         # The error check builds twice more, and the package's tests don't
-        # depend on the chip, so they run for the first chip only.
-        if { [ "$WITH_XCODE" = false ] || check_xcode "$CHIP" >> "$LOG" 2>&1; } \
-            && { [ "$CHIP" != "${CHIPS[0]}" ] || { check_diagnostics "$CHIP" && check_package_tests "$CHIP"; } >> "$LOG" 2>&1; }; then
+        # depend on the chip, so they run for the first chip only (and for
+        # every example, which has tests of its own).
+        if { [ "$EXAMPLES" = false ] || check_no_warnings "$ITEM" "$LOG"; } \
+            && { [ "$WITH_XCODE" = false ] || check_xcode "$ITEM" >> "$LOG" 2>&1; } \
+            && { [ "$EXAMPLES" = true ] || [ "$ITEM" != "${ITEMS[0]}" ] || check_diagnostics "$ITEM" >> "$LOG" 2>&1; } \
+            && { ! is_first_or_example "$ITEM" || check_package_tests "$ITEM" >> "$LOG" 2>&1; }; then
             echo "Passed in $(( $(date +%s) - START ))s: $(grep -m1 "^$PROJECT_NAME.bin binary size" "$LOG")"
         else
             echo "Built, but a check failed. Last lines of $LOG:"
             tail -20 "$LOG"
-            FAILED+=("$CHIP")
+            FAILED+=("$ITEM")
         fi
     else
         echo "Failed after $(( $(date +%s) - START ))s. Last lines of $LOG:"
         tail -20 "$LOG"
-        FAILED+=("$CHIP")
+        FAILED+=("$ITEM")
     fi
 done
 
 echo ""
 echo "================================================="
 if [ ${#FAILED[@]} -eq 0 ]; then
-    echo " All ${#CHIPS[@]} chip(s) passed: ${CHIPS[*]}"
+    echo " All ${#ITEMS[@]} ${KIND}(s) passed: ${ITEMS[*]}"
     echo "================================================="
     # Only a temporary directory this script created is removed; a
     # --work-dir directory is left as it is.

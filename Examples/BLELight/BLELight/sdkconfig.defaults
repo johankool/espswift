@@ -1,0 +1,23 @@
+# Default ESP-IDF configuration for Embedded Swift
+
+# The chip this project is built for, chosen when the project was created.
+# To switch chips, change it here (e.g. esp32c3, esp32c5, esp32c6, esp32h2)
+# and build again: build.sh then reconfigures the project for the new chip.
+CONFIG_IDF_TARGET="esp32c6"
+
+# The board's flash size (ESP32-C6-DevKitC-1).
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+
+# Disable Task Watchdog Timer by default
+CONFIG_ESP_TASK_WDT=n
+CONFIG_ESP_TASK_WDT_EN=n
+
+# Optional: Faster boot
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ=240
+
+# Optional: Reduce binary size
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+
+# Bluetooth LE, with the NimBLE stack.
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y

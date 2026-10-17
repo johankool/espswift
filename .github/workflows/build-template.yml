@@ -1,5 +1,6 @@
 # Sets up ESPSwift and builds a project from the template for every chip the
-# template offers, using tests/test_template.sh, on macOS and on Linux.
+# template offers, and the example projects in Examples/, using
+# tests/test_template.sh, on macOS and on Linux.
 #
 # macOS: install.sh (which installs EIM with Homebrew; on a runner without
 # swiftly, so it installs Swift from swift.org's .pkg), and the Xcode
@@ -8,7 +9,7 @@
 # and EIM's release. Neither checks Xcode itself or flashing.
 #
 # Each job downloads and installs ESP-IDF and Swift once; the test then
-# builds the chips one after another.
+# builds the chips one after another, and the examples.
 
 name: Build template
 
@@ -54,12 +55,18 @@ jobs:
       - name: Build the template for every chip
         run: bash tests/test_template.sh --work-dir "$RUNNER_TEMP/template-test"
 
+      - name: Build the examples
+        if: success() || failure()
+        run: bash tests/test_template.sh --examples --work-dir "$RUNNER_TEMP/examples-test"
+
       - name: Upload build logs
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: build-logs
-          path: ${{ runner.temp }}/template-test/*.log
+          path: |
+            ${{ runner.temp }}/template-test/*.log
+            ${{ runner.temp }}/examples-test/*.log
           if-no-files-found: ignore
 
   linux:
@@ -94,10 +101,16 @@ jobs:
       - name: Build the template for every chip
         run: bash tests/test_template.sh --work-dir "$RUNNER_TEMP/template-test"
 
+      - name: Build the examples
+        if: success() || failure()
+        run: bash tests/test_template.sh --examples --work-dir "$RUNNER_TEMP/examples-test"
+
       - name: Upload build logs
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: build-logs-linux
-          path: ${{ runner.temp }}/template-test/*.log
+          path: |
+            ${{ runner.temp }}/template-test/*.log
+            ${{ runner.temp }}/examples-test/*.log
           if-no-files-found: ignore

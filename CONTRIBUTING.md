@@ -50,13 +50,30 @@ bash tests/test_template.sh            # all chips
 bash tests/test_template.sh esp32c6    # one chip
 ```
 
-It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
+If you changed the template, `espswift` or an example, also build the examples in `Examples/` and run their tests:
+
+```bash
+bash tests/test_template.sh --examples              # all examples
+bash tests/test_template.sh --examples DeepSleep    # one example
+```
+
+It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. With `--examples` it copies each example instead, and also checks that its build has no warnings and that its Xcode project is up to date. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
 
 The test doesn't cover Xcode or hardware, so for changes there, also check by hand:
 - After running `install.sh` and restarting Xcode, **ESP32 RISC-V** appears under File → New → Project → Choose Template… → Other, with the **Board** pop-up.
 - A new project's `sdkconfig.defaults` has the chip and flash size of the board you picked, and `README.md` sits next to the `.xcodeproj`.
 - `Cmd+B` builds without flashing, and `Cmd+R` flashes your board and shows its serial output.
 - After that first build, code completion works in `Firmware/Firmware.swift` (e.g. typing `led_strip_` or `blinkStep`), `Cmd+U` runs the Kit package's tests, and Command-clicking `vTaskDelay` opens FreeRTOS's `task.h`.
+
+### Examples
+
+The examples in `Examples/` are projects as the template creates them (made with `espswift new <name> --board esp32-c6-devkitc-1 --folder Examples`), with their own code. Only Xcode creates Xcode projects from the template, so theirs are written by a script, from the test fixture:
+
+```bash
+python3 tests/xcode_project.py Examples/*
+```
+
+Run it after adding or removing a Swift file in an example's `Firmware/` or a test target in its Kit package, and after changing the template's Indexing target or Run scheme; the examples test fails until you do. When the template changes the project's files (such as `build.sh`), run `espswift update --project Examples/<name>` for each example. Each example's README starts with its own part, followed by the template's README; keep that part in step with the template's.
 
 ### 5. Commit
 
@@ -86,12 +103,14 @@ espswift/
 │   ├── Sources/EspSwiftCore/        # What they do, through the System protocol
 │   ├── Sources/CSerialPort/         # Opening serial ports (needs C)
 │   └── Tests/EspSwiftCoreTests/     # Unit tests, with a fake System
+├── Examples/                         # Example projects, each with its own README
 ├── tests/
-│   ├── test_template.sh             # Builds the template for every chip
+│   ├── test_template.sh             # Builds the template for every chip, or the examples (--examples)
+│   ├── xcode_project.py             # Writes the examples' Xcode projects
 │   └── fixtures/project.pbxproj     # An Xcode project Xcode made from the template
 ├── .github/workflows/
 │   ├── cli.yml                      # Builds and tests espswift, on macOS and Linux
-│   └── build-template.yml           # Sets up ESPSwift and runs the template test, on macOS and Linux
+│   └── build-template.yml           # Sets up ESPSwift and runs the template and examples tests, on macOS and Linux
 └── Xcode Template/
     └── ESP32 RISC-V.xctemplate/
         ├── TemplateInfo.plist

@@ -10,11 +10,10 @@ This project is being developed as part of the [Swift Mentorship Program](https:
 
 ## Near-term
 
-- [ ] **Test the other chips and boards on hardware.** Only the ESP32-C6-DevKitC-1 has run firmware. The ESP32-C2, C3, C5, C61, H2 and P4 are tested by building only, as are the other boards' LEDs: the WS2812 over SPI on the C2 and C61, the ESP8684-DevKitM-1's separate red, green and blue LEDs (assumed lit by a high level), the XIAO ESP32C6's one-colour LED (assumed lit by a low level) and the NanoC6's LED power pin.
+- [ ] **Test the other chips and boards on hardware.** Only the ESP32-C6-DevKitC-1 has run firmware (the template's and the examples', except WiFiRequest's connection and request, and ButtonInput's presses and I2CSensor's readings, which need a person and a sensor). The ESP32-C2, C3, C5, C61, H2 and P4 are tested by building only, as are the other boards' LEDs: the WS2812 over SPI on the C2 and C61, the ESP8684-DevKitM-1's separate red, green and blue LEDs (assumed lit by a high level), the XIAO ESP32C6's one-colour LED (assumed lit by a low level) and the NanoC6's LED power pin.
 - [ ] **Code completion with Xcode 26.** Projects build without errors in Xcode 26.6, but code completion and jump to definition don't work there; they're verified with Xcode 27 only, and so is CI. A starting point: compare the compiler arguments the editor gets (`xcodebuild -target Indexing -showBuildSettingsForIndex -json`) in Xcode 26.6 and 27. Testing it in CI would also need a test fixture (`tests/fixtures/project.pbxproj`) created by Xcode 26.
 - [ ] **Build the Swift package with SwiftPM's default build system.** The firmware build uses `swift build --build-system native` (see `cli/Sources/EspSwiftCore/PackageBuild.swift`): Swift Build, SwiftPM's default since Swift 6.4, links C targets with Apple's linker, which can't link code for the ESP32. SwiftPM warns that the native build system is deprecated and will be removed, so this needs a fix in Swift Build, or a way around it, before then. Worth reporting to the SwiftPM project.
 - [ ] **Cache downloads in CI.** Every CI run downloads and installs ESP-IDF, its tools and Swift (about 5 of its 11 minutes). Caching them between runs would make CI faster.
-- [ ] **Example projects:** GPIO input, an I2C sensor, Wi-Fi with an HTTP request, BLE, deep sleep; each a small project in an `Examples/` folder that CI builds as well.
 
 ## Longer-term
 
@@ -64,6 +63,7 @@ Not planned yet; worth considering.
 - [x] The Swift code is in Swift packages: the firmware can use Embedded-compatible Swift packages (such as `swift-mmio`), and code that doesn't use ESP-IDF is in a package of the project that Xcode tests on the Mac (`Cmd+U`)
 - [x] `espswift`, ESPSwift's command-line tool, in Swift: `setup`, `new`, `build`, `run`, `flash`, `monitor`, `debug`, `add`, `settings`, `update`, `doctor` and `uninstall`, on macOS and Linux; it replaces the shell and Python scripts and the SwiftUI installer (see [cli/README.md](cli/README.md))
 - [x] `espswift new` creates projects without Xcode
+- [x] Example projects in `Examples/`, built and tested by CI: ButtonInput (GPIO input with debouncing), I2CSensor (an SHT4x sensor), WiFiRequest (Wi-Fi and HTTPS), BLELight (a Bluetooth LE GATT server with NimBLE) and DeepSleep (a timer wake-up and RTC memory); `espswift update` sets up their Xcode projects
 - [x] ESP-IDF is installed with EIM, Espressif's ESP-IDF Installation Manager, and shared with Espressif's other tools
 - [x] A Homebrew tap (`brew install --HEAD espswift`), tested locally
 - [x] Linux: espswift sets up, creates, builds and tests projects on Linux; the template test runs there too (a CI job)

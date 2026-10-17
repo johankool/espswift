@@ -25,6 +25,7 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
 ✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
+✅ **Example Projects** — a button, an I2C sensor, Wi-Fi with HTTPS, Bluetooth LE and deep sleep, in [Examples](Examples)  
 
 ---
 
@@ -92,7 +93,7 @@ Xcode runs `espswift` for you (`Cmd+B`, `Cmd+R`); in Terminal it works in any fo
 | `espswift debug` | Debugs the firmware on the board with LLDB |
 | `espswift add <library> [--header]` | Adds an ESP-IDF library from the [Component Registry](https://components.espressif.com) |
 | `espswift settings` | ESP-IDF's settings menu (menuconfig) |
-| `espswift update` | Updates a project created from an older template |
+| `espswift update` | Updates a project created from an older template, or sets up one from elsewhere, such as an example |
 | `espswift ports` | Lists connected boards |
 | `espswift doctor` | Checks ESP-IDF, Swift and the other tools |
 | `espswift setup` / `espswift uninstall` | Installs, updates or removes ESPSwift |
@@ -149,6 +150,8 @@ public func app_main() {
     }
 }
 ```
+
+More examples, each a project to open in Xcode, are in [Examples](Examples): reading a button, an I2C temperature sensor, Wi-Fi with an HTTPS request, a Bluetooth LE light and deep sleep.
 
 ---
 
@@ -210,8 +213,10 @@ espswift/
 │   ├── Sources/espswift/            # The commands (swift-argument-parser)
 │   ├── Sources/EspSwiftCore/        # What they do: setup, build, flash, monitor, debug, ...
 │   └── Tests/EspSwiftCoreTests/     # Unit tests (swift test)
+├── Examples/                        # Example projects: button, I2C sensor, Wi-Fi, Bluetooth LE, deep sleep
 ├── tests/
-│   └── test_template.sh             # Builds the template for every chip (also run in CI, on macOS and Linux)
+│   ├── test_template.sh             # Builds the template for every chip, and the examples (also run in CI, on macOS and Linux)
+│   └── xcode_project.py             # Writes the examples' Xcode projects
 └── Xcode Template/
     └── ESP32 RISC-V.xctemplate/
         ├── TemplateInfo.plist       # Xcode template configuration

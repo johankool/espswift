@@ -1,0 +1,54 @@
+# Component CMakeLists.txt for the main ESP-IDF component.
+#
+# The firmware's Swift code is a Swift package (the Firmware folder next to
+# the Xcode project). SwiftPM builds it as a step of this build, into a
+# library that is linked into the firmware.
+
+idf_build_get_property(arch IDF_TARGET_ARCH)
+if("${arch}" STREQUAL "xtensa")
+    idf_build_get_property(target IDF_TARGET)
+    message(FATAL_ERROR "Embedded Swift doesn't support Xtensa chips such as the ${target}; choose a RISC-V chip (ESP32-C2, C3, C5, C6, C61, H2 or P4) in sdkconfig.defaults.")
+endif()
+
+# swift_flags.c is empty. Its compile command provides the C flags (ESP-IDF's
+# include paths and definitions) with which Swift imports ESP-IDF's headers.
+# Without REQUIRES, the main component uses every component in the build,
+# including libraries added with espswift add.
+idf_component_register(SRCS swift_flags.c)
+
+idf_build_get_property(BUILD_DIR BUILD_DIR)
+# espswift: the one that runs the build (espswift build sets ESPSWIFT_BIN),
+# else the installed one.
+if(DEFINED ENV{ESPSWIFT_BIN})
+    set(ESPSWIFT_BIN "$ENV{ESPSWIFT_BIN}")
+else()
+    set(ESPSWIFT_BIN "$ENV{HOME}/.espswift/bin/espswift")
+endif()
+set(SWIFT_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/libFirmware.a")
+
+# Builds the Swift package on every build; SwiftPM decides what to rebuild.
+add_custom_target(swift_package
+    COMMAND "${ESPSWIFT_BIN}" internal build-package
+        --build-folder "${BUILD_DIR}"
+        --flags-source "${CMAKE_CURRENT_LIST_DIR}/swift_flags.c"
+        --project "${CMAKE_CURRENT_LIST_DIR}/../.."
+        --package "${CMAKE_CURRENT_LIST_DIR}/../../Firmware"
+        --swift-bin "${ESPSWIFT_SWIFT_BIN_DIR}"
+        --output "${SWIFT_LIBRARY}"
+        ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}
+    # Swift's module hash section isn't needed in the firmware.
+    COMMAND "${CMAKE_OBJCOPY}" --remove-section .swift_modhash "${SWIFT_LIBRARY}"
+    BYPRODUCTS "${SWIFT_LIBRARY}"
+    COMMENT "Building the Swift package"
+    USES_TERMINAL
+    VERBATIM
+)
+add_dependencies(${COMPONENT_LIB} swift_package)
+
+# The Swift library is linked as a whole: nothing in ESP-IDF refers to the
+# Swift code until app_main is linked, so the linker would otherwise skip
+# it. As a link option it comes before ESP-IDF's libraries, which provide
+# what the Swift code uses.
+target_link_options(${COMPONENT_LIB} INTERFACE
+    "LINKER:--whole-archive,${SWIFT_LIBRARY},--no-whole-archive")
+set_property(TARGET ${COMPONENT_LIB} APPEND PROPERTY INTERFACE_LINK_DEPENDS "${SWIFT_LIBRARY}")
