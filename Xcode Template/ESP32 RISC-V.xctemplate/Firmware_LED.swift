@@ -38,6 +38,13 @@ struct LED {
         case .addressable(let pin, let powerPin):
             if let powerPin { Self.makeOutput(powerPin, on: true, activeLow: false) }
             guard let strip = Self.newStrip(pin: pin) else { return nil }
+            // Turn the LED off, twice: on some boards the LED's pin is held
+            // high while the chip starts (it's a strapping pin), and the
+            // LED takes the driver pulling it low for a first bit, which
+            // garbles the first colour sent. The second, after a pause,
+            // arrives intact.
+            led_strip_clear(strip)
+            vTaskDelay(1)
             led_strip_clear(strip)
             self.strip = strip
         case .rgb(let red, let green, let blue, let activeLow):

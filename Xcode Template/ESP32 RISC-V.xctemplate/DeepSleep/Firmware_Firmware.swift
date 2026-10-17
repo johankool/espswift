@@ -45,6 +45,8 @@ func waitForUSB() {
 
 @_cdecl("app_main")
 public func app_main() {
+    // The LED first: it kept its colour while the chip slept.
+    let led = LED(Board.led)
     waitForUSB()
 
     // What woke the chip: each kind of wake-up is a bit.
@@ -60,10 +62,12 @@ public func app_main() {
 
     // Show the colour for this wake-up for a second.
     let step = blinkStep(wakeCount)
-    let led = LED(Board.led)
     led?.show(red: step.red, green: step.green, blue: step.blue)
     print("LED: \(step.name). Sleeping for \(sleepSeconds) seconds in a second...")
     vTaskDelay(ticks(milliseconds: 1000))
+
+    // The LED stays powered in deep sleep, so turn it off first.
+    led?.show(red: 0, green: 0, blue: 0)
 
     // Sleep, until the timer wakes the chip. The chip then starts from
     // the beginning, as after a reset, and app_main runs again.
