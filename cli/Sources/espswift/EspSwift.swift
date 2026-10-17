@@ -62,7 +62,8 @@ extension EspSwift {
             abstract: "Creates a project from the template, without Xcode.",
             discussion: """
                 The project builds with espswift build. It has no Xcode project: on \
-                macOS, create projects for Xcode with File ▸ New ▸ Project ▸ ESP32 RISC-V.
+                macOS, create projects for Xcode with File ▸ New ▸ Project ▸ Choose Template… ▸ \
+                ESP32 RISC-V.
                 """
         )
 

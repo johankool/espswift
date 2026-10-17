@@ -52,7 +52,7 @@ public struct XcodeTemplate: Sendable {
         if let text = system.readFile(scheme) {
             try system.writeFile(scheme, text.replacingOccurrences(of: "ESPSWIFT_COMMAND_PATH", with: locations.command))
         }
-        system.report("Installed the Xcode template ESP32 RISC-V. Restart Xcode to see it in File ▸ New ▸ Project.")
+        system.report("Installed the Xcode template ESP32 RISC-V. Restart Xcode to see it in File ▸ New ▸ Project ▸ Choose Template….")
     }
 
     /// Removes the template (also under its old name); whether there was one.

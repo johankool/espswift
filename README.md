@@ -46,7 +46,7 @@ On Linux, install ESP-IDF's prerequisites (on Ubuntu: `sudo apt install git wget
 
 ### Create a Project in Xcode
 1. Restart Xcode
-2. File → New → Project → Other → **ESP32 RISC-V**, and choose your board's chip in the **Chip** pop-up
+2. File → New → Project → Choose Template… → Other → **ESP32 RISC-V**, and choose your board's chip in the **Chip** pop-up (before Xcode 27.1, File → New → Project opens the templates directly)
 3. Connect your board via USB
 4. Press `Cmd+B` — builds the firmware
 5. Press `Cmd+R` — flashes it to the board and shows its serial output in Xcode's console
