@@ -16,37 +16,32 @@ public struct NewProject: Sendable {
         self.template = template
     }
 
-    /// The template's definitions and its pop-ups (Chip, Board).
+    /// The template's definitions and its pop-up, Board.
     struct TemplateInfo {
         var nodes: [String]
         var definitions: [String: [String: Any]]
         var options: [[String: Any]]
 
-        var chips: [String] {
-            options.first { $0["Identifier"] as? String == "chip" }?["Values"] as? [String] ?? Pins.chips
+        var boardOption: [String: Any]? {
+            options.first { $0["Identifier"] as? String == "board" }
         }
 
-        /// Whether a pop-up is shown with the choices made so far: it can
-        /// require other options to have a value (RequiredOptions), as each
-        /// chip has a Board pop-up of its own.
-        static func isShown(_ option: [String: Any], with choices: [String: String]) -> Bool {
-            (option["RequiredOptions"] as? [String: String] ?? [:]).allSatisfy { choices[$0.key] == $0.value }
+        /// The boards, in the pop-up's order, with their titles and chips
+        /// (each board's chip variable).
+        var boards: [Board] {
+            guard let option = boardOption else { return [] }
+            let values = option["Values"] as? [String] ?? []
+            let titles = option["ValueTitles"] as? [String] ?? values
+            let variables = option["Variables"] as? [String: [String: String]] ?? [:]
+            return zip(values, titles).map { Board(value: $0, title: $1, chip: variables[$0]?["chip"] ?? "") }
         }
+    }
 
-        /// The Board pop-ups: one per chip.
-        var boardOptions: [[String: Any]] {
-            options.filter { ($0["Identifier"] as? String)?.hasPrefix("board") == true }
-        }
-
-        /// The values of a pop-up allowed with the choices made so far: a
-        /// value can require other options to have a value
-        /// (RequiredOptionsForValues).
-        static func allowedValues(of option: [String: Any], with choices: [String: String]) -> [String] {
-            let requirements = option["RequiredOptionsForValues"] as? [String: [String: String]] ?? [:]
-            return (option["Values"] as? [String] ?? []).filter { value in
-                (requirements[value] ?? [:]).allSatisfy { choices[$0.key] == $0.value }
-            }
-        }
+    /// A board the template offers.
+    public struct Board: Sendable, Equatable {
+        public var value: String
+        public var title: String
+        public var chip: String
     }
 
     func templateInfo() throws -> TemplateInfo {
@@ -59,37 +54,50 @@ public struct NewProject: Sendable {
         return TemplateInfo(nodes: nodes, definitions: definitions, options: plist["Options"] as? [[String: Any]] ?? [])
     }
 
-    /// The chip a board needs (from RequiredOptionsForValues); nil for a
-    /// board that fits any chip, such as Other board.
-    public func chip(forBoard board: String) throws -> String? {
-        let options = try templateInfo().boardOptions.filter { ($0["Values"] as? [String] ?? []).contains(board) }
-        // A board name in several chips' lists, such as "other", names no chip.
-        guard options.count == 1 else { return nil }
-        return (options[0]["RequiredOptions"] as? [String: String])?["chip"]
+    /// The boards the template offers, in its Board pop-up's order.
+    public func boards() throws -> [Board] {
+        try templateInfo().boards
     }
 
-    /// The boards (values and titles) the template offers for a chip.
-    public func boards(for chip: String) throws -> [(value: String, title: String)] {
+    /// The board to use for a chip and a board, either of which can be
+    /// missing: the board, if it has that chip; else the chip's first board;
+    /// else the pop-up's default.
+    public func board(_ board: String?, chip: String?) throws -> String {
         let info = try templateInfo()
-        guard let option = info.boardOptions.first(where: { TemplateInfo.isShown($0, with: ["chip": chip]) }) else { return [] }
-        let titles = Dictionary(zip(option["Values"] as? [String] ?? [], option["ValueTitles"] as? [String] ?? []),
-                                uniquingKeysWith: { first, _ in first })
-        return TemplateInfo.allowedValues(of: option, with: ["chip": chip]).map { ($0, titles[$0] ?? $0) }
+        let boards = info.boards
+        let chips = boards.map(\.chip).reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } }
+        if let chip, !chips.contains(chip) {
+            throw EspSwiftError("The template has no \(chip); choose one of \(chips.joined(separator: ", ")).")
+        }
+        if let board {
+            guard let found = boards.first(where: { $0.value == board }) else {
+                throw EspSwiftError("The template has no board \(board); see espswift new --list-boards.")
+            }
+            if let chip, found.chip != chip {
+                throw EspSwiftError("\(found.title) has an \(found.chip), not an \(chip).")
+            }
+            return board
+        }
+        if let chip, let first = boards.first(where: { $0.chip == chip }) {
+            return first.value
+        }
+        guard let fallback = info.boardOption?["Default"] as? String ?? boards.first?.value else {
+            throw EspSwiftError("The template has no boards to choose from.")
+        }
+        return fallback
     }
 
-    /// Creates the project `name` for `chip` (and `board`, else the
-    /// template's default for the chip) in `parent` (the project folder is
-    /// parent/name); returns the project folder.
+    /// Creates the project `name` for `board` (else the template's default)
+    /// in `parent` (the project folder is parent/name); returns the project
+    /// folder.
     @discardableResult
-    public func run(name: String, chip: String, board: String? = nil, in parent: String, author: String,
+    public func run(name: String, board: String? = nil, in parent: String, author: String,
                     date: String) throws -> String {
         guard !name.isEmpty, !name.contains("/"), !name.hasPrefix("."), name.allSatisfy({ !$0.isWhitespace }) else {
             throw EspSwiftError("\"\(name)\" can't be a project name: use letters, digits, - or _, without spaces.")
         }
         let info = try templateInfo()
-        guard info.chips.contains(chip) else {
-            throw EspSwiftError("The template has no \(chip); choose one of \(info.chips.joined(separator: ", ")).")
-        }
+        let board = try self.board(board, chip: nil)
         let root = "\(parent)/\(name)"
         guard !system.fileExists(root) else {
             throw EspSwiftError("\(root) exists already.")
@@ -99,29 +107,13 @@ public struct NewProject: Sendable {
             "___FULLUSERNAME___": author,
             "___DATE___": date,
         ]
-        // The pop-ups shown, in order: the value chosen (or the default, if
-        // allowed with the choices before it, else the first allowed), and
-        // the variables that value sets (Variables), as ___VARIABLE_<name>___.
-        var choices: [String: String] = [:]
-        var boardUsed = board == nil
+        // Each pop-up's value (the board, or its default) and the variables
+        // that value sets (Variables, such as the board's chip), as
+        // ___VARIABLE_<name>___.
         for option in info.options {
-            guard let identifier = option["Identifier"] as? String, TemplateInfo.isShown(option, with: choices) else { continue }
-            let isBoard = identifier.hasPrefix("board")
-            let requested = identifier == "chip" ? chip : isBoard ? board : nil
-            if isBoard { boardUsed = true }
-            let allowed = TemplateInfo.allowedValues(of: option, with: choices)
-            let value: String
-            if let wanted = requested {
-                guard allowed.contains(wanted) else {
-                    throw EspSwiftError("The template has no \(identifier) \(wanted) for these choices; choose one of \(allowed.joined(separator: ", ")).")
-                }
-                value = wanted
-            } else if let fallback = (option["Default"] as? String).flatMap({ allowed.contains($0) ? $0 : nil }) ?? allowed.first {
-                value = fallback
-            } else {
-                continue
-            }
-            choices[identifier] = value
+            guard let identifier = option["Identifier"] as? String else { continue }
+            let values = option["Values"] as? [String] ?? []
+            guard let value = identifier == "board" ? board : option["Default"] as? String ?? values.first else { continue }
             placeholders["___VARIABLE_\(identifier)___"] = value
             for (variable, text) in (option["Variables"] as? [String: [String: String]])?[value] ?? [:] {
                 placeholders["___VARIABLE_\(variable)___"] = text
@@ -129,9 +121,6 @@ public struct NewProject: Sendable {
         }
         func fillIn(_ text: String) -> String {
             placeholders.reduce(text) { $0.replacingOccurrences(of: $1.key, with: $1.value) }
-        }
-        guard boardUsed else {
-            throw EspSwiftError("The template has no boards to choose from.")
         }
 
         for node in info.nodes {
@@ -156,7 +145,7 @@ public struct NewProject: Sendable {
                 if to.hasSuffix(".sh") { try system.makeExecutable(to) }
             }
         }
-        system.report("Created \(name) for the \(chip) in \(root).")
+        system.report("Created \(name) in \(root), for \(placeholders["___VARIABLE_boardName___"] ?? board).")
         return root
     }
 

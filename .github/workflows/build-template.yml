@@ -49,7 +49,7 @@ jobs:
       - name: Install ESPSwift
         run: bash install.sh
 
-      # Builds every chip in the template's Chip pop-up.
+      # Builds every chip of the template's boards.
       - name: Build the template for every chip
         run: bash tests/test_template.sh --work-dir "$RUNNER_TEMP/template-test"
 

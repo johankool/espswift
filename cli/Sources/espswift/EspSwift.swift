@@ -70,13 +70,13 @@ extension EspSwift {
         @Argument(help: "The project's name; its folder gets this name.")
         var name: String?
 
-        @Option(help: "The chip: esp32c2, esp32c3, esp32c5, esp32c6, esp32c61, esp32h2 or esp32p4; by default, the board's, else esp32c6.")
-        var chip: String?
-
-        @Option(help: "The board, which sets its LED and flash size (see --list-boards); by default, the chip's first.")
+        @Option(help: "The board, which sets the chip, its LED and its flash size (see --list-boards); by default, the chip's first board, else an ESP32-C6-DevKitC-1.")
         var board: String?
 
-        @Flag(help: "List the boards for the chip, and stop.")
+        @Option(help: "The chip: esp32c2, esp32c3, esp32c5, esp32c6, esp32c61, esp32h2 or esp32p4. Without --board, picks the chip's first board; for a board not listed, use --board other-<chip>.")
+        var chip: String?
+
+        @Flag(help: "List the boards (for --chip, if given), and stop.")
         var listBoards = false
 
         @Option(help: "Where to create the project's folder; by default, the current folder.")
@@ -87,20 +87,20 @@ extension EspSwift {
             try reportingErrors {
                 let template = try Resources.find(system: system).xcodeTemplate
                 let new = NewProject(system: system, template: template)
-                let chip = try self.chip ?? board.flatMap(new.chip(forBoard:)) ?? "esp32c6"
                 if listBoards {
-                    for board in try new.boards(for: chip) {
-                        system.report("\(board.value)\t\(board.title)")
+                    for board in try new.boards() where chip == nil || board.chip == chip {
+                        system.report("\(board.value)\t\(board.chip)\t\(board.title)")
                     }
                     return
                 }
+                let board = try new.board(self.board, chip: chip)
                 let formatter = DateFormatter()
                 formatter.dateStyle = .short
                 formatter.timeStyle = .none
                 let author = NSFullUserName().isEmpty ? (system.environment["USER"] ?? "") : NSFullUserName()
                 let parent = folder.map { URL(fileURLWithPath: $0).standardizedFileURL.path } ?? system.currentDirectory
                 guard let name else { throw EspSwiftError("Name the project: espswift new <name>") }
-                try new.run(name: name, chip: chip, board: board, in: parent, author: author,
+                try new.run(name: name, board: board, in: parent, author: author,
                          date: formatter.string(from: Date()))
                 system.report("Build it with: cd \(name) && \(Locations(system: system).command) build")
             }

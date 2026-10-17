@@ -185,13 +185,13 @@
 	<array>
 		<dict>
 			<key>Default</key>
-			<string>esp32c6</string>
+			<string>esp32-c6-devkitc-1</string>
 			<key>Description</key>
-			<string>The ESP32 chip on your board. It is written to sdkconfig.defaults as CONFIG_IDF_TARGET.</string>
+			<string>Your board, which sets the chip, its LED and its flash size. For a board not listed, choose Other with its chip.</string>
 			<key>Identifier</key>
-			<string>chip</string>
+			<string>board</string>
 			<key>Name</key>
-			<string>Chip:</string>
+			<string>Board:</string>
 			<key>Required</key>
 			<true/>
 			<key>SortOrder</key>
@@ -200,487 +200,300 @@
 			<string>popup</string>
 			<key>ValueTitles</key>
 			<array>
-				<string>ESP32-C2</string>
-				<string>ESP32-C3</string>
-				<string>ESP32-C5</string>
-				<string>ESP32-C6</string>
-				<string>ESP32-C61</string>
-				<string>ESP32-H2</string>
-				<string>ESP32-P4</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>esp32c2</string>
-				<string>esp32c3</string>
-				<string>esp32c5</string>
-				<string>esp32c6</string>
-				<string>esp32c61</string>
-				<string>esp32h2</string>
-				<string>esp32p4</string>
-			</array>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp8684-devkitm-1</string>
-			<key>Description</key>
-			<string>Your ESP32-C2 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32c2</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32c2</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>110</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP8684-DevKitM-1</string>
-				<string>Other board</string>
+				<string>ESP8684-DevKitM-1 (ESP32-C2)</string>
+				<string>ESP32-C3-DevKitM-1</string>
+				<string>ESP32-C5-DevKitC-1</string>
+				<string>ESP32-C6-DevKitC-1</string>
+				<string>ESP32-C6-DevKitM-1</string>
+				<string>Seeed Studio XIAO ESP32C6</string>
+				<string>M5Stack NanoC6</string>
+				<string>ESP32-C61-DevKitC-1</string>
+				<string>ESP32-H2-DevKitM-1</string>
+				<string>ESP32-P4-Function-EV-Board</string>
+				<string>Other ESP32-C2 board</string>
+				<string>Other ESP32-C3 board</string>
+				<string>Other ESP32-C5 board</string>
+				<string>Other ESP32-C6 board</string>
+				<string>Other ESP32-C61 board</string>
+				<string>Other ESP32-H2 board</string>
+				<string>Other ESP32-P4 board</string>
 			</array>
 			<key>Values</key>
 			<array>
 				<string>esp8684-devkitm-1</string>
-				<string>other</string>
-			</array>
-			<key>Variables</key>
-			<dict>
-				<key>esp8684-devkitm-1</key>
-				<dict>
-					<key>boardName</key>
-					<string>ESP8684-DevKitM-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_RGB</string>
-					<key>boardLEDGPIO</key>
-					<string>8</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-				<key>other</key>
-				<dict>
-					<key>boardName</key>
-					<string>another ESP32-C2 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
-					<key>boardLEDGPIO</key>
-					<string>-1</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-			</dict>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp32-c3-devkitm-1</string>
-			<key>Description</key>
-			<string>Your ESP32-C3 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32c3</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32c3</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>111</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP32-C3-DevKitM-1</string>
-				<string>Other board</string>
-			</array>
-			<key>Values</key>
-			<array>
 				<string>esp32-c3-devkitm-1</string>
-				<string>other</string>
+				<string>esp32-c5-devkitc-1</string>
+				<string>esp32-c6-devkitc-1</string>
+				<string>esp32-c6-devkitm-1</string>
+				<string>seeed-xiao-esp32c6</string>
+				<string>m5stack-nanoc6</string>
+				<string>esp32-c61-devkitc-1</string>
+				<string>esp32-h2-devkitm-1</string>
+				<string>esp32-p4-function-ev-board</string>
+				<string>other-esp32c2</string>
+				<string>other-esp32c3</string>
+				<string>other-esp32c5</string>
+				<string>other-esp32c6</string>
+				<string>other-esp32c61</string>
+				<string>other-esp32h2</string>
+				<string>other-esp32p4</string>
 			</array>
 			<key>Variables</key>
 			<dict>
 				<key>esp32-c3-devkitm-1</key>
 				<dict>
-					<key>boardName</key>
-					<string>ESP32-C3-DevKitM-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
-					<key>boardLEDGPIO</key>
-					<string>8</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-				<key>other</key>
-				<dict>
-					<key>boardName</key>
-					<string>another ESP32-C3 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
-					<key>boardLEDGPIO</key>
-					<string>-1</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-			</dict>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp32-c5-devkitc-1</string>
-			<key>Description</key>
-			<string>Your ESP32-C5 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32c5</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32c5</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>112</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP32-C5-DevKitC-1</string>
-				<string>Other board</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>esp32-c5-devkitc-1</string>
-				<string>other</string>
-			</array>
-			<key>Variables</key>
-			<dict>
-				<key>esp32-c5-devkitc-1</key>
-				<dict>
-					<key>boardName</key>
-					<string>ESP32-C5-DevKitC-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
-					<key>boardLEDGPIO</key>
-					<string>27</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
-				</dict>
-				<key>other</key>
-				<dict>
-					<key>boardName</key>
-					<string>another ESP32-C5 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
-					<key>boardLEDGPIO</key>
-					<string>-1</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-			</dict>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp32-c6-devkitc-1</string>
-			<key>Description</key>
-			<string>Your ESP32-C6 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32c6</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32c6</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>113</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP32-C6-DevKitC-1</string>
-				<string>ESP32-C6-DevKitM-1</string>
-				<string>Seeed Studio XIAO ESP32C6</string>
-				<string>M5Stack NanoC6</string>
-				<string>Other board</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>esp32-c6-devkitc-1</string>
-				<string>esp32-c6-devkitm-1</string>
-				<string>seeed-xiao-esp32c6</string>
-				<string>m5stack-nanoc6</string>
-				<string>other</string>
-			</array>
-			<key>Variables</key>
-			<dict>
-				<key>esp32-c6-devkitc-1</key>
-				<dict>
-					<key>boardName</key>
-					<string>ESP32-C6-DevKitC-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
 					<key>boardLEDGPIO</key>
 					<string>8</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_ADDRESSABLE</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-C3-DevKitM-1</string>
+					<key>chip</key>
+					<string>esp32c3</string>
+				</dict>
+				<key>esp32-c5-devkitc-1</key>
+				<dict>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>27</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_ADDRESSABLE</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-C5-DevKitC-1</string>
+					<key>chip</key>
+					<string>esp32c5</string>
+				</dict>
+				<key>esp32-c6-devkitc-1</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>8</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_ADDRESSABLE</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-C6-DevKitC-1</string>
+					<key>chip</key>
+					<string>esp32c6</string>
 				</dict>
 				<key>esp32-c6-devkitm-1</key>
 				<dict>
-					<key>boardName</key>
-					<string>ESP32-C6-DevKitM-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
 					<string>8</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-				<key>seeed-xiao-esp32c6</key>
-				<dict>
-					<key>boardName</key>
-					<string>Seeed Studio XIAO ESP32C6</string>
 					<key>boardLEDKind</key>
-					<string>BOARD_LED_SINGLE</string>
-					<key>boardLEDGPIO</key>
-					<string>15</string>
+					<string>BOARD_LED_ADDRESSABLE</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-C6-DevKitM-1</string>
+					<key>chip</key>
+					<string>esp32c6</string>
+				</dict>
+				<key>esp32-c61-devkitc-1</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>8</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_ADDRESSABLE</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-C61-DevKitC-1</string>
+					<key>chip</key>
+					<string>esp32c61</string>
+				</dict>
+				<key>esp32-h2-devkitm-1</key>
+				<dict>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>8</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_ADDRESSABLE</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-H2-DevKitM-1</string>
+					<key>chip</key>
+					<string>esp32h2</string>
+				</dict>
+				<key>esp32-p4-function-ev-board</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_NONE</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP32-P4-Function-EV-Board</string>
+					<key>chip</key>
+					<string>esp32p4</string>
+				</dict>
+				<key>esp8684-devkitm-1</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>8</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_RGB</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>ESP8684-DevKitM-1 (ESP32-C2)</string>
+					<key>chip</key>
+					<string>esp32c2</string>
 				</dict>
 				<key>m5stack-nanoc6</key>
 				<dict>
-					<key>boardName</key>
-					<string>M5Stack NanoC6</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
 					<string>20</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_ADDRESSABLE</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>19</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardName</key>
+					<string>M5Stack NanoC6</string>
+					<key>chip</key>
+					<string>esp32c6</string>
 				</dict>
-				<key>other</key>
+				<key>other-esp32c2</key>
 				<dict>
+					<key>boardFlashSize</key>
+					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>another ESP32-C2 board</string>
+					<key>chip</key>
+					<string>esp32c2</string>
+				</dict>
+				<key>other-esp32c3</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>another ESP32-C3 board</string>
+					<key>chip</key>
+					<string>esp32c3</string>
+				</dict>
+				<key>other-esp32c5</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
+					<key>boardName</key>
+					<string>another ESP32-C5 board</string>
+					<key>chip</key>
+					<string>esp32c5</string>
+				</dict>
+				<key>other-esp32c6</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardLEDGPIO</key>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
+					<key>boardLEDPowerGPIO</key>
+					<string>-1</string>
 					<key>boardName</key>
 					<string>another ESP32-C6 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
-					<key>boardLEDGPIO</key>
-					<string>-1</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
+					<key>chip</key>
+					<string>esp32c6</string>
+				</dict>
+				<key>other-esp32c61</key>
+				<dict>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-			</dict>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp32-c61-devkitc-1</string>
-			<key>Description</key>
-			<string>Your ESP32-C61 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32c61</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32c61</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>114</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP32-C61-DevKitC-1</string>
-				<string>Other board</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>esp32-c61-devkitc-1</string>
-				<string>other</string>
-			</array>
-			<key>Variables</key>
-			<dict>
-				<key>esp32-c61-devkitc-1</key>
-				<dict>
-					<key>boardName</key>
-					<string>ESP32-C61-DevKitC-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
 					<key>boardLEDGPIO</key>
-					<string>8</string>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
-				</dict>
-				<key>other</key>
-				<dict>
 					<key>boardName</key>
 					<string>another ESP32-C61 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
-					<key>boardLEDGPIO</key>
-					<string>-1</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
+					<key>chip</key>
+					<string>esp32c61</string>
+				</dict>
+				<key>other-esp32h2</key>
+				<dict>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-			</dict>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp32-h2-devkitm-1</string>
-			<key>Description</key>
-			<string>Your ESP32-H2 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32h2</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32h2</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>115</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP32-H2-DevKitM-1</string>
-				<string>Other board</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>esp32-h2-devkitm-1</string>
-				<string>other</string>
-			</array>
-			<key>Variables</key>
-			<dict>
-				<key>esp32-h2-devkitm-1</key>
-				<dict>
-					<key>boardName</key>
-					<string>ESP32-H2-DevKitM-1</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_ADDRESSABLE</string>
 					<key>boardLEDGPIO</key>
-					<string>8</string>
+					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-				<key>other</key>
-				<dict>
 					<key>boardName</key>
 					<string>another ESP32-H2 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
-					<key>boardLEDGPIO</key>
-					<string>-1</string>
-					<key>boardLEDPowerGPIO</key>
-					<string>-1</string>
+					<key>chip</key>
+					<string>esp32h2</string>
+				</dict>
+				<key>other-esp32p4</key>
+				<dict>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
-				</dict>
-			</dict>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>esp32-p4-function-ev-board</string>
-			<key>Description</key>
-			<string>Your ESP32-P4 board, which sets its LED and flash size. Choose Other board for others.</string>
-			<key>Identifier</key>
-			<string>board_esp32p4</string>
-			<key>Name</key>
-			<string>Board:</string>
-			<key>Required</key>
-			<true/>
-			<key>RequiredOptions</key>
-			<dict>
-				<key>chip</key>
-				<string>esp32p4</string>
-			</dict>
-			<key>SortOrder</key>
-			<integer>116</integer>
-			<key>Type</key>
-			<string>popup</string>
-			<key>ValueTitles</key>
-			<array>
-				<string>ESP32-P4-Function-EV-Board</string>
-				<string>Other board</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>esp32-p4-function-ev-board</string>
-				<string>other</string>
-			</array>
-			<key>Variables</key>
-			<dict>
-				<key>esp32-p4-function-ev-board</key>
-				<dict>
-					<key>boardName</key>
-					<string>ESP32-P4-Function-EV-Board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_NONE</string>
 					<key>boardLEDGPIO</key>
 					<string>-1</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_CHIP_DEFAULT</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string>CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y</string>
-				</dict>
-				<key>other</key>
-				<dict>
 					<key>boardName</key>
 					<string>another ESP32-P4 board</string>
-					<key>boardLEDKind</key>
-					<string>BOARD_LED_CHIP_DEFAULT</string>
+					<key>chip</key>
+					<string>esp32p4</string>
+				</dict>
+				<key>seeed-xiao-esp32c6</key>
+				<dict>
+					<key>boardFlashSize</key>
+					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
-					<string>-1</string>
+					<string>15</string>
+					<key>boardLEDKind</key>
+					<string>BOARD_LED_SINGLE</string>
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
-					<key>boardFlashSize</key>
-					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
+					<key>boardName</key>
+					<string>Seeed Studio XIAO ESP32C6</string>
+					<key>chip</key>
+					<string>esp32c6</string>
 				</dict>
 			</dict>
 		</dict>

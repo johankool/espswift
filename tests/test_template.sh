@@ -26,7 +26,7 @@
 # placeholders and indexes), flashing, and running on a board.
 #
 # Usage: bash tests/test_template.sh [--keep] [--work-dir DIR] [chip ...]
-#   chip            One or more chips from the template's Chip pop-up,
+#   chip            One or more chips of the template's boards,
 #                   e.g. esp32c6. Default: all of them.
 #   --keep          Keep the generated projects and build logs. They are
 #                   always kept when a build fails, or with --work-dir.
@@ -62,12 +62,13 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TEMPLATE="$REPO_ROOT/Xcode Template/ESP32 RISC-V.xctemplate"
 PROJECT_NAME="TemplateTest"
 
-# The chips the template offers, from its Chip pop-up.
+# The chips the template offers: those of the boards in its Board pop-up.
 ALL_CHIPS=($(python3 -c '
 import plistlib, sys
 plist = plistlib.load(open(sys.argv[1], "rb"))
-chip = next(o for o in plist["Options"] if o["Identifier"] == "chip")
-print(" ".join(chip["Values"]))
+board = next(o for o in plist["Options"] if o["Identifier"] == "board")
+chips = [board["Variables"][value]["chip"] for value in board["Values"]]
+print(" ".join(dict.fromkeys(chips)))
 ' "$TEMPLATE/TemplateInfo.plist")) || exit 1
 
 if [ ${#CHIPS[@]} -eq 0 ]; then
@@ -262,9 +263,9 @@ check_diagnostics() {
         mv "$file.orig" "$file"
 
         # Compilers name the file by its real path (/private/var/... for a
-        # temporary directory).
-        file="$(cd "$(dirname "$file")" && pwd -P)/$(basename "$file")"
-        if ! echo "$output" | grep -F "$file:$line:" | grep -q ": error: "; then
+        # temporary directory); CMake can name it as given.
+        local real="$(cd "$(dirname "$file")" && pwd -P)/$(basename "$file")"
+        if ! echo "$output" | grep -F -e "$file:$line:" -e "$real:$line:" | grep -q ": error: "; then
             echo "The build didn't report the error on line $line of $file as an Xcode issue. Its output:"
             echo "$output" | tail -20
             return 1

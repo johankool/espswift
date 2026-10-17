@@ -14,7 +14,7 @@ Write firmware for RISC-V based ESP32 chips in Swift — build and flash directl
 ## Features
 
 ✅ **Native Swift on Microcontrollers** — Write ESP32 firmware in Swift, not C/C++  
-✅ **Choose Your Chip** — ESP32-C2, C3, C5, C6, C61, H2 or P4, picked when you create a project  
+✅ **Choose Your Board** — a DevKit or another board with an ESP32-C2, C3, C5, C6, C61, H2 or P4, picked when you create a project; it sets the chip, LED and flash size  
 ✅ **Xcode Integration** — `Cmd+B` builds, `Cmd+R` flashes the board and shows its output, `Cmd+U` runs tests  
 ✅ **Build Errors in Xcode** — Swift, C and CMake errors in the Issue navigator, linked to their line  
 ✅ **Code Completion** — completion and jump to definition for Swift and ESP-IDF's C APIs  
@@ -46,14 +46,14 @@ On Linux, install ESP-IDF's prerequisites (on Ubuntu: `sudo apt install git wget
 
 ### Create a Project in Xcode
 1. Restart Xcode
-2. File → New → Project → Choose Template… → Other → **ESP32 RISC-V**, and choose your board's chip in the **Chip** pop-up
+2. File → New → Project → Choose Template… → Other → **ESP32 RISC-V**, and choose your board in the **Board** pop-up (or Other, with its chip)
 3. Connect your board via USB
 4. Press `Cmd+B` — builds the firmware
 5. Press `Cmd+R` — flashes it to the board and shows its serial output in Xcode's console
 
 ### Create a Project in Terminal
 ```bash
-~/.espswift/bin/espswift new MyProject --chip esp32c6
+~/.espswift/bin/espswift new MyProject --board esp32-c6-devkitc-1   # see --list-boards
 cd MyProject
 ~/.espswift/bin/espswift run        # build, flash and show the serial output
 ```
@@ -66,7 +66,7 @@ Xcode runs `espswift` for you (`Cmd+B`, `Cmd+R`); in Terminal it works in any fo
 
 | Command | What it does |
 | --- | --- |
-| `espswift new <name> [--chip]` | Creates a project from the template |
+| `espswift new <name> [--board] [--chip]` | Creates a project from the template |
 | `espswift build [clean]` | Builds the project (`Cmd+B`) |
 | `espswift run` | Builds, flashes and shows the serial output (`Cmd+R`) |
 | `espswift flash` / `espswift monitor` | Flashes the latest build / shows the serial output (`--idf` for ESP-IDF's monitor, which decodes crashes) |
@@ -148,7 +148,7 @@ Yes, with LLDB in Terminal: `espswift debug` connects to the chip's built-in USB
 
 ### Which chips are supported?
 
-The RISC-V based ESP32 chips: ESP32-C2, C3, C5, C6, C61, H2 and P4. Choose one in the **Chip** pop-up when you create a project. The template is tested on hardware with the ESP32-C6; the other chips are tested by building only.
+The RISC-V based ESP32 chips: ESP32-C2, C3, C5, C6, C61, H2 and P4. Choose your board in the **Board** pop-up when you create a project: it lists Espressif's DevKits and a few others (Seeed Studio XIAO ESP32C6, M5Stack NanoC6), and Other for each chip. The template is tested on hardware with the ESP32-C6; the other chips are tested by building only.
 
 The Xtensa based chips (the original ESP32, ESP32-S2 and ESP32-S3, found for example on ESP32 DevKitV1 boards) are not supported: Swift doesn't support Xtensa.
 

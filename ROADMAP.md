@@ -35,7 +35,7 @@ Not planned yet; worth considering.
 - [ ] **Interactive serial input:** Xcode's console is output-only; a "Monitor in Terminal" action could open the serial monitor in Terminal for two-way communication.
 - [ ] **Show the firmware size after each build** (`idf.py size`), so growth is visible before it hits the flash limit.
 - [ ] **Faster builds with ccache,** which ESP-IDF supports for its C code.
-- [ ] **Choose the board, not just the chip:** a Board pop-up (e.g. ESP32-C6-DevKitC-1 or DevKitM-1) could set the LED pin and flash size together.
+- [x] **Choose the board, not just the chip:** a Board pop-up (e.g. ESP32-C6-DevKitC-1 or DevKitM-1) sets the chip, LED pin and flash size together.
 
 **Examples and libraries**
 - [ ] **Example projects:** Wi-Fi with an HTTP request, BLE, an I2C sensor, deep sleep; each a small project in an `Examples/` folder that CI builds as well.
