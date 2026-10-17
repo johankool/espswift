@@ -9,7 +9,7 @@ espswift setup [--[no-]xcode-template]     # installs ESP-IDF (with EIM), Swift 
 espswift new <name> [--board] [--folder]   # creates a project from the template, without Xcode (also on Linux)
 espswift build [clean] [--verbose]         # builds the project, showing errors as Xcode issues (projects' build.sh runs it)
 espswift flash [--port] [--last-build]     # flashes the project's latest build
-espswift monitor [--port] [--idf]          # shows the board's serial output (--idf: ESP-IDF's monitor)
+espswift monitor [--port] [--idf]          # shows the board's serial output, with crashes' backtraces (--idf: ESP-IDF's monitor)
 espswift run [--port] [--last-build]       # builds, flashes and monitors (Cmd+R runs it with --last-build)
 espswift debug                             # debugs the firmware on the board with LLDB (OpenOCD, built-in USB-JTAG)
 espswift add <component> [--header]        # adds an ESP-IDF library (main/idf_component.yml and ESPIDF.h)

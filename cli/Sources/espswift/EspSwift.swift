@@ -175,8 +175,9 @@ extension EspSwift {
             abstract: "Shows the board's serial output.",
             discussion: """
                 Waits for the board when it resets or is unplugged. Stop it with Ctrl+C. \
-                With --idf, ESP-IDF's own monitor runs instead, in a terminal: it decodes \
-                crash backtraces and sends what you type to the board.
+                Crashes are followed by their backtrace, from the project's build. With \
+                --idf, ESP-IDF's own monitor runs instead, in a terminal: it also sends \
+                what you type to the board.
                 """
         )
 
@@ -186,7 +187,7 @@ extension EspSwift {
         @Flag(help: "Use ESP-IDF's monitor (idf.py monitor), for a terminal.")
         var idf = false
 
-        @Option(help: "The project's folder, for --idf; by default, the one espswift runs in.")
+        @Option(help: "The project's folder, whose build decodes crashes; by default, the one espswift runs in.")
         var project: String?
 
         func run() throws {
@@ -198,7 +199,13 @@ extension EspSwift {
                     try EspSwiftCore.Monitor.idfMonitor(system: system, port: port, project: project,
                                                         buildFolder: EspSwiftCore.Flash.buildFolder(for: project, system: system))
                 } else {
-                    try EspSwiftCore.Monitor(system: system, port: port).run()
+                    // Decodes crashes with the project's build, or else the last build.
+                    let project = try? Project.find(system: system, start: self.project)
+                    let build = project.map { LastBuild(sourceFolder: $0.sourceFolder,
+                                                        buildFolder: EspSwiftCore.Flash.buildFolder(for: $0, system: system)) }
+                        ?? LastBuild.read(system: system)
+                    try EspSwiftCore.Monitor(system: system, port: port,
+                                             decoder: build.flatMap { PanicDecoder(system: system, build: $0) }).run()
                 }
             }
         }
@@ -232,7 +239,8 @@ extension EspSwift {
                 let (source, build) = try buildToFlash(system: system, project: project, lastBuild: lastBuild)
                 let port = try SerialPorts.choose(port, system: system)
                 try EspSwiftCore.Flash(system: system).run(sourceFolder: source, buildFolder: build, port: port)
-                try EspSwiftCore.Monitor(system: system, port: port).run()
+                let decoder = PanicDecoder(system: system, build: LastBuild(sourceFolder: source, buildFolder: build))
+                try EspSwiftCore.Monitor(system: system, port: port, decoder: decoder).run()
             } catch let error as EspSwiftError {
                 printError("Error: \(error)")
                 throw ExitCode.failure

@@ -5,14 +5,19 @@ import Foundation
 ///
 /// When the port goes away (the board resets, as after flashing, or is
 /// unplugged), it waits for the port and continues.
+///
+/// With a decoder, a crash's dump is followed by its backtrace, with
+/// function names, files and lines, and the dump's stack is left out.
 public struct Monitor: Sendable {
     public var system: System
     public var port: String
     public var baudRate = 115200
+    public var decoder: PanicDecoder?
 
-    public init(system: System, port: String) {
+    public init(system: System, port: String, decoder: PanicDecoder? = nil) {
         self.system = system
         self.port = port
+        self.decoder = decoder
     }
 
     /// Runs until stopped (Ctrl+C, or Stop in Xcode). `reconnects` limits
@@ -24,6 +29,8 @@ public struct Monitor: Sendable {
         system.report("=================================================")
         var remaining = reconnects
         var waiting = false
+        var watcher = PanicDumpWatcher(hidesStack: decoder != nil)
+        var lastRegisters: String?
         while true {
             guard system.fileExists(port) else {
                 if !waiting {
@@ -43,7 +50,22 @@ public struct Monitor: Sendable {
                 continue
             }
             while let data = system.readSerialPort(handle) {
-                system.writeOutput(data)
+                for event in watcher.process(data) {
+                    switch event {
+                    case .output(let output):
+                        system.writeOutput(output)
+                    case .dump(let dump):
+                        guard let decoder else { continue }
+                        // A crash at startup repeats after every reset: decode it once.
+                        let registers = Self.registers(of: dump)
+                        if registers == lastRegisters {
+                            system.report("(The same crash as before; its backtrace is above.)")
+                            continue
+                        }
+                        lastRegisters = registers
+                        for line in decoder.decode(dump) { system.report(line) }
+                    }
+                }
             }
             system.closeSerialPort(handle)
             guard remaining > 0 else { return }
@@ -51,6 +73,13 @@ public struct Monitor: Sendable {
             system.report("")
             system.report("(\(port) went away; the board reset or was unplugged.)")
         }
+    }
+
+    /// A dump's registers, which tell crashes apart (the stack has the same
+    /// values in another order after a reset, or other leftovers).
+    static func registers(of dump: String) -> String {
+        // The board ends lines with \r\n, which is one Character.
+        dump.split(whereSeparator: \.isNewline).prefix { !$0.hasPrefix("Stack memory:") }.joined(separator: "\n")
     }
 
     /// ESP-IDF's own monitor (idf.py monitor), for a terminal: it decodes

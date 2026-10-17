@@ -74,6 +74,22 @@ A new test target in the Kit runs with `Cmd+U` once it's added to the scheme: **
 
 The firmware can use Swift packages that support Embedded Swift, such as [swift-mmio](https://github.com/apple/swift-mmio) for type-safe access to the chip's registers. Add them to `Firmware/Package.swift`, where the lines for swift-mmio show how: the package under `dependencies`, and its product under the `Firmware` target's dependencies. The next `Cmd+B` downloads and builds it, and code completion picks it up after that build. A package with macros, like swift-mmio, takes a few minutes to build the first time.
 
+## When the firmware crashes
+
+When the firmware crashes, for instance on an array index out of range or a `fatalError`, the board prints its registers and resets. Xcode's console (`Cmd+R`) and `espswift monitor` follow that with the backtrace, from the last build's symbols:
+
+```
+Backtrace (decoded by espswift):
+  #0 Swift runtime failure: Index out of range at Firmware/Firmware.swift:6
+  #1 specialized Array._checkSubscript(_:wasNativeTypeChecked:)
+  #2 specialized Array.subscript.getter
+  #3 element(_:at:) at Firmware/Firmware.swift:5
+  #4 compute(_:) at Firmware/Firmware.swift:11
+  #5 app_main() at Firmware/Firmware.swift:18
+```
+
+A crash at startup repeats after every reset; its backtrace is shown once. Embedded Swift leaves out `fatalError`'s message, so the backtrace says "fatal error" instead.
+
 ## Debugging on the board
 
 You can stop the firmware at breakpoints in your Swift code and look at the backtrace and variables, with the LLDB debugger in Terminal. (Xcode's own debugger can't connect to the board.)
@@ -157,7 +173,7 @@ The example blinks the board's LED: an addressable RGB LED (WS2812), separate re
 ~/.espswift/bin/espswift ports      # list the connected boards
 ```
 
-Press `Ctrl+C` to stop the serial output. With several boards connected, choose one with `--port`, e.g. `--port /dev/cu.usbmodem1101`. `espswift monitor --idf` runs ESP-IDF's own monitor instead, which decodes crash backtraces into file and line numbers and sends what you type to the board.
+Press `Ctrl+C` to stop the serial output. With several boards connected, choose one with `--port`, e.g. `--port /dev/cu.usbmodem1101`. `espswift monitor --idf` runs ESP-IDF's own monitor instead, which also sends what you type to the board.
 
 The serial output starts when the monitor connects, just after the board starts, so the very first lines can be missing; press the board's RESET button to see them.
 

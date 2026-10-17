@@ -16,6 +16,9 @@ public struct Locations: Sendable {
     public var command: String { "\(espswiftHome)/bin/espswift" }
     /// The file that records the path of the Swift toolchain setup installed.
     public var swiftToolchainRecord: String
+    /// The file that records the repository a development build's resources
+    /// (the Xcode template) are in, for setup's copy of it.
+    public var resourcesRecord: String { "\(espswiftHome)/resources" }
     /// The Xcode template, on macOS.
     public var xcodeTemplate: String?
 

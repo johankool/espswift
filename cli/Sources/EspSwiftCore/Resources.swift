@@ -15,6 +15,8 @@ public struct Resources: Sendable {
     ///    installation (such as Homebrew's) puts them.
     /// 3. The repository espswift was built in, for development: a parent
     ///    folder of espswift that has them.
+    /// 4. The repository recorded by espswift setup, for its copy of a
+    ///    development build in ~/.espswift/libexec (install.sh).
     public static func find(system: System) throws -> Resources {
         var candidates: [String] = []
         if let path = system.environment["ESPSWIFT_RESOURCES"] {
@@ -27,6 +29,10 @@ public struct Resources: Sendable {
                 candidates.append(folder)
                 folder = parent(of: folder)
             }
+        }
+        if let recorded = system.readFile(Locations(system: system).resourcesRecord)?
+            .split(separator: "\n").first {
+            candidates.append(String(recorded))
         }
         for candidate in candidates {
             let resources = Resources(root: candidate)

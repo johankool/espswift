@@ -265,6 +265,9 @@ public struct Setup: Sendable {
             try system.createDirectory(Resources.parent(of: destination))
             try system.copyContents(of: executable, to: destination)
             try system.makeExecutable(destination)
+            // The copy isn't in the repository, so it finds the template there
+            // through this record.
+            try system.writeFile(locations.resourcesRecord, resources.root + "\n")
         }
         try system.createDirectory(Resources.parent(of: commandLink))
         try system.createSymbolicLink(at: commandLink, to: destination)

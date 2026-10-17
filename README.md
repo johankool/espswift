@@ -22,6 +22,7 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **Code Completion** — completion and jump to definition for Swift and ESP-IDF's C APIs  
 ✅ **Swift Packages** — use Embedded-ready packages such as swift-mmio; test plain Swift code on your Mac  
 ✅ **On-Chip Debugging** — breakpoints, backtraces and variables in Swift on the board, with LLDB  
+✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
 ✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
 
@@ -87,7 +88,7 @@ Xcode runs `espswift` for you (`Cmd+B`, `Cmd+R`); in Terminal it works in any fo
 | `espswift new <name> [--board] [--chip]` | Creates a project from the template |
 | `espswift build [clean]` | Builds the project (`Cmd+B`) |
 | `espswift run` | Builds, flashes and shows the serial output (`Cmd+R`) |
-| `espswift flash` / `espswift monitor` | Flashes the latest build / shows the serial output (`--idf` for ESP-IDF's monitor, which decodes crashes) |
+| `espswift flash` / `espswift monitor` | Flashes the latest build / shows the serial output, with crashes' backtraces (`--idf` for ESP-IDF's monitor, which takes input) |
 | `espswift debug` | Debugs the firmware on the board with LLDB |
 | `espswift add <library> [--header]` | Adds an ESP-IDF library from the [Component Registry](https://components.espressif.com) |
 | `espswift settings` | ESP-IDF's settings menu (menuconfig) |

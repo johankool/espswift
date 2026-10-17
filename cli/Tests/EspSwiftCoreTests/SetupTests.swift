@@ -178,6 +178,20 @@ import Testing
         #expect(try Resources.find(system: system).root == "/Users/test/repo")
     }
 
+    @Test func findsTheRepositoryFromSetupsCopy() throws {
+        // install.sh: setup copies a development build to ~/.espswift/libexec
+        // and records the repository, where the copy finds the template.
+        let system = FakeSystem.workingMac
+        system.executablePath = "/Users/test/repo/cli/.build/release/espswift"
+        system.file("/Users/test/repo/cli/.build/release/espswift", "binary")
+        system.directories.insert("/Users/test/repo/Xcode Template/ESP32 RISC-V.xctemplate")
+        try Setup(system: system, resources: Resources(root: "/Users/test/repo")).linkCommand()
+        #expect(system.readFile("/Users/test/.espswift/libexec/espswift") == "binary")
+
+        system.executablePath = "/Users/test/.espswift/libexec/espswift"
+        #expect(try Resources.find(system: system).root == "/Users/test/repo")
+    }
+
     @Test func prefersTheEnvironment() throws {
         let system = FakeSystem.freshMac
         system.environment["ESPSWIFT_RESOURCES"] = "/custom"

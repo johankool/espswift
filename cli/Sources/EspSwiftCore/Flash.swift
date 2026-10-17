@@ -4,6 +4,11 @@ public struct LastBuild: Equatable, Sendable {
     public var sourceFolder: String
     public var buildFolder: String
 
+    public init(sourceFolder: String, buildFolder: String) {
+        self.sourceFolder = sourceFolder
+        self.buildFolder = buildFolder
+    }
+
     public static func read(system: System) -> LastBuild? {
         let file = "\(Locations(system: system).espswiftHome)/last-build"
         let lines = (system.readFile(file) ?? "").split(separator: "\n").map(String.init)

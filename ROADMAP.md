@@ -28,7 +28,6 @@ Not planned yet; worth considering.
 
 **Debugging**
 - [ ] **Debugging in Xcode's interface.** Debugging works with LLDB in Terminal (`espswift debug`). Xcode's own debugger refuses the firmware: a scheme's executable must be a Mac program ("Inappropriate file type or format"), also when waiting for it to launch. A remaining idea is a stand-in `debugserver` (set through `LLDB_DEBUGSERVER_PATH` from an LLDB init file) that relays Xcode's LLDB to OpenOCD, with a Mac stub as the scheme's executable.
-- [ ] **Decode crash backtraces:** turn the addresses in a panic dump into file and line numbers in the Xcode console, as ESP-IDF's monitor does.
 
 **Everyday workflow**
 - [ ] **Choose the serial port** in Xcode when several boards are connected; `espswift run` takes the first one it finds (in Terminal, `--port` chooses).
@@ -53,6 +52,7 @@ Not planned yet; worth considering.
 - [x] `Cmd+B` only builds; `Cmd+R` flashes the board and shows its serial output
 - [x] `Cmd+R` works in new projects without reopening them first ([#3](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template/issues/3))
 - [x] On-chip debugging with LLDB (`espswift debug`): breakpoints in Swift, backtraces and variables, through the built-in USB-JTAG
+- [x] Crash backtraces in Xcode's console and `espswift monitor`: a crash's dump is decoded into Swift function names, files and lines, as ESP-IDF's monitor does
 - [x] Each project's `build.sh` calls ESPSwift's installed build script, so updating ESPSwift updates the build of every project created from then on
 - [x] Projects carry a template version; the build warns when a project is out of date (older template, or code completion on an older Swift), and `espswift update` updates it
 - [x] Build errors and warnings (Swift, C, CMake, `sdkconfig.defaults`) in Xcode's Issue navigator, linked to their line; the build log leaves out ESP-IDF's other output
