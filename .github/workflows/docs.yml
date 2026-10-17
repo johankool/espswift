@@ -1,0 +1,44 @@
+# Builds the DocC tutorial (Documentation/ESPSwift.docc), with warnings as
+# errors, and checks it starts from the files the template creates (see
+# tests/check_tutorial.sh). The built documentation, for static hosting, is
+# kept as an artifact.
+
+name: Tutorial
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Documentation/**'
+      - 'Xcode Template/**'
+      - 'tests/check_tutorial.sh'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'Documentation/**'
+      - 'Xcode Template/**'
+      - 'tests/check_tutorial.sh'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tutorial:
+    name: Build the tutorial
+    runs-on: xcode-27
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build and check the tutorial
+        run: bash tests/check_tutorial.sh --output "$RUNNER_TEMP/docs"
+      - name: Upload the documentation
+        uses: actions/upload-artifact@v7
+        with:
+          name: tutorial
+          path: ${{ runner.temp }}/docs

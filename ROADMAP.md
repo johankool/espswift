@@ -43,7 +43,7 @@ Not planned yet; worth considering.
 **Quality and reach**
 - [ ] **More checks in CI:** ShellCheck for `install.sh`, the template's `build.sh` and the test; `espswift setup`'s swiftly route (CI uses swift.org's installer on macOS and Swift's Docker image on Linux); the Homebrew formula; and `espswift uninstall`.
 - [ ] **A VS Code and Cursor guide:** code completion there would need SourceKit-LSP pointed at the firmware build of the Swift package, and the CodeLLDB extension could debug with the same setup as `espswift debug`.
-- [ ] **A documentation site:** a DocC tutorial ("your first firmware") built around the template.
+- [ ] **A documentation site:** publish the DocC tutorial (CI builds it for static hosting, as an artifact), e.g. on GitHub Pages; and more tutorials, such as one per example.
 
 ## Done
 
@@ -66,4 +66,5 @@ Not planned yet; worth considering.
 - [x] Examples to start a project from, in the template's Example pop-up and `espswift new --example`, built and tested by CI: Blink, Button input (GPIO input with debouncing), I2C sensor (an SHT4x), I2C display (an SSD1306), Wi-Fi and HTTPS, Bluetooth LE light (a GATT server with NimBLE) and Deep sleep (a timer wake-up and RTC memory); `espswift new` asks for the board and the example
 - [x] ESP-IDF is installed with EIM, Espressif's ESP-IDF Installation Manager, and shared with Espressif's other tools
 - [x] A Homebrew tap (`brew install --HEAD espswift`), tested locally
+- [x] A DocC tutorial, "Your First Firmware" (`Documentation/ESPSwift.docc`): set up, create a project, run it, change it and test it on the Mac; CI builds it and checks it starts from the template's files
 - [x] Linux: espswift sets up, creates, builds and tests projects on Linux; the template test runs there too (a CI job)

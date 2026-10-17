@@ -1,0 +1,13 @@
+@Tutorials(name: "ESPSwift") {
+    @Intro(title: "Embedded Swift on ESP32") {
+        Write firmware for RISC-V based ESP32 boards in Swift, and build, flash and test it from Xcode.
+    }
+
+    @Chapter(name: "Get Started") {
+        Set up ESPSwift, create a project from the template, run it on your board, and make it your own.
+
+        @Image(source: "get-started.svg", alt: "An ESP32 development board with its LED lit.")
+
+        @TutorialReference(tutorial: "doc:Your-First-Firmware")
+    }
+}

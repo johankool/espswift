@@ -1,0 +1,205 @@
+@Tutorial(time: 30) {
+    @Intro(title: "Your First Firmware") {
+        Set up ESPSwift, create a project from its Xcode template, and run it on an ESP32 board. Then change what the firmware does, and test that change on your Mac, without the board.
+
+        You need a Mac with Xcode, and a board with a RISC-V based ESP32: an ESP32-C2, C3, C5, C6, C61, H2 or P4, such as the ESP32-C6-DevKitC-1. This tutorial uses that board; for another, choose it when you create the project.
+    }
+
+    @Section(title: "Set up ESPSwift") {
+        @ContentAndMedia {
+            ESPSwift is a command-line tool, `espswift`, with an Xcode template. Setting it up installs what Embedded Swift on the ESP32 needs: ESP-IDF, Espressif's framework for the chip, with its compilers and tools, and a Swift toolchain with Embedded Swift for RISC-V.
+        }
+
+        @Steps {
+            @Step {
+                Install `espswift` with Homebrew, from ESPSwift's tap. Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose ESP-IDF Installation Manager (EIM) installs ESP-IDF.
+
+                @Code(name: "Terminal", file: "install-01.sh")
+            }
+
+            @Step {
+                Run `espswift setup`. It installs ESP-IDF, the Swift toolchain and the tools they need, and asks whether to install the Xcode template: answer yes. It takes 5 to 10 minutes, the first time.
+
+                @Code(name: "Terminal", file: "install-02.sh")
+            }
+
+            @Step {
+                Run `espswift doctor` to check that everything is in order. It lists what it checked, and tells you how to fix anything that isn't.
+
+                @Code(name: "Terminal", file: "install-03.sh")
+            }
+
+            @Step {
+                Restart Xcode, so it finds the template.
+            }
+        }
+    }
+
+    @Section(title: "Create a project") {
+        @ContentAndMedia {
+            A project from the template is a firmware that runs on its own: the Blink example blinks the board's LED. You choose your board when you create it, which sets the chip, the LED and the flash size.
+        }
+
+        @Steps {
+            @Step {
+                In Xcode, choose File ▸ New ▸ Project. Under Other, choose **ESP32 RISC-V**, and click Next.
+            }
+
+            @Step {
+                Name the project `Hello`. In the **Board** pop-up, choose your board, such as ESP32-C6-DevKitC-1, or Other with its chip for a board that isn't listed. In the **Example** pop-up, keep **Blink**. Click Next, and choose where to save it.
+            }
+
+            @Step {
+                Open `Firmware/Firmware.swift`. Its `app_main` function is where the firmware starts, as `main` is for a program on the Mac. It sets up the LED, and then shows a new colour every second, forever: firmware doesn't end.
+
+                `Board.swift` says which LED your board has, and `LED.swift` drives it. The colours come from `blinkStep`, in the Kit package.
+
+                @Code(name: "Firmware.swift", file: "Firmware-01.swift")
+            }
+        }
+    }
+
+    @Section(title: "Run it on the board") {
+        @ContentAndMedia {
+            Xcode builds the firmware with ESP-IDF, flashes it to the board over USB, and shows what the board prints in its console.
+        }
+
+        @Steps {
+            @Step {
+                Connect the board to your Mac. On the ESP32-C6-DevKitC-1, use its port labelled **USB**, the chip's own USB port, which also lets you debug the firmware later.
+            }
+
+            @Step {
+                Press Cmd+B to build the firmware. The first build takes a few minutes, as it builds ESP-IDF too; later ones take seconds. Errors appear in the Issue navigator, linked to their line, as for any project.
+            }
+
+            @Step {
+                Press Cmd+R. Xcode flashes the firmware to the board and shows its output in the console: the board restarts, the firmware says hello, and the LED blinks red, green, blue and off.
+
+                Xcode's run destination says My Mac: Xcode runs `espswift` on your Mac, which flashes the board.
+
+                @Code(name: "Console", file: "console-01.txt")
+            }
+
+            @Step {
+                Press Cmd+. to stop watching the console. The firmware keeps running on the board, also without the Mac: connect it to any USB power supply.
+            }
+        }
+    }
+
+    @Section(title: "Make it your own") {
+        @ContentAndMedia {
+            Change the firmware, and run it again. Code completion works as in any Swift project, after the first build, for Swift and for ESP-IDF's C APIs.
+        }
+
+        @Steps {
+            @Step {
+                Change what the firmware says when it starts.
+
+                @Code(name: "Firmware.swift", file: "Firmware-02.swift")
+            }
+
+            @Step {
+                Make the LED blink four times as fast: wait 250 milliseconds instead of 1000. `vTaskDelay` is a function of FreeRTOS, the operating system ESP-IDF runs on, which counts time in ticks; `ticks(milliseconds:)`, in `FreeRTOS.swift`, converts milliseconds to ticks.
+
+                Press Cmd+R to see the change on the board.
+
+                @Code(name: "Firmware.swift", file: "Firmware-03.swift")
+            }
+
+            @Step {
+                Open `Packages/HelloKit/Sources/Blink/Blink.swift`. The blink pattern is plain Swift, without ESP-IDF, in a package of its own: the firmware uses it, and your Mac can test it.
+
+                @Code(name: "Blink.swift", file: "Blink-01.swift")
+            }
+
+            @Step {
+                Add yellow to the pattern: red and green together. The pattern now repeats every 5 steps.
+
+                @Code(name: "Blink.swift", file: "Blink-02.swift")
+            }
+        }
+    }
+
+    @Section(title: "Test it on your Mac") {
+        @ContentAndMedia {
+            Code in the Kit package runs on the Mac too, so its tests run there, without the board: quick to run, and on any Mac.
+        }
+
+        @Steps {
+            @Step {
+                Open `Packages/HelloKit/Tests/BlinkTests/BlinkTests.swift`. Its tests, with Swift Testing, check the pattern: still red, green, blue and off.
+
+                @Code(name: "BlinkTests.swift", file: "BlinkTests-01.swift")
+            }
+
+            @Step {
+                Press Cmd+U. The tests run on the Mac, and fail: the pattern has yellow now, and repeats every 5 steps.
+            }
+
+            @Step {
+                Update the tests for the new pattern, and press Cmd+U again: they pass. Then press Cmd+R to see yellow on the board.
+
+                @Code(name: "BlinkTests.swift", file: "BlinkTests-02.swift")
+            }
+        }
+    }
+
+    @Assessments {
+        @MultipleChoice {
+            Where does the firmware start running?
+
+            @Choice(isCorrect: true) {
+                In `app_main`, in `Firmware/Firmware.swift`.
+
+                @Justification(reaction: "That's right!") {
+                    ESP-IDF calls `app_main` once the chip has started, as a program on the Mac starts in `main`.
+                }
+            }
+
+            @Choice(isCorrect: false) {
+                In `blinkStep`, in `Blink.swift`.
+
+                @Justification(reaction: "Try again.") {
+                    `blinkStep` gives the colour of a step of the pattern; the firmware calls it.
+                }
+            }
+
+            @Choice(isCorrect: false) {
+                In `build.sh`.
+
+                @Justification(reaction: "Try again.") {
+                    `build.sh` runs on your Mac, when Xcode builds the project; it isn't part of the firmware.
+                }
+            }
+        }
+
+        @MultipleChoice {
+            Which code can you test on your Mac with Cmd+U?
+
+            @Choice(isCorrect: false) {
+                Any code in `Firmware/`.
+
+                @Justification(reaction: "Try again.") {
+                    The code in `Firmware/` uses ESP-IDF, which only runs on the chip.
+                }
+            }
+
+            @Choice(isCorrect: true) {
+                The code in the Kit package, in `Packages/`.
+
+                @Justification(reaction: "That's right!") {
+                    It's plain Swift, without ESP-IDF, so it builds for the Mac as well as for the board.
+                }
+            }
+
+            @Choice(isCorrect: false) {
+                None: firmware can only run on the board.
+
+                @Justification(reaction: "Try again.") {
+                    The Kit package's code is part of the firmware, and also runs on the Mac.
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+  <title>An ESP32 development board with its LED lit</title>
+  <rect width="600" height="360" fill="#f2f2f7"/>
+  <!-- The board -->
+  <rect x="90" y="100" width="420" height="160" rx="14" fill="#1d3b6e"/>
+  <!-- Pin headers -->
+  <g fill="#c9a227">
+    <rect x="120" y="112" width="360" height="10" rx="3"/>
+    <rect x="120" y="238" width="360" height="10" rx="3"/>
+  </g>
+  <!-- USB ports -->
+  <rect x="62" y="140" width="44" height="30" rx="5" fill="#b8bcc4"/>
+  <rect x="62" y="190" width="44" height="30" rx="5" fill="#b8bcc4"/>
+  <!-- The chip module -->
+  <rect x="300" y="138" width="150" height="84" rx="6" fill="#d9dbe0"/>
+  <text x="375" y="186" font-family="-apple-system, Helvetica, sans-serif" font-size="22" font-weight="600" text-anchor="middle" fill="#1d3b6e">ESP32</text>
+  <!-- The LED, lit -->
+  <circle cx="220" cy="180" r="34" fill="#ff7a59" opacity="0.25"/>
+  <circle cx="220" cy="180" r="14" fill="#ff5a36"/>
+  <!-- The Swift bird, as a simple mark -->
+  <path d="M520 300 q30 -10 46 -40 q-14 30 -40 40 z" fill="#f05138"/>
+</svg>

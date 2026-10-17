@@ -153,6 +153,18 @@ public func app_main() {
 
 ---
 
+## Tutorial
+
+New to Embedded Swift or the ESP32? **Your First Firmware**, a DocC tutorial in `Documentation/ESPSwift.docc`, takes you from setting up ESPSwift to running a project on your board, changing it, and testing it on your Mac. To read it, open the repository's folder in Terminal and run:
+
+```bash
+xcrun docc preview Documentation/ESPSwift.docc
+```
+
+and open the address it prints (`/tutorials/espswift`).
+
+---
+
 ## Examples
 
 A new project starts from one of the template's examples: the **Example** pop-up in Xcode, or `espswift new --example` (see `--list-examples`). Each works on every board in the Board pop-up; the pins it uses are those of your board. The comments at the top of the project's `Firmware/Firmware.swift` explain it, and what to wire.

@@ -66,6 +66,16 @@ The test doesn't cover Xcode or hardware, so for changes there, also check by ha
 - `Cmd+B` builds without flashing, and `Cmd+R` flashes your board and shows its serial output.
 - After that first build, code completion works in `Firmware/Firmware.swift` (e.g. typing `led_strip_` or `blinkStep`), `Cmd+U` runs the Kit package's tests, and Command-clicking `vTaskDelay` opens FreeRTOS's `task.h`.
 
+### The tutorial
+
+The DocC tutorial is in `Documentation/ESPSwift.docc`: its pages (`*.tutorial`) and, in `Resources/`, the files its steps show. Its `-01` files are those a new project from the Blink example has; later steps change them. Preview it with `xcrun docc preview Documentation/ESPSwift.docc`, and check it with:
+
+```bash
+bash tests/check_tutorial.sh
+```
+
+which builds it with warnings as errors and fails if the template's files no longer match the tutorial's. CI runs it (`docs.yml`).
+
 ### Examples
 
 The template's **Example** pop-up chooses what a new project starts from. Each example is a value of the pop-up, in `TemplateInfo.plist`, with:
@@ -105,6 +115,7 @@ espswift/
 ├── tests/
 │   ├── test_template.sh             # Builds the template for every chip, or its examples (--examples)
 │   ├── xcode_project.py             # Writes a test project's Xcode project, from the fixture
+│   ├── check_tutorial.sh            # Builds the DocC tutorial and checks it against the template
 │   └── fixtures/project.pbxproj     # An Xcode project Xcode made from the template
 ├── .github/workflows/
 │   ├── cli.yml                      # Builds and tests espswift, on macOS and Linux

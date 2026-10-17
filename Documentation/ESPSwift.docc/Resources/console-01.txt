@@ -1,0 +1,12 @@
+=================================================
+ ESP32 Serial Monitor
+ Port: /dev/cu.usbmodem1101 @ 115200 baud
+=================================================
+I (256) main_task: Started on CPU0
+I (256) main_task: Calling app_main()
+Hello from Embedded Swift on ESP32!
+LED: Red
+LED: Green
+LED: Blue
+LED: Off
+LED: Red
