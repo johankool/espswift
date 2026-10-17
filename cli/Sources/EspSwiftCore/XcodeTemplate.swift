@@ -11,10 +11,6 @@ public struct XcodeTemplate: Sendable {
     }
     /// The template's old name, from when it supported only the ESP32-C6.
     var oldTemplate: String { "\(templatesFolder)/ESP32-C6.xctemplate" }
-    /// What the template's Run scheme has for espswift's path, which needs
-    /// to be absolute: installing the template fills it in, and `espswift
-    /// update` in a project with the placeholder.
-    static let commandPlaceholder = "ESPSWIFT_COMMAND_PATH"
 
     public init(system: System) {
         self.system = system
@@ -54,7 +50,7 @@ public struct XcodeTemplate: Sendable {
         // needs an absolute path.
         let scheme = "\(template)/scheme.xcscheme"
         if let text = system.readFile(scheme) {
-            try system.writeFile(scheme, text.replacingOccurrences(of: Self.commandPlaceholder, with: locations.command))
+            try system.writeFile(scheme, text.replacingOccurrences(of: "ESPSWIFT_COMMAND_PATH", with: locations.command))
         }
         system.report("Installed the Xcode template ESP32 RISC-V. Restart Xcode to see it in File ▸ New ▸ Project ▸ Choose Template….")
     }

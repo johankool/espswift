@@ -43,20 +43,6 @@ import Testing
         #expect(try !update.run())
         #expect(system.reports.last == "Already up to date.")
     }
-
-    @Test func pointsTheRunSchemeAtEspswift() throws {
-        let system = Self.system()
-        system.environment["ESPSWIFT_TEMPLATE"] = "/template"
-        system.file("/template/build.sh", "build.sh")
-        system.file("/Users/test/Blink/Blink/build.sh", "build.sh")
-        let scheme = "/Users/test/Blink/Blink.xcodeproj/xcshareddata/xcschemes/Blink.xcscheme"
-        system.file(scheme, "<PathRunnable FilePath = \"ESPSWIFT_COMMAND_PATH\">")
-        let update = UpdateProject(system: system, project: try Project.find(system: system, start: "/Users/test/Blink"))
-        #expect(try update.run())
-        #expect(system.readFile(scheme) == "<PathRunnable FilePath = \"/Users/test/.espswift/bin/espswift\">")
-        #expect(system.reports.contains("  Pointed the scheme Blink (Cmd+R) at /Users/test/.espswift/bin/espswift."))
-        #expect(try !update.run())
-    }
 }
 
 @Suite struct DebugTests {
