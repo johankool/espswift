@@ -27,11 +27,25 @@ static inline TickType_t pd_ms_to_ticks(uint32_t ms) {
     return pdMS_TO_TICKS(ms);
 }
 
-// ── Onboard RGB LED ──────────────────────────────────────────────
-// Espressif's DevKit boards have a WS2812 RGB LED. Its pin depends on the
-// chip (as in ESP-IDF's blink example); change it here for other boards.
+// ── Board ────────────────────────────────────────────────────────
+// The board chosen when the project was created: ___VARIABLE_boardName___.
+// Its LED is one of: BOARD_LED_ADDRESSABLE (WS2812), BOARD_LED_SINGLE (one
+// colour), BOARD_LED_RGB (separate red, green and blue), BOARD_LED_NONE, or
+// BOARD_LED_CHIP_DEFAULT (the chip's usual pin, below). A GPIO of -1 means
+// none.
+#define BOARD_NAME "___VARIABLE_boardName___"
+#define ___VARIABLE_boardLEDKind___ 1
+#define BOARD_LED_GPIO ___VARIABLE_boardLEDGPIO___
+#define BOARD_LED_POWER_GPIO ___VARIABLE_boardLEDPowerGPIO___
 
-#if CONFIG_IDF_TARGET_ESP32C5
+// ── Onboard RGB LED ──────────────────────────────────────────────
+// Espressif's DevKit boards have a WS2812 RGB LED. Its pin is the board's,
+// else depends on the chip (as in ESP-IDF's blink example); change it here
+// for other boards.
+
+#if BOARD_LED_GPIO >= 0
+#define BOARD_RGB_LED_GPIO BOARD_LED_GPIO
+#elif CONFIG_IDF_TARGET_ESP32C5
 #define BOARD_RGB_LED_GPIO 27
 #elif CONFIG_IDF_TARGET_ESP32P4
 #define BOARD_RGB_LED_GPIO 44

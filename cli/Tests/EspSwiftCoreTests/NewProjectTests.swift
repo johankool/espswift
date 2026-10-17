@@ -68,3 +68,35 @@ import Testing
         }
     }
 }
+
+@Suite struct BoardOptionTests {
+    static var board: [String: Any] { [
+        "Identifier": "board",
+        "Default": "c6-devkit",
+        "Values": ["c3-devkit", "c6-devkit", "other"],
+        "RequiredOptionsForValues": ["c3-devkit": ["chip": "esp32c3"], "c6-devkit": ["chip": "esp32c6"]],
+        "Variables": ["c6-devkit": ["boardLEDGPIO": "8"], "c3-devkit": ["boardLEDGPIO": "8"], "other": ["boardLEDGPIO": "-1"]],
+    ] }
+
+    @Test func offersTheBoardsOfTheChip() {
+        #expect(NewProject.TemplateInfo.allowedValues(of: Self.board, with: ["chip": "esp32c6"]) == ["c6-devkit", "other"])
+        #expect(NewProject.TemplateInfo.allowedValues(of: Self.board, with: ["chip": "esp32h2"]) == ["other"])
+    }
+
+    @Test func fillsInTheBoardsVariables() throws {
+        let system = NewProjectTests.system()
+        var plist = try #require(PropertyListSerialization.propertyList(from: system.readData("/t/TemplateInfo.plist")!, format: nil) as? [String: Any])
+        var options = plist["Options"] as! [[String: Any]]
+        options.append(Self.board)
+        plist["Options"] = options
+        try system.writeFile("/t/TemplateInfo.plist", PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0))
+        system.file("/t/README.md", "___VARIABLE_board___ on GPIO ___VARIABLE_boardLEDGPIO___\n")
+        let new = NewProject(system: system, template: "/t")
+        try new.run(name: "A", chip: "esp32c3", in: "/w", author: "", date: "")
+        // The default (c6-devkit) needs another chip: the first allowed.
+        #expect(system.readFile("/w/A/README.md") == "c3-devkit on GPIO 8\n")
+        try new.run(name: "B", chip: "esp32c3", board: "other", in: "/w", author: "", date: "")
+        #expect(system.readFile("/w/B/README.md") == "other on GPIO -1\n")
+        #expect(try new.chip(forBoard: "c6-devkit") == "esp32c6")
+    }
+}

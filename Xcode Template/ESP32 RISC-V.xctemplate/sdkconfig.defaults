@@ -5,6 +5,9 @@
 # and build again: build.sh then reconfigures the project for the new chip.
 CONFIG_IDF_TARGET="___VARIABLE_chip___"
 
+# The board's flash size (___VARIABLE_boardName___).
+___VARIABLE_boardFlashSize___
+
 # Disable Task Watchdog Timer by default
 CONFIG_ESP_TASK_WDT=n
 CONFIG_ESP_TASK_WDT_EN=n
