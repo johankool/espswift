@@ -28,17 +28,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE = os.path.join(REPO_ROOT, "Xcode Template", "ESP32 RISC-V.xctemplate")
 FIXTURE = os.path.join(REPO_ROOT, "tests", "fixtures", "project.pbxproj")
 
-# The fixture's Swift files in Firmware/, in the template's order, with the
-# identifiers of their file reference and build file.
-FIXTURE_FILES = {
-    "Firmware.swift": ("C783649930803249000D72CC", "C78364A330803249000D72CC"),
-    "Board.swift": ("C78364B030803249000D72CC", "C78364B130803249000D72CC"),
-    "LED.swift": ("C78364B230803249000D72CC", "C78364B330803249000D72CC"),
-    "FreeRTOS.swift": ("C78364B430803249000D72CC", "C78364B530803249000D72CC"),
-}
-PACKAGE_SWIFT = "C783649A30803249000D72CC"
-# Identifiers for other files: C78364C030803249000D72CC and up.
-NEW_ID = "C78364{:02X}30803249000D72CC"
+# Identifiers for the project's Swift files in Firmware/ (24 hex digits,
+# like Xcode's): E5F000000000000000000000 and up.
+NEW_ID = "E5F0{:020X}"
 
 
 def quoted(value):
@@ -67,35 +59,35 @@ def indexing_settings(name):
 
 
 def firmware_files(project_dir):
-    """The Swift files in Firmware/ (not its Package.swift), in the
-    template's order, then the others by name."""
+    """The Swift files in Firmware/ (not its Package.swift), by name."""
     folder = os.path.join(project_dir, "Firmware")
-    names = [n for n in os.listdir(folder) if n.endswith(".swift") and n != "Package.swift"]
-    return [n for n in FIXTURE_FILES if n in names] + sorted(n for n in names if n not in FIXTURE_FILES)
+    return sorted(n for n in os.listdir(folder) if n.endswith(".swift") and n != "Package.swift")
 
 
 def pbxproj(project_dir, name):
     text = open(FIXTURE).read()
 
-    # The fixture's Firmware files go; the project's own come back below.
-    removed = [i for ids in FIXTURE_FILES.values() for i in ids]
+    # The fixture's Swift files in Firmware/ (those of the example it was
+    # made from) go, wherever they're mentioned; the project's own come back
+    # below. Package.swift, in no target, stays.
+    group = re.search(r"/\* Firmware \*/ = \{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = \((.*?)\);", text, flags=re.S)
+    refs = [m.group(1) for m in re.finditer(r"([0-9A-F]{24}) /\* (\S+\.swift) \*/", group.group(1))
+            if not m.group(0).endswith("/* Package.swift */")]
+    builds = [m.group(1) for ref in refs
+              for m in re.finditer(r"([0-9A-F]{24}) /\* \S+ in Sources \*/ = \{isa = PBXBuildFile; fileRef = " + ref, text)]
+    removed = refs + builds
     text = "\n".join(line for line in text.split("\n") if not any(i in line for i in removed))
 
     # The project's Swift files in Firmware/.
     build_files, file_refs, children, sources = [], [], [], []
-    next_id = 0xC0
-    for file in firmware_files(project_dir):
-        if file in FIXTURE_FILES:
-            ref, build = FIXTURE_FILES[file]
-        else:
-            ref, build = NEW_ID.format(next_id), NEW_ID.format(next_id + 1)
-            next_id += 2
+    for index, file in enumerate(firmware_files(project_dir)):
+        ref, build = NEW_ID.format(2 * index), NEW_ID.format(2 * index + 1)
         build_files.append(f"\t\t{build} /* {file} in Sources */ = {{isa = PBXBuildFile; fileRef = {ref} /* {file} */; }};")
         file_refs.append(f"\t\t{ref} /* {file} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {quoted(file)}; sourceTree = \"<group>\"; }};")
         children.append(f"\t\t\t\t{ref} /* {file} */,")
         sources.append(f"\t\t\t\t{build} /* {file} in Sources */,")
 
-    def sorted_section(section, entries):
+    def add_to_section(section, entries):
         # Xcode keeps a section's entries in the order of their identifiers.
         nonlocal text
         start = text.index(f"/* Begin {section} section */\n") + len(f"/* Begin {section} section */\n")
@@ -103,10 +95,10 @@ def pbxproj(project_dir, name):
         lines = [line for line in text[start:end].split("\n") if line] + entries
         text = text[:start] + "\n".join(sorted(lines)) + "\n" + text[end:]
 
-    sorted_section("PBXBuildFile", build_files)
-    sorted_section("PBXFileReference", file_refs)
+    add_to_section("PBXBuildFile", build_files)
+    add_to_section("PBXFileReference", file_refs)
     # In the Firmware group, before Package.swift.
-    package = f"\t\t\t\t{PACKAGE_SWIFT} /* Package.swift */,"
+    package = re.search(r"\t\t\t\t[0-9A-F]{24} /\* Package\.swift \*/,", text).group(0)
     text = text.replace(package, "\n".join(children + [package]))
     # In the Indexing target's Sources phase.
     phase = re.search(r"isa = PBXSourcesBuildPhase;\n\t\t\tfiles = \(\n", text)
@@ -117,7 +109,7 @@ def pbxproj(project_dir, name):
                   r'\t\t\tbuildSettings = \{\n).*?(\n\t\t\t\};)',
                   lambda m: m.group(1) + indexing_settings("___PROJECTNAME___") + m.group(2), text, flags=re.S)
 
-    # The fixture's development team is the one of whoever created it.
+    # A development team would be that of whoever made the fixture.
     text = "\n".join(line for line in text.split("\n") if "DEVELOPMENT_TEAM = " not in line)
     # Xcode only quotes names that need it.
     text = re.sub(r'= "(___PROJECTNAME___(?:Kit)?)";', lambda m: f"= {quoted(m.group(1).replace('___PROJECTNAME___', name))};", text)

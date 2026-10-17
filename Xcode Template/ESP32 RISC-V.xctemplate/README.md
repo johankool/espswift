@@ -49,6 +49,8 @@ ___PROJECTNAME___/
         └── CMakeLists.txt      # Builds the Firmware package and links it into the firmware
 ```
 
+Xcode's Project navigator leaves out the files you'd hardly ever change, though they're in the project's folder: `build.sh`, the `CMakeLists.txt` files, `main/swift_flags.c`, `.gitignore` and the Run scheme's file. Open them from Finder or Terminal when you need to.
+
 To add Swift code to the firmware, create a file in `Firmware/` (also in a subfolder), and tick the **Indexing** target in the dialog for the new file so it gets code completion (see below). It's compiled into your firmware on the next `Cmd+B`; there's no list of files to update.
 
 Code that doesn't need ESP-IDF can go in the Kit package instead, where you can test it. Create files in a folder in its `Sources/`, such as `Sources/___VARIABLE_exampleModule___/`, with File ▸ New ▸ File from Template in Xcode. A new folder there is a new module: add it to the Kit's `Package.swift`, next to `___VARIABLE_exampleModule___`, and to the Firmware package's `Package.swift`, next to `___VARIABLE_exampleModule___`, to use it in the firmware. Code in the Kit package is built into the firmware too, so it must work in Embedded Swift.

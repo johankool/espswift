@@ -7,100 +7,101 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C78364A330803249000D72CC /* Firmware.swift in Sources */ = {isa = PBXBuildFile; fileRef = C783649930803249000D72CC /* Firmware.swift */; };
-		C78364B130803249000D72CC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B030803249000D72CC /* Board.swift */; };
-		C78364B330803249000D72CC /* LED.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B230803249000D72CC /* LED.swift */; };
-		C78364B530803249000D72CC /* FreeRTOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B430803249000D72CC /* FreeRTOS.swift */; };
+		C79F4DFE30844077004FB6F3 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79F4DF230844077004FB6F3 /* Board.swift */; };
+		C79F4DFF30844077004FB6F3 /* LED.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79F4DF330844077004FB6F3 /* LED.swift */; };
+		C79F4E0030844077004FB6F3 /* FreeRTOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79F4DF430844077004FB6F3 /* FreeRTOS.swift */; };
+		C79F4E0130844077004FB6F3 /* Firmware.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79F4DF830844077004FB6F3 /* Firmware.swift */; };
+		C79F4E0230844077004FB6F3 /* SSD1306.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79F4DF930844077004FB6F3 /* SSD1306.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C783648D30803249000D72CC /* libIndexing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIndexing.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		C783649030803249000D72CC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		C783649930803249000D72CC /* Firmware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Firmware.swift; sourceTree = "<group>"; };
-		C78364B030803249000D72CC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
-		C78364B230803249000D72CC /* LED.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LED.swift; sourceTree = "<group>"; };
-		C78364B430803249000D72CC /* FreeRTOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRTOS.swift; sourceTree = "<group>"; };
-		C783649A30803249000D72CC /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		C783649D30803249000D72CC /* ESPIDF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ESPIDF.h; sourceTree = "<group>"; };
-		C783649E30803249000D72CC /* ESPIDF.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ESPIDF.c; sourceTree = "<group>"; };
-		C78364A030803249000D72CC /* ___PROJECTNAME___Kit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "___PROJECTNAME___Kit"; sourceTree = "<group>"; };
+		C79F4DEA30844077004FB6F3 /* libIndexing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIndexing.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C79F4DED30844077004FB6F3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		C79F4DEE30844077004FB6F3 /* sdkconfig.defaults */ = {isa = PBXFileReference; lastKnownFileType = text; path = sdkconfig.defaults; sourceTree = "<group>"; };
+		C79F4DF030844077004FB6F3 /* idf_component.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = idf_component.yml; sourceTree = "<group>"; };
+		C79F4DF230844077004FB6F3 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		C79F4DF330844077004FB6F3 /* LED.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LED.swift; sourceTree = "<group>"; };
+		C79F4DF430844077004FB6F3 /* FreeRTOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRTOS.swift; sourceTree = "<group>"; };
+		C79F4DF530844077004FB6F3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		C79F4DF730844077004FB6F3 /* ESPIDF.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ESPIDF.c; sourceTree = "<group>"; };
+		C79F4DF830844077004FB6F3 /* Firmware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Firmware.swift; sourceTree = "<group>"; };
+		C79F4DF930844077004FB6F3 /* SSD1306.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSD1306.swift; sourceTree = "<group>"; };
+		C79F4DFB30844077004FB6F3 /* ESPIDF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ESPIDF.h; sourceTree = "<group>"; };
+		C79F4DFD30844077004FB6F3 /* ___PROJECTNAME___Kit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "___PROJECTNAME___Kit"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C78364A430803249000D72CC /* Exceptions for "___PROJECTNAME___" folder in "Indexing" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				main/swift_flags.c,
-			);
-			target = C783648C30803249000D72CC /* Indexing */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		C783648F30803249000D72CC /* ___PROJECTNAME___ */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C78364A430803249000D72CC /* Exceptions for "___PROJECTNAME___" folder in "Indexing" target */,
-			);
-			path = "___PROJECTNAME___";
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXGroup section */
-		C783648530803249000D72CC = {
+		C79F4DE230844077004FB6F3 = {
 			isa = PBXGroup;
 			children = (
-				C783649030803249000D72CC /* README.md */,
-				C783648F30803249000D72CC /* ___PROJECTNAME___ */,
-				C783649830803249000D72CC /* Firmware */,
-				C783649F30803249000D72CC /* Packages */,
-				C783648E30803249000D72CC /* Products */,
+				C79F4DED30844077004FB6F3 /* README.md */,
+				C79F4DEC30844077004FB6F3 /* ___PROJECTNAME___ */,
+				C79F4DF130844077004FB6F3 /* Firmware */,
+				C79F4DFC30844077004FB6F3 /* Packages */,
+				C79F4DEB30844077004FB6F3 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		C783648E30803249000D72CC /* Products */ = {
+		C79F4DEB30844077004FB6F3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C783648D30803249000D72CC /* libIndexing.a */,
+				C79F4DEA30844077004FB6F3 /* libIndexing.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C783649830803249000D72CC /* Firmware */ = {
+		C79F4DEC30844077004FB6F3 /* ___PROJECTNAME___ */ = {
 			isa = PBXGroup;
 			children = (
-				C783649930803249000D72CC /* Firmware.swift */,
-				C78364B030803249000D72CC /* Board.swift */,
-				C78364B230803249000D72CC /* LED.swift */,
-				C78364B430803249000D72CC /* FreeRTOS.swift */,
-				C783649A30803249000D72CC /* Package.swift */,
-				C783649B30803249000D72CC /* ESPIDF */,
+				C79F4DEE30844077004FB6F3 /* sdkconfig.defaults */,
+				C79F4DEF30844077004FB6F3 /* main */,
+			);
+			path = "___PROJECTNAME___";
+			sourceTree = "<group>";
+		};
+		C79F4DEF30844077004FB6F3 /* main */ = {
+			isa = PBXGroup;
+			children = (
+				C79F4DF030844077004FB6F3 /* idf_component.yml */,
+			);
+			path = main;
+			sourceTree = "<group>";
+		};
+		C79F4DF130844077004FB6F3 /* Firmware */ = {
+			isa = PBXGroup;
+			children = (
+				C79F4DF230844077004FB6F3 /* Board.swift */,
+				C79F4DF330844077004FB6F3 /* LED.swift */,
+				C79F4DF430844077004FB6F3 /* FreeRTOS.swift */,
+				C79F4DF530844077004FB6F3 /* Package.swift */,
+				C79F4DF830844077004FB6F3 /* Firmware.swift */,
+				C79F4DF930844077004FB6F3 /* SSD1306.swift */,
+				C79F4DF630844077004FB6F3 /* ESPIDF */,
 			);
 			path = Firmware;
 			sourceTree = "<group>";
 		};
-		C783649B30803249000D72CC /* ESPIDF */ = {
+		C79F4DF630844077004FB6F3 /* ESPIDF */ = {
 			isa = PBXGroup;
 			children = (
-				C783649E30803249000D72CC /* ESPIDF.c */,
-				C783649C30803249000D72CC /* include */,
+				C79F4DF730844077004FB6F3 /* ESPIDF.c */,
+				C79F4DFA30844077004FB6F3 /* include */,
 			);
 			path = ESPIDF;
 			sourceTree = "<group>";
 		};
-		C783649C30803249000D72CC /* include */ = {
+		C79F4DFA30844077004FB6F3 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				C783649D30803249000D72CC /* ESPIDF.h */,
+				C79F4DFB30844077004FB6F3 /* ESPIDF.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
 		};
-		C783649F30803249000D72CC /* Packages */ = {
+		C79F4DFC30844077004FB6F3 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				C78364A030803249000D72CC /* ___PROJECTNAME___Kit */,
+				C79F4DFD30844077004FB6F3 /* ___PROJECTNAME___Kit */,
 			);
 			path = Packages;
 			sourceTree = "<group>";
@@ -108,14 +109,11 @@
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		C783648A30803249000D72CC /* ___PROJECTNAME___ */ = {
+		C79F4DE730844077004FB6F3 /* ___PROJECTNAME___ */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = C78364AA30803249000D72CC /* Build configuration list for PBXLegacyTarget "___PROJECTNAME___" */;
+			buildConfigurationList = C79F4E0330844077004FB6F3 /* Build configuration list for PBXLegacyTarget "___PROJECTNAME___" */;
 			buildToolPath = "$(PROJECT_DIR)/___PROJECTNAME___/build.sh";
-			fileSystemSynchronizedGroups = (
-				C783648F30803249000D72CC /* ___PROJECTNAME___ */,
-			);
 			name = "___PROJECTNAME___";
 			passBuildSettingsInEnvironment = 1;
 			productName = "___PROJECTNAME___";
@@ -123,79 +121,105 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
-		C783648C30803249000D72CC /* Indexing */ = {
+		C79F4DE930844077004FB6F3 /* Indexing */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C78364A530803249000D72CC /* Build configuration list for PBXNativeTarget "Indexing" */;
+			buildConfigurationList = C79F4E0630844077004FB6F3 /* Build configuration list for PBXNativeTarget "Indexing" */;
 			buildPhases = (
-				C783648B30803249000D72CC /* Sources */,
+				C79F4DE830844077004FB6F3 /* Sources */,
 			);
 			buildRules = (
 			);
-			fileSystemSynchronizedGroups = (
-				C783648F30803249000D72CC /* ___PROJECTNAME___ */,
-			);
 			name = Indexing;
 			productName = Indexing;
-			productReference = C783648D30803249000D72CC /* libIndexing.a */;
+			productReference = C79F4DEA30844077004FB6F3 /* libIndexing.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		C783648630803249000D72CC /* Project object */ = {
+		C79F4DE330844077004FB6F3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2700;
-				LastUpgradeCheck = 2700;
+				LastSwiftUpdateCheck = 2710;
+				LastUpgradeCheck = 2710;
 				TargetAttributes = {
-					C783648A30803249000D72CC = {
-						CreatedOnToolsVersion = 27.0;
+					C79F4DE730844077004FB6F3 = {
+						CreatedOnToolsVersion = 27.1;
 					};
-					C783648C30803249000D72CC = {
-						CreatedOnToolsVersion = 27.0;
+					C79F4DE930844077004FB6F3 = {
+						CreatedOnToolsVersion = 27.1;
 					};
 				};
 			};
-			buildConfigurationList = C783648930803249000D72CC /* Build configuration list for PBXProject "___PROJECTNAME___" */;
+			buildConfigurationList = C79F4DE630844077004FB6F3 /* Build configuration list for PBXProject "___PROJECTNAME___" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = C783648530803249000D72CC;
+			mainGroup = C79F4DE230844077004FB6F3;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = C783648E30803249000D72CC /* Products */;
+			productRefGroup = C79F4DEB30844077004FB6F3 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C783648A30803249000D72CC /* ___PROJECTNAME___ */,
-				C783648C30803249000D72CC /* Indexing */,
+				C79F4DE730844077004FB6F3 /* ___PROJECTNAME___ */,
+				C79F4DE930844077004FB6F3 /* Indexing */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C783648B30803249000D72CC /* Sources */ = {
+		C79F4DE830844077004FB6F3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				C78364A330803249000D72CC /* Firmware.swift in Sources */,
-				C78364B130803249000D72CC /* Board.swift in Sources */,
-				C78364B330803249000D72CC /* LED.swift in Sources */,
-				C78364B530803249000D72CC /* FreeRTOS.swift in Sources */,
+				C79F4E0030844077004FB6F3 /* FreeRTOS.swift in Sources */,
+				C79F4DFE30844077004FB6F3 /* Board.swift in Sources */,
+				C79F4E0230844077004FB6F3 /* SSD1306.swift in Sources */,
+				C79F4E0130844077004FB6F3 /* Firmware.swift in Sources */,
+				C79F4DFF30844077004FB6F3 /* LED.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		C78364A630803249000D72CC /* Debug configuration for PBXNativeTarget "Indexing" */ = {
+		C79F4DE430844077004FB6F3 /* Debug configuration for PBXProject "___PROJECTNAME___" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		C79F4DE530844077004FB6F3 /* Release configuration for PBXProject "___PROJECTNAME___" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		C79F4E0430844077004FB6F3 /* Debug configuration for PBXLegacyTarget "___PROJECTNAME___" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Debug;
+		};
+		C79F4E0530844077004FB6F3 /* Release configuration for PBXLegacyTarget "___PROJECTNAME___" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Release;
+		};
+		C79F4E0730844077004FB6F3 /* Debug configuration for PBXNativeTarget "Indexing" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CRU5YWAZ4Y;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)-esp32";
 				EXCLUDED_SOURCE_FILE_NAMES = (
 					"\"$(SRCROOT)/___PROJECTNAME___/*\"",
 					"\"$(SRCROOT)/___PROJECTNAME___/*/*\"",
@@ -236,12 +260,12 @@
 			};
 			name = Debug;
 		};
-		C78364A730803249000D72CC /* Release configuration for PBXNativeTarget "Indexing" */ = {
+		C79F4E0830844077004FB6F3 /* Release configuration for PBXNativeTarget "Indexing" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CRU5YWAZ4Y;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)-esp32";
 				EXCLUDED_SOURCE_FILE_NAMES = (
 					"\"$(SRCROOT)/___PROJECTNAME___/*\"",
 					"\"$(SRCROOT)/___PROJECTNAME___/*/*\"",
@@ -279,169 +303,38 @@
 				SWIFT_TARGET_TRIPLE = "riscv32-none-none-eabi";
 				SWIFT_VERSION = 6.0;
 				TOOLCHAINS = ESPSWIFT_SWIFT_TOOLCHAIN_ID;
-			};
-			name = Release;
-		};
-		C78364A830803249000D72CC /* Debug configuration for PBXProject "___PROJECTNAME___" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = CRU5YWAZ4Y;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-			};
-			name = Debug;
-		};
-		C78364A930803249000D72CC /* Release configuration for PBXProject "___PROJECTNAME___" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = CRU5YWAZ4Y;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-			};
-			name = Release;
-		};
-		C78364AB30803249000D72CC /* Debug configuration for PBXLegacyTarget "___PROJECTNAME___" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CRU5YWAZ4Y;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		C78364AC30803249000D72CC /* Release configuration for PBXLegacyTarget "___PROJECTNAME___" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CRU5YWAZ4Y;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C783648930803249000D72CC /* Build configuration list for PBXProject "___PROJECTNAME___" */ = {
+		C79F4DE630844077004FB6F3 /* Build configuration list for PBXProject "___PROJECTNAME___" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C78364A830803249000D72CC /* Debug configuration for PBXProject "___PROJECTNAME___" */,
-				C78364A930803249000D72CC /* Release configuration for PBXProject "___PROJECTNAME___" */,
+				C79F4DE430844077004FB6F3 /* Debug configuration for PBXProject "___PROJECTNAME___" */,
+				C79F4DE530844077004FB6F3 /* Release configuration for PBXProject "___PROJECTNAME___" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		C78364A530803249000D72CC /* Build configuration list for PBXNativeTarget "Indexing" */ = {
+		C79F4E0330844077004FB6F3 /* Build configuration list for PBXLegacyTarget "___PROJECTNAME___" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C78364A630803249000D72CC /* Debug configuration for PBXNativeTarget "Indexing" */,
-				C78364A730803249000D72CC /* Release configuration for PBXNativeTarget "Indexing" */,
+				C79F4E0430844077004FB6F3 /* Debug configuration for PBXLegacyTarget "___PROJECTNAME___" */,
+				C79F4E0530844077004FB6F3 /* Release configuration for PBXLegacyTarget "___PROJECTNAME___" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		C78364AA30803249000D72CC /* Build configuration list for PBXLegacyTarget "___PROJECTNAME___" */ = {
+		C79F4E0630844077004FB6F3 /* Build configuration list for PBXNativeTarget "Indexing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C78364AB30803249000D72CC /* Debug configuration for PBXLegacyTarget "___PROJECTNAME___" */,
-				C78364AC30803249000D72CC /* Release configuration for PBXLegacyTarget "___PROJECTNAME___" */,
+				C79F4E0730844077004FB6F3 /* Debug configuration for PBXNativeTarget "Indexing" */,
+				C79F4E0830844077004FB6F3 /* Release configuration for PBXNativeTarget "Indexing" */,
 			);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = C783648630803249000D72CC /* Project object */;
+	rootObject = C79F4DE330844077004FB6F3 /* Project object */;
 	validationLevel = 1;
 }

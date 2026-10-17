@@ -14,6 +14,8 @@
 			<string>gitignore</string>
 			<key>TargetIndices</key>
 			<array/>
+			<key>OmitFromProjectStructure</key>
+			<true/>
 		</dict>
 		<key>../___PROJECTNAME___.xcodeproj/xcshareddata/xcschemes/___PROJECTNAME___.xcscheme</key>
 		<dict>
@@ -21,6 +23,8 @@
 			<string>scheme.xcscheme</string>
 			<key>TargetIndices</key>
 			<array/>
+			<key>OmitFromProjectStructure</key>
+			<true/>
 		</dict>
 		<key>CMakeLists.txt</key>
 		<dict>
@@ -28,6 +32,8 @@
 			<string>CMakeLists.txt</string>
 			<key>TargetIndices</key>
 			<array/>
+			<key>OmitFromProjectStructure</key>
+			<true/>
 		</dict>
 		<key>README.md</key>
 		<dict>
@@ -116,17 +122,17 @@
 			<string>build.sh</string>
 			<key>TargetIndices</key>
 			<array/>
+			<key>OmitFromProjectStructure</key>
+			<true/>
 		</dict>
 		<key>main/CMakeLists.txt</key>
 		<dict>
-			<key>Group</key>
-			<array>
-				<string>main</string>
-			</array>
 			<key>Path</key>
 			<string>main_CMakeLists.txt</string>
 			<key>TargetIndices</key>
 			<array/>
+			<key>OmitFromProjectStructure</key>
+			<true/>
 		</dict>
 		<key>main/idf_component.yml</key>
 		<dict>
@@ -141,14 +147,12 @@
 		</dict>
 		<key>main/swift_flags.c</key>
 		<dict>
-			<key>Group</key>
-			<array>
-				<string>main</string>
-			</array>
 			<key>Path</key>
 			<string>main_swift_flags.c</string>
 			<key>TargetIndices</key>
 			<array/>
+			<key>OmitFromProjectStructure</key>
+			<true/>
 		</dict>
 		<key>sdkconfig.defaults</key>
 		<dict>
