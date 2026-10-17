@@ -1,3 +1,6 @@
 # Created by the first build of an example, from its sdkconfig.defaults.
 sdkconfig
 sdkconfig.old
+
+# Created by Xcode when it opens an example.
+project.xcworkspace/
