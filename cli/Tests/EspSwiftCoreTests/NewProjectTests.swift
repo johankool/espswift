@@ -70,33 +70,36 @@ import Testing
 }
 
 @Suite struct BoardOptionTests {
-    static var board: [String: Any] { [
-        "Identifier": "board",
-        "Default": "c6-devkit",
-        "Values": ["c3-devkit", "c6-devkit", "other"],
-        "RequiredOptionsForValues": ["c3-devkit": ["chip": "esp32c3"], "c6-devkit": ["chip": "esp32c6"]],
-        "Variables": ["c6-devkit": ["boardLEDGPIO": "8"], "c3-devkit": ["boardLEDGPIO": "8"], "other": ["boardLEDGPIO": "-1"]],
-    ] }
+    /// A Board pop-up shown only for one chip, as the template has one per chip.
+    static func board(for chip: String, values: [String]) -> [String: Any] {
+        ["Identifier": "board_\(chip)", "Default": values[0], "Values": values, "RequiredOptions": ["chip": chip],
+         "Variables": Dictionary(uniqueKeysWithValues: values.map { ($0, ["boardName": "\($0) (\(chip))"]) })]
+    }
 
-    @Test func offersTheBoardsOfTheChip() {
-        #expect(NewProject.TemplateInfo.allowedValues(of: Self.board, with: ["chip": "esp32c6"]) == ["c6-devkit", "other"])
-        #expect(NewProject.TemplateInfo.allowedValues(of: Self.board, with: ["chip": "esp32h2"]) == ["other"])
+    @Test func showsTheBoardPopUpOfTheChip() {
+        let c6 = Self.board(for: "esp32c6", values: ["c6-devkit", "other"])
+        #expect(NewProject.TemplateInfo.isShown(c6, with: ["chip": "esp32c6"]))
+        #expect(!NewProject.TemplateInfo.isShown(c6, with: ["chip": "esp32c3"]))
     }
 
     @Test func fillsInTheBoardsVariables() throws {
         let system = NewProjectTests.system()
         var plist = try #require(PropertyListSerialization.propertyList(from: system.readData("/t/TemplateInfo.plist")!, format: nil) as? [String: Any])
         var options = plist["Options"] as! [[String: Any]]
-        options.append(Self.board)
+        options += [Self.board(for: "esp32c3", values: ["c3-devkit", "other"]),
+                    Self.board(for: "esp32c6", values: ["c6-devkit", "c6-mini", "other"])]
         plist["Options"] = options
         try system.writeFile("/t/TemplateInfo.plist", PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0))
-        system.file("/t/README.md", "___VARIABLE_board___ on GPIO ___VARIABLE_boardLEDGPIO___\n")
+        system.file("/t/README.md", "___VARIABLE_boardName___\n")
         let new = NewProject(system: system, template: "/t")
+        // The chip's Board pop-up, with its default: its first board.
         try new.run(name: "A", chip: "esp32c3", in: "/w", author: "", date: "")
-        // The default (c6-devkit) needs another chip: the first allowed.
-        #expect(system.readFile("/w/A/README.md") == "c3-devkit on GPIO 8\n")
-        try new.run(name: "B", chip: "esp32c3", board: "other", in: "/w", author: "", date: "")
-        #expect(system.readFile("/w/B/README.md") == "other on GPIO -1\n")
-        #expect(try new.chip(forBoard: "c6-devkit") == "esp32c6")
+        #expect(system.readFile("/w/A/README.md") == "c3-devkit (esp32c3)\n")
+        try new.run(name: "B", chip: "esp32c6", board: "c6-mini", in: "/w", author: "", date: "")
+        #expect(system.readFile("/w/B/README.md") == "c6-mini (esp32c6)\n")
+        #expect(throws: EspSwiftError.self) { try new.run(name: "C", chip: "esp32c3", board: "c6-mini", in: "/w", author: "", date: "") }
+        #expect(try new.chip(forBoard: "c6-mini") == "esp32c6")
+        #expect(try new.chip(forBoard: "other") == nil)
+        #expect(try new.boards(for: "esp32c6").map(\.value) == ["c6-devkit", "c6-mini", "other"])
     }
 }
