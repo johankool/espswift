@@ -25,7 +25,7 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
 ✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
-✅ **Examples to Start From** — Blink, a button, an I2C sensor, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
+✅ **Examples to Start From** — Blink, a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
 
 ---
 
@@ -162,6 +162,7 @@ A new project starts from one of the template's examples: the **Example** pop-up
 | Blink (`blink`) | Blinks the LED: red, green, blue, off | The board's LED, whatever kind it is |
 | Button input (`button-input`) | The BOOT button changes the LED's colour; holding it turns the LED off | Reading a GPIO pin, with debouncing tested on the Mac |
 | I2C sensor (`i2c-sensor`) | Reads a Sensirion SHT4x temperature and humidity sensor, and shows the temperature on the LED | ESP-IDF's I2C driver; checksums and conversions tested on the Mac |
+| I2C display (`i2c-display`) | Shows text on an SSD1306 OLED display (128 × 64, such as Adafruit's): a title, the board, how long it's been running and a bar | An I2C display driver in Swift; drawing and a 5 × 7 font tested on the Mac |
 | Wi-Fi and HTTPS (`wifi-request`) | Connects to your Wi-Fi network and requests a web page over HTTPS; until you set your network in `Credentials.swift`, lists the networks nearby | ESP-IDF's Wi-Fi, events and HTTP client, with its certificate bundle |
 | Bluetooth LE light (`ble-light`) | A phone (with an app such as nRF Connect or LightBlue) connects and writes the LED's colour: three bytes, such as `200000` for red | A GATT server with NimBLE, and C callbacks in Swift |
 | Deep sleep (`deep-sleep`) | Shows a colour, sleeps for 10 seconds, wakes up with the next one | Deep sleep, a timer wake-up, and a variable in RTC memory (`@section(".rtc.data")`) |
