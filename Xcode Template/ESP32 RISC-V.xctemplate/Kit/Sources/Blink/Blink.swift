@@ -3,10 +3,10 @@
 
 /// One step of the blink pattern: a color for the LED and its name.
 public struct BlinkStep {
-    public var red: UInt32
-    public var green: UInt32
-    public var blue: UInt32
-    public var name: StaticString
+    public let red: UInt32
+    public let green: UInt32
+    public let blue: UInt32
+    public let name: StaticString
 }
 
 /// Cycles through red, green, blue and off.
