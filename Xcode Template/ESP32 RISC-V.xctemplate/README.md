@@ -1,6 +1,6 @@
 # ___PROJECTNAME___
 
-Embedded Swift firmware for an ESP32 (`___VARIABLE_chip___`), built with ESP-IDF.
+Embedded Swift firmware for ___VARIABLE_boardName___ (`___VARIABLE_chip___`), built with ESP-IDF.
 
 ## Everyday use in Xcode
 
@@ -141,9 +141,9 @@ The chip you chose when creating the project is set in `sdkconfig.defaults`:
 CONFIG_IDF_TARGET="___VARIABLE_chip___"
 ```
 
-To build for another RISC-V based ESP32 (`esp32c2`, `esp32c3`, `esp32c5`, `esp32c6`, `esp32c61`, `esp32h2` or `esp32p4`), change this line and press `Cmd+B`. The build then reconfigures the project for the new chip, which recreates `sdkconfig` from `sdkconfig.defaults` (the previous one is kept as `sdkconfig.old`).
+The chip, and the flash size below it, are those of the board you chose when you created the project (___VARIABLE_boardName___). To build for another RISC-V based ESP32 (`esp32c2`, `esp32c3`, `esp32c5`, `esp32c6`, `esp32c61`, `esp32h2` or `esp32p4`), change this line and press `Cmd+B`. The build then reconfigures the project for the new chip, which recreates `sdkconfig` from `sdkconfig.defaults` (the previous one is kept as `sdkconfig.old`).
 
-The example blinks the RGB LED of Espressif's DevKit boards. Its pin is chosen per chip in `Firmware/ESPIDF/include/ESPIDF.h` (`BOARD_RGB_LED_GPIO`); change it there if your board's LED is on another pin.
+The example blinks the board's LED: an addressable RGB LED (WS2812), separate red, green and blue LEDs, or a one-colour LED. A board without an LED only prints the colours. The board's LED, its pins and polarity are set in `Firmware/ESPIDF/include/ESPIDF.h` (`BOARD_LED_…`); change them there for another board.
 
 ## Building, flashing and watching in Terminal
 

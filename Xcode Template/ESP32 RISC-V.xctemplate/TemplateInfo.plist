@@ -258,6 +258,12 @@
 			<dict>
 				<key>esp32-c3-devkitm-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -273,6 +279,12 @@
 				</dict>
 				<key>esp32-c5-devkitc-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -288,6 +300,12 @@
 				</dict>
 				<key>esp32-c6-devkitc-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -303,6 +321,12 @@
 				</dict>
 				<key>esp32-c6-devkitm-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -318,6 +342,12 @@
 				</dict>
 				<key>esp32-c61-devkitc-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -333,6 +363,12 @@
 				</dict>
 				<key>esp32-h2-devkitm-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -348,6 +384,12 @@
 				</dict>
 				<key>esp32-p4-function-ev-board</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -363,10 +405,16 @@
 				</dict>
 				<key>esp8684-devkitm-1</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>8</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
-					<string>8</string>
+					<string>0</string>
 					<key>boardLEDKind</key>
 					<string>BOARD_LED_RGB</string>
 					<key>boardLEDPowerGPIO</key>
@@ -378,6 +426,12 @@
 				</dict>
 				<key>m5stack-nanoc6</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -393,6 +447,12 @@
 				</dict>
 				<key>other-esp32c2</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -402,12 +462,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-C2 board</string>
+					<string>an ESP32-C2 board</string>
 					<key>chip</key>
 					<string>esp32c2</string>
 				</dict>
 				<key>other-esp32c3</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -417,12 +483,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-C3 board</string>
+					<string>an ESP32-C3 board</string>
 					<key>chip</key>
 					<string>esp32c3</string>
 				</dict>
 				<key>other-esp32c5</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -432,12 +504,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-C5 board</string>
+					<string>an ESP32-C5 board</string>
 					<key>chip</key>
 					<string>esp32c5</string>
 				</dict>
 				<key>other-esp32c6</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -447,12 +525,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-C6 board</string>
+					<string>an ESP32-C6 board</string>
 					<key>chip</key>
 					<string>esp32c6</string>
 				</dict>
 				<key>other-esp32c61</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -462,12 +546,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-C61 board</string>
+					<string>an ESP32-C61 board</string>
 					<key>chip</key>
 					<string>esp32c61</string>
 				</dict>
 				<key>other-esp32h2</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -477,12 +567,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-H2 board</string>
+					<string>an ESP32-H2 board</string>
 					<key>chip</key>
 					<string>esp32h2</string>
 				</dict>
 				<key>other-esp32p4</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>0</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string># The flash size is ESP-IDF's default, 2 MB. For more, set your board's, e.g. CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>
@@ -492,12 +588,18 @@
 					<key>boardLEDPowerGPIO</key>
 					<string>-1</string>
 					<key>boardName</key>
-					<string>another ESP32-P4 board</string>
+					<string>an ESP32-P4 board</string>
 					<key>chip</key>
 					<string>esp32p4</string>
 				</dict>
 				<key>seeed-xiao-esp32c6</key>
 				<dict>
+					<key>boardLEDActiveLow</key>
+					<string>1</string>
+					<key>boardLEDBlueGPIO</key>
+					<string>-1</string>
+					<key>boardLEDGreenGPIO</key>
+					<string>-1</string>
 					<key>boardFlashSize</key>
 					<string>CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</string>
 					<key>boardLEDGPIO</key>

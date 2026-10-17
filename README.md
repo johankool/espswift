@@ -21,7 +21,7 @@ Write firmware for RISC-V based ESP32 chips in Swift — build and flash directl
 ✅ **Swift Packages** — use Embedded-ready packages such as swift-mmio; test plain Swift code on your Mac  
 ✅ **On-Chip Debugging** — breakpoints, backtraces and variables in Swift on the board, with LLDB  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
-✅ **NeoPixel Ready** — WS2812 RGB LED example included  
+✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
 
 ---
 
