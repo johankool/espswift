@@ -29,6 +29,7 @@ ___PROJECTNAME___/
 │   ├── Firmware.swift          # Your firmware code starts here (app_main)
 │   ├── Board.swift             # Your board's name and LED
 │   ├── LED.swift               # Drives the LED, whatever kind it is
+│   ├── FreeRTOS.swift          # Swift versions of FreeRTOS's macros, such as pdMS_TO_TICKS
 │   ├── Package.swift           # The firmware's packages, such as swift-mmio
 │   └── ESPIDF/include/
 │       └── ESPIDF.h            # ESP-IDF's C APIs for Swift: `import ESPIDF`

@@ -83,6 +83,21 @@
 				<string>com.espswift.target.indexing</string>
 			</array>
 		</dict>
+		<key>Firmware/FreeRTOS.swift</key>
+		<dict>
+			<key>Group</key>
+			<array>
+				<string>Firmware</string>
+			</array>
+			<key>IsTopLevel</key>
+			<true/>
+			<key>Path</key>
+			<string>Firmware_FreeRTOS.swift</string>
+			<key>TargetIdentifiers</key>
+			<array>
+				<string>com.espswift.target.indexing</string>
+			</array>
+		</dict>
 		<key>Firmware/Package.swift</key>
 		<dict>
 			<key>Group</key>
@@ -204,6 +219,7 @@
 		<string>Firmware/Firmware.swift</string>
 		<string>Firmware/Board.swift</string>
 		<string>Firmware/LED.swift</string>
+		<string>Firmware/FreeRTOS.swift</string>
 		<string>Firmware/Package.swift</string>
 		<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 		<string>Firmware/ESPIDF/ESPIDF.c</string>

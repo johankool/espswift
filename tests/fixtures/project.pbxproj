@@ -10,6 +10,7 @@
 		C78364A330803249000D72CC /* Firmware.swift in Sources */ = {isa = PBXBuildFile; fileRef = C783649930803249000D72CC /* Firmware.swift */; };
 		C78364B130803249000D72CC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B030803249000D72CC /* Board.swift */; };
 		C78364B330803249000D72CC /* LED.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B230803249000D72CC /* LED.swift */; };
+		C78364B530803249000D72CC /* FreeRTOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78364B430803249000D72CC /* FreeRTOS.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +19,7 @@
 		C783649930803249000D72CC /* Firmware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Firmware.swift; sourceTree = "<group>"; };
 		C78364B030803249000D72CC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		C78364B230803249000D72CC /* LED.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LED.swift; sourceTree = "<group>"; };
+		C78364B430803249000D72CC /* FreeRTOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRTOS.swift; sourceTree = "<group>"; };
 		C783649A30803249000D72CC /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		C783649D30803249000D72CC /* ESPIDF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ESPIDF.h; sourceTree = "<group>"; };
 		C783649E30803249000D72CC /* ESPIDF.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ESPIDF.c; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				C783649930803249000D72CC /* Firmware.swift */,
 				C78364B030803249000D72CC /* Board.swift */,
 				C78364B230803249000D72CC /* LED.swift */,
+				C78364B430803249000D72CC /* FreeRTOS.swift */,
 				C783649A30803249000D72CC /* Package.swift */,
 				C783649B30803249000D72CC /* ESPIDF */,
 			);
@@ -181,6 +184,7 @@
 				C78364A330803249000D72CC /* Firmware.swift in Sources */,
 				C78364B130803249000D72CC /* Board.swift in Sources */,
 				C78364B330803249000D72CC /* LED.swift in Sources */,
+				C78364B530803249000D72CC /* FreeRTOS.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */

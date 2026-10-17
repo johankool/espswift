@@ -144,7 +144,7 @@ public func app_main() {
     print("Hello from Embedded Swift on ESP32!")
 
     while true {
-        vTaskDelay(pd_ms_to_ticks(1000))
+        vTaskDelay(ticks(milliseconds: 1000))  // ticks(milliseconds:) is in FreeRTOS.swift
         print("Tick...")
     }
 }
@@ -229,6 +229,7 @@ espswift/
         │   ├── Firmware.swift       # Firmware entry point (app_main)
         │   ├── Board.swift          # The board's name and LED, from the Board pop-up
         │   ├── LED.swift            # Drives the board's LED, whatever kind it is
+        │   ├── FreeRTOS.swift       # Swift versions of FreeRTOS's macros, such as pdMS_TO_TICKS
         │   ├── Package.swift        # The firmware package, built by ESP-IDF with SwiftPM
         │   └── ESPIDF/include/ESPIDF.h   # ESP-IDF's C APIs for Swift (import ESPIDF)
         └── Kit/                     # Packages/<Project>Kit: plain Swift, tested on the Mac (Cmd+U)

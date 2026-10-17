@@ -36,7 +36,7 @@ public func app_main() {
         print("LED: \(step.name)")
 
         // Wait 1 second using FreeRTOS task delay.
-        vTaskDelay(pd_ms_to_ticks(1000))
+        vTaskDelay(ticks(milliseconds: 1000))
 
         colorIndex += 1
     }
