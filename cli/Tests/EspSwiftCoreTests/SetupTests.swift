@@ -133,19 +133,19 @@ import Testing
 @Suite struct UninstallTests {
     @Test func removesEverythingWithAll() throws {
         let system = FakeSystem.workingMac
-        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif/tools"])
+        system.directories.insert(FakeSystem.toolchain)
         try Uninstall(system: system).run(assumeYes: true, all: true)
         #expect(system.actions == [
             "rm /Users/test/.espswift",
             "rm \(FakeSystem.template)",
             "rm \(FakeSystem.toolchain)",
-            "rm /Users/test/.espressif/tools",
+            "run /opt/homebrew/bin/eim remove v6.1",
         ])
     }
 
     @Test func keepsSharedItemsWithoutConfirmation() throws {
         let system = FakeSystem.workingMac
-        system.directories.formUnion([FakeSystem.toolchain, "/Users/test/.espressif/tools"])
+        system.directories.insert(FakeSystem.toolchain)
         try Uninstall(system: system).run(assumeYes: true, all: false)
         #expect(system.actions == ["rm /Users/test/.espswift", "rm \(FakeSystem.template)"])
     }

@@ -50,7 +50,7 @@ bash tests/test_template.sh            # all chips
 bash tests/test_template.sh esp32c6    # one chip
 ```
 
-It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
+It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
 
 The test doesn't cover Xcode or hardware, so for changes there, also check by hand:
 - After running `install.sh` and restarting Xcode, **ESP32 RISC-V** appears under File → New → Project → Choose Template… → Other, with the **Board** pop-up.

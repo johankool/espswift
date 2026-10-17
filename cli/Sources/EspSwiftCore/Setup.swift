@@ -95,8 +95,9 @@ public struct Setup: Sendable {
     }
 
     /// The packages ESP-IDF's tools need on Ubuntu and Debian, from ESP-IDF's
-    /// Linux setup guide (OpenOCD, for debugging, needs libusb).
-    static let linuxPackages = "git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0"
+    /// Linux setup guide (OpenOCD, for debugging, needs libusb), but Ninja,
+    /// which EIM installs.
+    static let linuxPackages = "git wget flex bison gperf python3 python3-pip python3-venv cmake ccache libffi-dev libssl-dev dfu-util libusb-1.0-0"
 
     /// The programs ESP-IDF needs, checked before downloading anything.
     func missingPrerequisites() -> [(program: String, package: String)] {

@@ -42,7 +42,9 @@ bash install.sh
 
 `install.sh` builds `espswift`, ESPSwift's command-line tool (in `cli/`; building it needs Swift 6, which comes with Xcode), and runs `espswift setup`, which installs ESP-IDF, the Swift toolchain and the tools they need, and asks whether to install the Xcode template. Installation takes 5–10 minutes (~3GB download). Run `~/.espswift/bin/espswift doctor` afterwards to check everything is in order.
 
-On Linux, install ESP-IDF's prerequisites (on Ubuntu: `sudo apt install git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0`) and Swift 6.4 with [swiftly](https://www.swift.org/install/linux/), then run `install.sh`.
+ESP-IDF is installed with [EIM](https://docs.espressif.com/projects/idf-im-ui/en/latest/), Espressif's ESP-IDF Installation Manager, so it's shared with Espressif's other tools, such as its VS Code extension. On macOS, `install.sh` installs EIM with Homebrew, from Espressif's tap, which it trusts for this (`brew trust --formula espressif/eim/eim`), as Homebrew requires.
+
+On Linux, install ESP-IDF's prerequisites (on Ubuntu: `sudo apt install git wget flex bison gperf python3 python3-pip python3-venv cmake ccache libffi-dev libssl-dev dfu-util libusb-1.0-0`), [EIM](https://docs.espressif.com/projects/idf-im-ui/en/latest/) (from Espressif's package repository, or with Homebrew) and Swift 6.4 with [swiftly](https://www.swift.org/install/linux/), then run `install.sh`.
 
 ### Create a Project in Xcode
 1. Restart Xcode
@@ -222,7 +224,7 @@ Embedded-Swift-Xcode-Template/
 
 - macOS: Xcode 26 or later (tested with Xcode 26.6 and 27), and a macOS version that runs it. Code completion needs Xcode 27.
 - Linux: Ubuntu 24.04 or similar, with ESP-IDF's prerequisites and Swift 6.4 (see [Install](#install))
-- Python, CMake and Ninja: on macOS, `espswift setup` installs any that are missing with [Homebrew](https://brew.sh) (Python 3.14); on Linux, Python 3.10 or newer
+- Python, CMake and EIM: on macOS, `install.sh` and `espswift setup` install any that are missing with [Homebrew](https://brew.sh) (Python 3.14, which ESP-IDF 6.1 supports; Homebrew's default Python may be newer); on Linux, Python 3.10 or newer
 - About 10 GB of disk space: the Swift toolchain takes about 5 GB, ESP-IDF and its tools about 4 GB, and each project's build output about 250 MB
 - An internet connection for installing, and for each project's first build (which downloads its ESP-IDF components)
 - A board with a RISC-V based ESP32 chip (ESP32-C2, C3, C5, C6, C61, H2 or P4) and a USB connection
@@ -236,9 +238,9 @@ Embedded-Swift-Xcode-Template/
 | Path | Contents |
 |------|----------|
 | `~/.espswift/bin/espswift` | `espswift`, which projects build with (a copy in `~/.espswift/libexec`) |
-| `~/.espswift/esp-idf/` | ESP-IDF 6.1 (~750 MB) |
-| `~/.espswift/python/` | Link to the Python ESP-IDF's Python environment was made for (3.14 on macOS) |
-| `~/.espressif/` | ESP-IDF's compilers, tools and Python environment (~3.5 GB, including ~1 GB of downloaded archives) |
+| `~/.espressif/v6.1/` | ESP-IDF 6.1, installed with EIM (~700 MB) |
+| `~/.espressif/tools/` | ESP-IDF's compilers, tools and Python environment, and EIM's list of installations, `eim_idf.json` (~3 GB) |
+| `~/.espswift/python/` | Link to the Python that EIM makes ESP-IDF's Python environment with (3.14 on macOS) |
 | `~/Library/Developer/Toolchains/` | macOS: the Swift 6.4.0 release toolchain (~5 GB), installed with [swiftly](https://www.swift.org/install/macos/) if you have it, otherwise from swift.org's installer. On Linux, swiftly's toolchain, or the Swift on your `PATH` |
 | `~/.espswift/swift-toolchain` | Path of the Swift toolchain that projects use |
 | `~/Library/Developer/Xcode/Templates/` | ESP32 RISC-V Xcode template (macOS) |
@@ -259,12 +261,9 @@ It replaces the project's `build.sh` with the template's and points code complet
 
 ### Switching ESP-IDF versions
 
-`espswift setup` installs a fixed ESP-IDF release (`Pins.espIDF` in `cli/Sources/EspSwiftCore/Versions.swift`) and never replaces an existing `~/.espswift/esp-idf`; `espswift doctor` says when it's another version. To switch to the pinned release:
+`espswift setup` installs a fixed ESP-IDF release (`Pins.espIDF` in `cli/Sources/EspSwiftCore/Versions.swift`) with EIM, next to any other versions EIM installed (`eim list`), and uses that one. When a new version of ESPSwift pins another release, run `install.sh` again to install it. To use an ESP-IDF that EIM didn't install, set `IDF_PATH` to its folder.
 
-```bash
-rm -rf ~/.espswift/esp-idf
-bash install.sh
-```
+If ESP-IDF's Python environment stops working, for instance after the Python it was made with was removed, `espswift doctor` says so, and `eim fix v6.1` repairs it.
 
 Then, in each existing project, press `Cmd+Shift+K` followed by `Cmd+B` in Xcode. ESP-IDF updates the project's `sdkconfig` for the new version; review that change before committing it.
 
@@ -278,9 +277,9 @@ To remove ESPSwift, run:
 ~/.espswift/bin/espswift uninstall
 ```
 
-It removes `~/.espswift` (ESP-IDF and espswift itself) and the Xcode template. It then asks before removing things other projects may also use: the Swift toolchain (through swiftly, if you use it), ESP-IDF's tools in `~/.espressif`, and ESP-IDF's component download cache. Use `--all` to remove those without asking, and `--yes` to skip the confirmation.
+It removes `~/.espswift` (espswift itself) and the Xcode template. It then asks before removing things other projects may also use: the Swift toolchain (through swiftly, if you use it), ESP-IDF 6.1 (with `eim remove`), and ESP-IDF's component download cache. Use `--all` to remove those without asking, and `--yes` to skip the confirmation.
 
-It never removes Homebrew or the packages installed with it (Python, CMake, Ninja), swiftly, or your projects.
+It never removes Homebrew or the packages installed with it (Python, CMake, EIM), other ESP-IDF versions, swiftly, or your projects.
 
 ---
 

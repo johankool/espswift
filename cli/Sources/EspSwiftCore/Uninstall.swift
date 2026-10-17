@@ -1,14 +1,15 @@
 /// Removes what `espswift setup` installed: `espswift uninstall`.
 ///
-/// Always removed (used only by ESPSwift): ~/.espswift (ESP-IDF, espswift's
-/// link, the toolchain record) and the Xcode template.
+/// Always removed (used only by ESPSwift): ~/.espswift (espswift's link,
+/// the Python link, the toolchain record) and the Xcode template.
 ///
 /// Removed only when confirmed, or with --all, because other projects may
-/// use them too: the Swift toolchain, ESP-IDF's tools (~/.espressif) and
-/// ESP-IDF's component download cache.
+/// use them too: the Swift toolchain, ESP-IDF (with EIM, which installed it)
+/// and ESP-IDF's component download cache.
 ///
-/// Never removed: Homebrew and its packages (Python, CMake, Ninja), swiftly,
-/// espswift itself (Homebrew removes it), and projects.
+/// Never removed: Homebrew and its packages (Python, CMake, EIM), swiftly,
+/// espswift itself (Homebrew removes it), other ESP-IDF versions, and
+/// projects.
 public struct Uninstall: Sendable {
     public var system: System
     public var locations: Locations
@@ -69,22 +70,23 @@ public struct Uninstall: Sendable {
                 system.report("Removed the Swift toolchain \(name)")
             }
         }
-        for (path, question) in [
-            (locations.idfToolsPath, "Other ESP-IDF installations may use them."),
-            (componentCache, "It's downloaded again when needed."),
-        ] where system.isDirectory(path) {
-            let what = path == componentCache ? "ESP-IDF's component download cache" : "ESP-IDF's tools in \(display(path))"
-            if all || system.confirm("Remove \(what)\(size(path))? \(question)", default: false) {
-                try system.removeItem(path)
-                system.report("Removed \(what)")
+        if let installation = EIM(system: system).pinnedInstallation(), let eim = system.findExecutable("eim"),
+           all || system.confirm("Remove ESP-IDF \(installation.name)\(size(Resources.parent(of: installation.path)))? Other projects may use it.", default: false) {
+            guard system.runVisibly(eim, ["remove", installation.name], environment: system.environment) == 0 else {
+                throw EspSwiftError("EIM couldn't remove ESP-IDF \(installation.name).")
             }
+            system.report("Removed ESP-IDF \(installation.name)")
+        }
+        if system.isDirectory(componentCache),
+           all || system.confirm("Remove ESP-IDF's component download cache\(size(componentCache))? It's downloaded again when needed.", default: false) {
+            try system.removeItem(componentCache)
+            system.report("Removed ESP-IDF's component download cache")
         }
 
         system.report("")
         system.report("""
-            Not removed: ESP-IDF, which EIM installed (eim remove \(Setup.eimVersion), or eim purge for all \
-            versions), Homebrew's packages (Python, EIM), swiftly, espswift itself \
-            (brew uninstall espswift), and your projects.
+            Not removed: Homebrew's packages (Python, CMake, EIM), other ESP-IDF versions \
+            (eim list), swiftly, espswift itself (brew uninstall espswift), and your projects.
             """)
     }
 

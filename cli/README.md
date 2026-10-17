@@ -5,7 +5,7 @@ The command-line tool for Embedded Swift on RISC-V based ESP32 chips, written in
 It's being built in phases (see below). So far it has:
 
 ```
-espswift setup [--[no-]xcode-template]     # installs ESP-IDF, Swift and the tools they need (replaces install.sh)
+espswift setup [--[no-]xcode-template]     # installs ESP-IDF (with EIM), Swift and the tools they need
 espswift new <name> [--board] [--folder]   # creates a project from the template, without Xcode (also on Linux)
 espswift build [clean] [--verbose]         # builds the project, showing errors as Xcode issues (projects' build.sh runs it)
 espswift flash [--port] [--last-build]     # flashes the project's latest build
@@ -15,7 +15,7 @@ espswift debug                             # debugs the firmware on the board wi
 espswift add <component> [--header]        # adds an ESP-IDF library (main/idf_component.yml and ESPIDF.h)
 espswift settings                          # ESP-IDF's settings menu (menuconfig)
 espswift update                            # updates a project created from an older template
-espswift doctor                            # checks ESP-IDF, Swift, Python, CMake, Ninja, the Xcode template and boards
+espswift doctor                            # checks Python, EIM, ESP-IDF and its tools, Swift, the Xcode template and boards
 espswift ports [--first]                   # lists the serial ports of connected boards
 espswift xcode install-template            # installs or updates the Xcode template (macOS)
 espswift xcode uninstall-template
@@ -60,7 +60,7 @@ Next: a Homebrew tap and a release workflow, after which `install.sh` can go (se
 
 `espswift setup` puts espswift at `~/.espswift/bin/espswift`: a link to Homebrew's `bin/espswift` when installed with Homebrew, or to a copy in `~/.espswift/libexec` when built from this repository (`install.sh`). A project's `build.sh`, which Xcode runs on Cmd+B, runs `~/.espswift/bin/espswift build` (or `ESPSWIFT_BIN`, which `tests/test_template.sh` sets to the one it builds).
 
-`espswift build` finds the project from Xcode's settings or the current folder, sets up ESP-IDF's environment (its `export.sh`), sets the chip when `sdkconfig.defaults` names a new one, runs `idf.py` with its output filtered for Xcode (`BuildOutputFilter`), keeps the full output in the build folder (`log/build-output.log`), sets up code completion and records the build for Cmd+R. `--verbose`, or `ESPSWIFT_VERBOSE=1`, shows all of ESP-IDF's output.
+`espswift build` finds the project from Xcode's settings or the current folder, sets up ESP-IDF's environment (what EIM's activation script sets up, or for an ESP-IDF in `IDF_PATH`, its `export.sh`), sets the chip when `sdkconfig.defaults` names a new one, runs `idf.py` with its output filtered for Xcode (`BuildOutputFilter`), keeps the full output in the build folder (`log/build-output.log`), sets up code completion and records the build for Cmd+R. `--verbose`, or `ESPSWIFT_VERBOSE=1`, shows all of ESP-IDF's output.
 
 Cmd+R (the template's Run scheme) starts `~/.espswift/bin/espswift run --last-build`: Xcode has just built the project, and doesn't tell the program it starts which project that was, so it flashes the build `espswift build` recorded last (`~/.espswift/last-build`). The monitor reads the serial port in Swift (`Monitor`, with a small C target, `CSerialPort`, for the port settings) and waits for the board when it resets or is unplugged.
 
