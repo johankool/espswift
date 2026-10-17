@@ -731,6 +731,77 @@
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
 				</dict>
+				<key>i2c-display</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CDisplay/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CDisplay/ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CDisplay/Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Firmware/SSD1306.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>I2CDisplay/Firmware_SSD1306.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/SSD1306.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
 				<key>wifi-request</key>
 				<dict>
 					<key>Definitions</key>
@@ -966,6 +1037,7 @@
 				<string>Blink</string>
 				<string>Button input</string>
 				<string>I2C sensor</string>
+				<string>I2C display</string>
 				<string>Wi-Fi and HTTPS</string>
 				<string>Bluetooth LE light</string>
 				<string>Deep sleep</string>
@@ -975,6 +1047,7 @@
 				<string>blink</string>
 				<string>button-input</string>
 				<string>i2c-sensor</string>
+				<string>i2c-display</string>
 				<string>wifi-request</string>
 				<string>ble-light</string>
 				<string>deep-sleep</string>
@@ -1013,6 +1086,17 @@
 					<string>it reads a Sensirion SHT4x temperature and humidity sensor over I2C, and shows the temperature on the LED.</string>
 					<key>exampleSettings</key>
 					<string># The I2C sensor example needs no other settings.</string>
+				</dict>
+				<key>i2c-display</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>I2C display</string>
+					<key>exampleModule</key>
+					<string>Display</string>
+					<key>exampleSummary</key>
+					<string>it shows text on an SSD1306 OLED display over I2C: a title, the board's name, how long it has been running, and a bar that fills up every minute.</string>
+					<key>exampleSettings</key>
+					<string># The I2C display example needs no other settings.</string>
 				</dict>
 				<key>wifi-request</key>
 				<dict>

@@ -102,7 +102,7 @@ print(" ".join(v for v in example["Values"] if v != example["Default"]))
 # Examples on chips that lack what they use (they say so instead), or that
 # build differently there, tested by default too.
 EXAMPLE_COMBINATIONS=(wifi-request@esp32h2 wifi-request@esp32c2 ble-light@esp32p4 ble-light@esp32c3
-                      deep-sleep@esp32c2 i2c-sensor@esp32p4)
+                      deep-sleep@esp32c2 i2c-sensor@esp32p4 i2c-display@esp32c2)
 
 if [ "$EXAMPLES" = true ]; then
     KIND="example"
