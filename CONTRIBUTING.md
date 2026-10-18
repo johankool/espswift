@@ -1,4 +1,4 @@
-# Contributing to Embedded Swift Xcode Template
+# Contributing to ESPSwift
 
 Thank you for your interest in contributing! This project aims to make Embedded Swift development on ESP32 as approachable as possible — contributions of all kinds are welcome.
 
@@ -30,9 +30,7 @@ bash install.sh
 ### 3. Create a branch
 
 ```bash
-git checkout -b feat/your-feature-name
-# or
-git checkout -b fix/your-bug-fix
+git checkout -b your-feature-name
 ```
 
 ### 4. Make your changes and test them
@@ -58,12 +56,12 @@ bash tests/test_template.sh --examples deep-sleep            # one example, on t
 bash tests/test_template.sh --examples deep-sleep@esp32c2    # one example, on a chip
 ```
 
-It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. With `--examples` it creates a project from each example instead (other than Blink, which every chip is built with), and also checks that its build has no warnings. GitHub Actions runs the CLI's tests (`cli.yml`) and the template test (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner.
+It builds espswift from `cli/`, creates each project with `espswift new` (which lays it out the way Xcode does) and builds it with the ESP-IDF (installed with EIM) and Swift toolchain `espswift setup` installed (run `install.sh` first). Each chip takes about half a minute. On Linux, without Xcode, it checks the builds, their error reporting and the Kit package's tests. With `--examples` it creates a project from each example instead (other than Blink, which every chip is built with), and also checks that its build has no warnings. GitHub Actions runs the CLI's tests (`cli.yml`) and the template and examples tests (`build-template.yml`) for every pull request, on macOS and Linux, after setting up everything on a fresh runner, and builds the tutorial (`docs.yml`).
 
 The test doesn't cover Xcode or hardware, so for changes there, also check by hand:
-- After running `install.sh` and restarting Xcode, **ESP32 RISC-V** appears under File → New → Project → Choose Template… → Other, with the **Board** pop-up.
-- A new project's `sdkconfig.defaults` has the chip and flash size of the board you picked, and `README.md` sits next to the `.xcodeproj`.
-- `Cmd+B` builds without flashing, and `Cmd+R` flashes your board and shows its serial output.
+- After running `install.sh` and restarting Xcode, **ESP32 RISC-V** appears under File → New → Project → Choose Template… → Other, with the **Board** and **Example** pop-ups.
+- A new project's `sdkconfig.defaults` has the chip and flash size of the board you picked, it has the example's files, `README.md` sits next to the `.xcodeproj`, and the Project navigator leaves out `build.sh`, the `CMakeLists.txt` files, `main/swift_flags.c`, `.gitignore` and the scheme.
+- `Cmd+B` builds without flashing, and `Cmd+R` flashes your board and shows its serial output (also after building another project: it flashes this project's build).
 - After that first build, code completion works in `Firmware/Firmware.swift` (e.g. typing `led_strip_` or `blinkStep`), `Cmd+U` runs the Kit package's tests, and Command-clicking `vTaskDelay` opens FreeRTOS's `task.h`.
 
 ### The tutorial
@@ -82,19 +80,19 @@ The template's **Example** pop-up chooses what a new project starts from. Each e
 - its files (its *Units*: nodes and definitions, which only that value adds): `Firmware/Firmware.swift`, the Kit package and `ESPIDF.h`, and any other files in `Firmware/`. Blink's are the template's own files; the other examples' are in a folder of their own, such as `ButtonInput/`, named as the template names files (`Firmware_WiFi.swift` for `Firmware/WiFi.swift`);
 - its variables: its title, its Kit module (`exampleModule`, which the Firmware package and the scheme's tests use), a one-sentence summary for the README and its lines for `sdkconfig.defaults`.
 
-The board's variables give an example its pins: `boardButton` (in `Board.swift`), and `boardI2CSDA` and `boardI2CSCL`. An example that needs something a chip lacks checks for it with `#if` (such as `CONFIG_SOC_WIFI_SUPPORTED`) and says so. Add a combination such as `wifi-request@esp32h2` to `EXAMPLE_COMBINATIONS` in `tests/test_template.sh` for a new one.
+The board's variables give an example its pins: `boardButton` (in `Board.swift`), and `boardI2CSDA` and `boardI2CSCL`. An example that needs something a chip lacks checks for it with `#if` (such as `CONFIG_SOC_WIFI_SUPPORTED`) and says so. For a new example, add it to the table in README.md's Examples, and a combination such as `wifi-request@esp32h2` to `EXAMPLE_COMBINATIONS` in `tests/test_template.sh` if it uses something not every chip has.
 
 ### 5. Commit
 
 ```bash
 git add .
-git commit -m "feat: describe what you did"
+git commit -m "Describe what you did"
 ```
 
 ### 6. Push and open a Pull Request
 
 ```bash
-git push origin feat/your-feature-name
+git push origin your-feature-name
 ```
 
 Then open a PR on GitHub against the `main` branch.
@@ -112,6 +110,7 @@ espswift/
 │   ├── Sources/EspSwiftCore/        # What they do, through the System protocol
 │   ├── Sources/CSerialPort/         # Opening serial ports (needs C)
 │   └── Tests/EspSwiftCoreTests/     # Unit tests, with a fake System
+├── Documentation/ESPSwift.docc/      # The DocC tutorial: its pages, and its files and images in Resources/
 ├── tests/
 │   ├── test_template.sh             # Builds the template for every chip, or its examples (--examples)
 │   ├── xcode_project.py             # Writes a test project's Xcode project, from the fixture
@@ -119,7 +118,8 @@ espswift/
 │   └── fixtures/project.pbxproj     # An Xcode project Xcode made from the template
 ├── .github/workflows/
 │   ├── cli.yml                      # Builds and tests espswift, on macOS and Linux
-│   └── build-template.yml           # Sets up ESPSwift and runs the template and examples tests, on macOS and Linux
+│   ├── build-template.yml           # Sets up ESPSwift and runs the template and examples tests, on macOS and Linux
+│   └── docs.yml                     # Builds the tutorial and checks it against the template
 └── Xcode Template/
     └── ESP32 RISC-V.xctemplate/
         ├── TemplateInfo.plist
@@ -128,13 +128,15 @@ espswift/
         ├── scheme.xcscheme
         ├── CMakeLists.txt
         ├── sdkconfig.defaults
+        ├── gitignore                # .gitignore, at the project's root
         ├── main_CMakeLists.txt, main_idf_component.yml, main_swift_flags.c   # main/
         ├── Firmware_Firmware.swift, Firmware_Board.swift, Firmware_LED.swift, Firmware_FreeRTOS.swift, Firmware_Package.swift   # Firmware/
         ├── ESPIDF_ESPIDF.h, ESPIDF_ESPIDF.c                                 # Firmware/ESPIDF/
-        └── Kit/                     # Packages/<Project>Kit
-            ├── Package.swift
-            ├── Sources/Blink/Blink.swift
-            └── Tests/BlinkTests/BlinkTests.swift
+        ├── Kit/                     # Packages/<Project>Kit (Blink's, and Deep sleep's)
+        │   ├── Package.swift
+        │   ├── Sources/Blink/Blink.swift
+        │   └── Tests/BlinkTests/BlinkTests.swift
+        └── ButtonInput/, I2CSensor/, I2CDisplay/, WiFiRequest/, BLELight/, DeepSleep/   # The other examples' files (see Examples)
 ```
 
 ---
@@ -155,14 +157,6 @@ espswift/
 - Reach files, the environment and programs only through the `System` protocol, so the commands can be tested with `FakeSystem`; add a test for what you change
 - Don't assume a Mac: espswift runs on macOS and Linux (no `PlistBuddy`, `xcrun` or `sed -i ''` outside macOS-only code)
 - Errors for the user are `EspSwiftError`s, which say what to do
-
-### Commit Messages
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-feat: add GPIO example
-fix: resolve CH340 port detection on macOS Ventura
-docs: update README with serial monitor guide
-chore: update .gitignore
-refactor: simplify port detection
 
 ---
 

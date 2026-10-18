@@ -1,4 +1,4 @@
 brew tap johankool/espswift
 brew trust --tap johankool/espswift
 brew trust --formula espressif/eim/eim
-brew install --HEAD espswift
+brew install espswift

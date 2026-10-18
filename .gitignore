@@ -12,3 +12,6 @@ DerivedData/
 # espswift (cli/) build output
 .build/
 .swiftpm/
+
+# DocC build output (xcrun docc preview writes it inside the catalog)
+.docc-build/
