@@ -54,6 +54,12 @@
             }
 
             @Step {
+                Look at the project in the Project navigator. **Firmware** has your firmware's Swift code; **Packages** has the Kit package, with Swift code that doesn't depend on the chip. The folder named after the project is the ESP-IDF project: `sdkconfig.defaults` has the chip and its settings, and `main/idf_component.yml` the ESP-IDF libraries the firmware uses.
+
+                @Image(source: "project-navigator.png", alt: "Xcode's Project navigator for a new project: README, the ESP-IDF folder with sdkconfig.defaults and main, Firmware with Board, LED, FreeRTOS, Package and Firmware, and Packages with the Kit package.")
+            }
+
+            @Step {
                 Open `Firmware/Firmware.swift`. Its `app_main` function is where the firmware starts, as `main` is for a program on the Mac. It sets up the LED, and then shows a new colour every second, forever: firmware doesn't end.
 
                 `Board.swift` says which LED your board has, and `LED.swift` drives it. The colours come from `blinkStep`, in the Kit package.
@@ -74,7 +80,9 @@
             }
 
             @Step {
-                Press Cmd+B to build the firmware. The first build takes a few minutes, as it builds ESP-IDF too; later ones take seconds. Errors appear in the Issue navigator, linked to their line, as for any project.
+                Press Cmd+B to build the firmware. The first build takes a few minutes, as it builds ESP-IDF too; later ones take seconds. Errors appear in the Issue navigator, linked to their line, as for any project; the build log shows the firmware's size.
+
+                @Image(source: "build-log.png", alt: "Xcode's build log: the ESP32 Embedded Swift Build, its progress, the firmware's size, and Build Succeeded.")
             }
 
             @Step {
@@ -82,7 +90,7 @@
 
                 Xcode's run destination says My Mac: Xcode runs `espswift` on your Mac, which flashes the board.
 
-                @Code(name: "Console", file: "console-01.txt")
+                @Image(source: "run-console.png", alt: "Xcode running the project: the build log above, and the console below with Flash complete, the ESP32 Serial Monitor, and the LED's colours.")
             }
 
             @Step {
@@ -111,17 +119,6 @@
                 @Code(name: "Firmware.swift", file: "Firmware-03.swift")
             }
 
-            @Step {
-                Open `Packages/HelloKit/Sources/Blink/Blink.swift`. The blink pattern is plain Swift, without ESP-IDF, in a package of its own: the firmware uses it, and your Mac can test it.
-
-                @Code(name: "Blink.swift", file: "Blink-01.swift")
-            }
-
-            @Step {
-                Add yellow to the pattern: red and green together. The pattern now repeats every 5 steps.
-
-                @Code(name: "Blink.swift", file: "Blink-02.swift")
-            }
         }
     }
 
@@ -132,13 +129,31 @@
 
         @Steps {
             @Step {
-                Open `Packages/HelloKit/Tests/BlinkTests/BlinkTests.swift`. Its tests, with Swift Testing, check the pattern: still red, green, blue and off.
+                Open `Packages/HelloKit/Sources/Blink/Blink.swift`. The blink pattern is plain Swift, without ESP-IDF, in a package of its own: the firmware uses it, and your Mac can test it.
+
+                @Code(name: "Blink.swift", file: "Blink-01.swift")
+            }
+
+            @Step {
+                Open `Packages/HelloKit/Tests/BlinkTests/BlinkTests.swift`. Its tests, with Swift Testing, check the pattern: red, green, blue and off, over and over.
 
                 @Code(name: "BlinkTests.swift", file: "BlinkTests-01.swift")
             }
 
             @Step {
-                Press Cmd+U. The tests run on the Mac, and fail: the pattern has yellow now, and repeats every 5 steps.
+                Press Cmd+U. The tests run on the Mac, in a moment, and pass.
+
+                @Image(source: "test-results.png", alt: "Xcode's test results: the three Blink tests passed, on the Mac.")
+            }
+
+            @Step {
+                Add yellow to the pattern: red and green together. The pattern now repeats every 5 steps.
+
+                @Code(name: "Blink.swift", file: "Blink-02.swift")
+            }
+
+            @Step {
+                Press Cmd+U again. Now the tests fail: they still expect red, green, blue and off, every 4 steps.
             }
 
             @Step {
