@@ -30,9 +30,7 @@ bash install.sh
 ### 3. Create a branch
 
 ```bash
-git checkout -b feat/your-feature-name
-# or
-git checkout -b fix/your-bug-fix
+git checkout -b your-feature-name
 ```
 
 ### 4. Make your changes and test them
@@ -88,13 +86,13 @@ The board's variables give an example its pins: `boardButton` (in `Board.swift`)
 
 ```bash
 git add .
-git commit -m "feat: describe what you did"
+git commit -m "Describe what you did"
 ```
 
 ### 6. Push and open a Pull Request
 
 ```bash
-git push origin feat/your-feature-name
+git push origin your-feature-name
 ```
 
 Then open a PR on GitHub against the `main` branch.
@@ -159,14 +157,6 @@ espswift/
 - Reach files, the environment and programs only through the `System` protocol, so the commands can be tested with `FakeSystem`; add a test for what you change
 - Don't assume a Mac: espswift runs on macOS and Linux (no `PlistBuddy`, `xcrun` or `sed -i ''` outside macOS-only code)
 - Errors for the user are `EspSwiftError`s, which say what to do
-
-### Commit Messages
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-feat: add GPIO example
-fix: resolve CH340 port detection on macOS Ventura
-docs: update README with serial monitor guide
-chore: update .gitignore
-refactor: simplify port detection
 
 ---
 
