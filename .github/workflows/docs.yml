@@ -1,7 +1,7 @@
 # Builds the DocC tutorial (Documentation/ESPSwift.docc), with warnings as
 # errors, and checks it starts from the files the template creates (see
-# tests/check_tutorial.sh). The built documentation, for static hosting, is
-# kept as an artifact.
+# tests/check_tutorial.sh). On main, publishes it on GitHub Pages:
+# https://johankool.github.io/espswift/tutorials/espswift
 
 name: Tutorial
 
@@ -35,10 +35,26 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+      # Hosted at https://<owner>.github.io/<repository>/.
       - name: Build and check the tutorial
-        run: bash tests/check_tutorial.sh --output "$RUNNER_TEMP/docs"
-      - name: Upload the documentation
-        uses: actions/upload-artifact@v7
+        run: bash tests/check_tutorial.sh --output "$RUNNER_TEMP/docs" --hosting-base-path "${{ github.event.repository.name }}"
+      - name: Upload it for GitHub Pages
+        uses: actions/upload-pages-artifact@v5
         with:
-          name: tutorial
           path: ${{ runner.temp }}/docs
+
+  publish:
+    name: Publish the tutorial
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: tutorial
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}tutorials/espswift
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

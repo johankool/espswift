@@ -25,7 +25,7 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
 ✅ **Examples to Start From** — Blink (whether your board's LED is a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED), a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
-✅ **Tutorial** — [Your First Firmware](#tutorial), from setting up to testing your change on the Mac  
+✅ **Tutorial** — [Your First Firmware](https://johankool.github.io/espswift/tutorials/espswift/your-first-firmware), from setting up to testing your change on the Mac  
 
 ---
 
@@ -149,13 +149,9 @@ public func app_main() {
 
 ## Tutorial
 
-New to Embedded Swift or the ESP32? **Your First Firmware**, a DocC tutorial in `Documentation/ESPSwift.docc`, takes you from setting up ESPSwift to running a project on your board, changing it, and testing it on your Mac. To read it, open the repository's folder in Terminal and run:
+New to Embedded Swift or the ESP32? **[Your First Firmware](https://johankool.github.io/espswift/tutorials/espswift/your-first-firmware)** takes you from setting up ESPSwift to running a project on your board, changing it, and testing it on your Mac.
 
-```bash
-xcrun docc preview Documentation/ESPSwift.docc
-```
-
-and open the address it prints (`/tutorials/espswift`).
+It's a DocC tutorial, in `Documentation/ESPSwift.docc`. To preview a change to it, run `xcrun docc preview Documentation/ESPSwift.docc` in the repository's folder, and open the address it prints (`/tutorials/espswift`).
 
 ---
 

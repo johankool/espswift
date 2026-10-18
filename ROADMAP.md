@@ -8,7 +8,7 @@ Contributions to any of these are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## Near-term
 
-- [ ] **A documentation site:** publish the DocC tutorial (CI builds it for static hosting, as an artifact), e.g. on GitHub Pages; and more tutorials, such as one per example.
+- [ ] **More tutorials,** such as one per example, next to Your First Firmware.
 
 ## Longer-term
 
@@ -63,5 +63,5 @@ Not planned yet; worth considering.
 - [x] Examples to start a project from, in the template's Example pop-up and `espswift new --example`, built and tested by CI: Blink, Button input (GPIO input with debouncing), I2C sensor (an SHT4x), I2C display (an SSD1306), Wi-Fi and HTTPS, Bluetooth LE light (a GATT server with NimBLE) and Deep sleep (a timer wake-up and RTC memory); `espswift new` asks for the board and the example
 - [x] ESP-IDF is installed with EIM, Espressif's ESP-IDF Installation Manager, and shared with Espressif's other tools
 - [x] A Homebrew tap, [johankool/homebrew-espswift](https://github.com/johankool/homebrew-espswift), and the first release, 0.2.0 (`brew install espswift`)
-- [x] A DocC tutorial, "Your First Firmware" (`Documentation/ESPSwift.docc`): set up, create a project, run it, change it and test it on the Mac; CI builds it and checks it starts from the template's files
+- [x] A DocC tutorial, [Your First Firmware](https://johankool.github.io/espswift/tutorials/espswift/your-first-firmware) (`Documentation/ESPSwift.docc`): set up, create a project, run it, change it and test it on the Mac; CI builds it, checks it starts from the template's files, and publishes it on GitHub Pages
 - [x] Linux: espswift sets up, creates, builds and tests projects on Linux; the template test runs there too (a CI job)

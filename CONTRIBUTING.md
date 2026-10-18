@@ -72,7 +72,7 @@ The DocC tutorial is in `Documentation/ESPSwift.docc`: its pages (`*.tutorial`) 
 bash tests/check_tutorial.sh
 ```
 
-which builds it with warnings as errors and fails if the template's files no longer match the tutorial's. CI runs it (`docs.yml`).
+which builds it with warnings as errors and fails if the template's files no longer match the tutorial's. CI runs it (`docs.yml`), and publishes the tutorial from `main` on [GitHub Pages](https://johankool.github.io/espswift/tutorials/espswift).
 
 ### Examples
 

@@ -8,15 +8,26 @@
 # the "Created by" line. When the template changes them, update the
 # tutorial's files to match, and the later steps (-02, -03) too.
 #
-# Needs Xcode's DocC (macOS). Usage: bash tests/check_tutorial.sh [--output DIR]
-#   --output DIR  Where to put the built documentation, for static hosting
-#                 (default: a temporary directory).
+# Needs Xcode's DocC (macOS).
+# Usage: bash tests/check_tutorial.sh [--output DIR] [--hosting-base-path PATH]
+#   --output DIR               Where to put the built documentation, for
+#                              static hosting (default: a temporary directory).
+#   --hosting-base-path PATH   The path it's hosted at, such as espswift for
+#                              https://johankool.github.io/espswift/.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CATALOG="$REPO_ROOT/Documentation/ESPSwift.docc"
 WORK_DIR=$(mktemp -d -t espswift-tutorial)
 OUTPUT="$WORK_DIR/docs"
-[ "$1" = "--output" ] && OUTPUT="$2"
+HOSTING=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --output) OUTPUT="$2"; shift ;;
+        --hosting-base-path) HOSTING=(--hosting-base-path "$2"); shift ;;
+        *) echo "Unknown option: $1" >&2; exit 1 ;;
+    esac
+    shift
+done
 
 echo "Building espswift..."
 swift build --package-path "$REPO_ROOT/cli" > "$WORK_DIR/espswift-build.log" 2>&1 \
@@ -39,7 +50,7 @@ check Packages/HelloKit/Tests/BlinkTests/BlinkTests.swift BlinkTests-01.swift
 
 echo "Building the tutorial..."
 xcrun docc convert "$CATALOG" --fallback-display-name ESPSwift --fallback-bundle-identifier com.espswift.docs \
-    --output-path "$OUTPUT" --transform-for-static-hosting --warnings-as-errors || FAILED=true
+    --output-path "$OUTPUT" --transform-for-static-hosting "${HOSTING[@]}" --warnings-as-errors || FAILED=true
 
 if [ "$FAILED" = true ]; then
     echo "The tutorial check failed."
