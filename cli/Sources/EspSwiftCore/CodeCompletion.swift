@@ -84,6 +84,12 @@ public struct CodeCompletion: Sendable {
             } else if argument == "-Xcc" && (value.hasPrefix("-D") || value.hasPrefix("-fmodule-map-file=")) && !forTheMac(value) {
                 flags += ["-Xcc", value]
                 i += 2
+            } else if argument == "-Xcc" && Self.isCxxOption(value) {
+                flags += ["-Xcc", value]  // How the C++ headers are imported, with C++ interoperability
+                i += 2
+            } else if argument.hasPrefix("-cxx-interoperability-mode=") {
+                flags.append(argument)  // C++ interoperability (Package.swift's .interoperabilityMode(.Cxx))
+                i += 1
             } else if argument == "-D" && !value.isEmpty {
                 flags.append("-D" + value)  // Compilation conditions, such as CONFIG_SOC_RMT_SUPPORTED
                 i += 2
@@ -100,6 +106,13 @@ public struct CodeCompletion: Sendable {
             }
         }
         return flags
+    }
+
+    /// The Clang options a target with C++ interoperability imports its C++
+    /// headers with, from its Package.swift: the C++ standard and library,
+    /// and which warnings to leave out.
+    static func isCxxOption(_ option: String) -> Bool {
+        option.hasPrefix("-std=") || ["-nostdinc++", "-fno-exceptions", "-fno-rtti"].contains(option) || option.hasPrefix("-Wno-")
     }
 
     /// One argument per line, quoted so paths with spaces survive; each

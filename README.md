@@ -24,7 +24,7 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **On-Chip Debugging** — breakpoints, backtraces and variables in Swift on the board, with LLDB  
 ✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
-✅ **Examples to Start From** — Blink (whether your board's LED is a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED), a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
+✅ **Examples to Start From** — Blink (whether your board's LED is a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED), a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light, a Matter light for Apple Home, or deep sleep, chosen when you create a project  
 ✅ **Tutorial** — [Your First Firmware](https://johankool.github.io/espswift/tutorials/espswift/your-first-firmware), from setting up to testing your change on the Mac  
 
 ---
@@ -167,9 +167,12 @@ A new project starts from one of the template's examples: the **Example** pop-up
 | I2C display (`i2c-display`) | Shows text on an SSD1306 OLED display (128 × 64, such as Adafruit's): a title, the board, how long it's been running and a bar | An I2C display driver in Swift; drawing and a 5 × 7 font tested on the Mac |
 | Wi-Fi and HTTPS (`wifi-request`) | Connects to your Wi-Fi network and requests a web page over HTTPS; until you set your network in `Credentials.swift`, lists the networks nearby | ESP-IDF's Wi-Fi, events and HTTP client, with its certificate bundle |
 | Bluetooth LE light (`ble-light`) | A phone (with an app such as nRF Connect or LightBlue) connects and writes the LED's colour: three bytes, such as `200000` for red | A GATT server with NimBLE, and C callbacks in Swift |
+| Matter light (`matter-light`) | A colour light for Matter: Apple's Home app (with a home hub) turns it on and off and sets its brightness and colour | esp-matter, Espressif's Matter SDK, through Swift's C++ interoperability; the colour maths tested on the Mac |
 | Deep sleep (`deep-sleep`) | Shows a colour, sleeps for 10 seconds, wakes up with the next one | Deep sleep, a timer wake-up, and a variable in RTC memory (`@section(".rtc.data")`) |
 
-The ESP32-H2 and ESP32-P4 have no Wi-Fi, and the ESP32-P4 has no Bluetooth; there, those examples say so. A board in deep sleep isn't connected over USB: to flash it, hold BOOT while pressing RESET.
+The ESP32-H2 and ESP32-P4 have no Wi-Fi, and the ESP32-P4 has no Bluetooth; there, those examples say so. The Matter light needs a board with 8 MB of flash, such as the ESP32-C6-DevKitC-1.
+
+To add the Matter light to Apple Home, which needs a home hub (an Apple TV or a HomePod): in the Home app, tap **+ ▸ Add Accessory** and scan [its QR code](https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT:Y.K9042C00KA0648G00), or tap **More options** and enter its manual pairing code, **3497-011-2332**. The firmware prints both when it starts; they're esp-matter's test codes. The Home app warns that the light isn't certified; choose **Add Anyway**. A board in deep sleep isn't connected over USB: to flash it, hold BOOT while pressing RESET.
 
 ---
 
@@ -260,7 +263,7 @@ espswift/
         │   ├── Package.swift
         │   ├── Sources/Blink/
         │   └── Tests/BlinkTests/
-        └── ButtonInput/, I2CSensor/, I2CDisplay/, WiFiRequest/, BLELight/, DeepSleep/   # The other examples' files
+        └── ButtonInput/, I2CSensor/, I2CDisplay/, WiFiRequest/, BLELight/, MatterLight/, DeepSleep/   # The other examples' files
 ```
 
 ---

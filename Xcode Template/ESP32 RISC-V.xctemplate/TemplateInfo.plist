@@ -89,19 +89,6 @@
 				<string>com.espswift.target.indexing</string>
 			</array>
 		</dict>
-		<key>Firmware/Package.swift</key>
-		<dict>
-			<key>Group</key>
-			<array>
-				<string>Firmware</string>
-			</array>
-			<key>IsTopLevel</key>
-			<true/>
-			<key>Path</key>
-			<string>Firmware_Package.swift</string>
-			<key>TargetIndices</key>
-			<array/>
-		</dict>
 		<key>Firmware/ESPIDF/ESPIDF.c</key>
 		<dict>
 			<key>Group</key>
@@ -180,7 +167,6 @@
 		<string>Firmware/Board.swift</string>
 		<string>Firmware/LED.swift</string>
 		<string>Firmware/FreeRTOS.swift</string>
-		<string>Firmware/Package.swift</string>
 		<string>Firmware/ESPIDF/ESPIDF.c</string>
 		<string>../.gitignore</string>
 		<string>../___PROJECTNAME___.xcodeproj/xcshareddata/xcschemes/___PROJECTNAME___.xcscheme</string>
@@ -617,10 +603,24 @@
 							<key>TargetIndices</key>
 							<array/>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
 						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
@@ -672,10 +672,24 @@
 							<key>TargetIndices</key>
 							<array/>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
 						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
@@ -727,10 +741,24 @@
 							<key>TargetIndices</key>
 							<array/>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
 						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
@@ -797,11 +825,25 @@
 								<string>com.espswift.target.indexing</string>
 							</array>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
 						<string>Firmware/Firmware.swift</string>
 						<string>Firmware/SSD1306.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
@@ -898,6 +940,19 @@
 								<string>com.espswift.target.indexing</string>
 							</array>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
@@ -905,6 +960,7 @@
 						<string>Firmware/WiFi.swift</string>
 						<string>Firmware/HTTPS.swift</string>
 						<string>Firmware/Credentials.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
@@ -971,13 +1027,180 @@
 								<string>com.espswift.target.indexing</string>
 							</array>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
 						<string>Firmware/Firmware.swift</string>
 						<string>Firmware/Bluetooth.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
+					</array>
+				</dict>
+				<key>matter-light</key>
+				<dict>
+					<key>Definitions</key>
+					<dict>
+						<key>Firmware/Firmware.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Firmware_Firmware.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/Matter.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Firmware_Matter.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/MatterNode.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Firmware_MatterNode.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/MatterClusters.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Firmware_MatterClusters.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/MatterAttribute.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Firmware_MatterAttribute.swift</string>
+							<key>TargetIdentifiers</key>
+							<array>
+								<string>com.espswift.target.indexing</string>
+							</array>
+						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Firmware/ESPIDF/include/ESPIDF.h</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+								<string>ESPIDF</string>
+								<string>include</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/ESPIDF_ESPIDF.h</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>Packages/___PROJECTNAME___Kit</key>
+						<dict>
+							<key>Group</key>
+							<string>Packages</string>
+							<key>IsPackageReference</key>
+							<true/>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>MatterLight/Kit</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>main/MatterShims.cpp</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>main</string>
+							</array>
+							<key>Path</key>
+							<string>MatterLight/main_MatterShims.cpp</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+						<key>partitions.csv</key>
+						<dict>
+							<key>Path</key>
+							<string>MatterLight/partitions.csv</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
+					</dict>
+					<key>Nodes</key>
+					<array>
+						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/Matter.swift</string>
+						<string>Firmware/MatterNode.swift</string>
+						<string>Firmware/MatterClusters.swift</string>
+						<string>Firmware/MatterAttribute.swift</string>
+						<string>Firmware/Package.swift</string>
+						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
+						<string>Packages/___PROJECTNAME___Kit</string>
+						<string>main/MatterShims.cpp</string>
+						<string>partitions.csv</string>
 					</array>
 				</dict>
 				<key>deep-sleep</key>
@@ -1027,10 +1250,24 @@
 							<key>TargetIndices</key>
 							<array/>
 						</dict>
+						<key>Firmware/Package.swift</key>
+						<dict>
+							<key>Group</key>
+							<array>
+								<string>Firmware</string>
+							</array>
+							<key>IsTopLevel</key>
+							<true/>
+							<key>Path</key>
+							<string>Firmware_Package.swift</string>
+							<key>TargetIndices</key>
+							<array/>
+						</dict>
 					</dict>
 					<key>Nodes</key>
 					<array>
 						<string>Firmware/Firmware.swift</string>
+						<string>Firmware/Package.swift</string>
 						<string>Firmware/ESPIDF/include/ESPIDF.h</string>
 						<string>Packages/___PROJECTNAME___Kit</string>
 					</array>
@@ -1044,6 +1281,7 @@
 				<string>I2C display</string>
 				<string>Wi-Fi and HTTPS</string>
 				<string>Bluetooth LE light</string>
+				<string>Matter light (Apple Home)</string>
 				<string>Deep sleep</string>
 			</array>
 			<key>Values</key>
@@ -1054,6 +1292,7 @@
 				<string>i2c-display</string>
 				<string>wifi-request</string>
 				<string>ble-light</string>
+				<string>matter-light</string>
 				<string>deep-sleep</string>
 			</array>
 			<key>Variables</key>
@@ -1068,6 +1307,8 @@
 					<string>it blinks the board's LED: red, green, blue and off, a colour a second.</string>
 					<key>exampleSettings</key>
 					<string># The Blink example needs no other settings.</string>
+					<key>exampleComponents</key>
+					<string></string>
 				</dict>
 				<key>button-input</key>
 				<dict>
@@ -1079,6 +1320,8 @@
 					<string>each press of the board's BOOT button shows the next colour on the LED, and holding it turns the LED off.</string>
 					<key>exampleSettings</key>
 					<string># The Button input example needs no other settings.</string>
+					<key>exampleComponents</key>
+					<string></string>
 				</dict>
 				<key>i2c-sensor</key>
 				<dict>
@@ -1090,6 +1333,8 @@
 					<string>it reads a Sensirion SHT4x temperature and humidity sensor over I2C, and shows the temperature on the LED.</string>
 					<key>exampleSettings</key>
 					<string># The I2C sensor example needs no other settings.</string>
+					<key>exampleComponents</key>
+					<string></string>
 				</dict>
 				<key>i2c-display</key>
 				<dict>
@@ -1101,6 +1346,8 @@
 					<string>it shows text on an SSD1306 OLED display over I2C: a title, the board's name, how long it has been running, and a bar that fills up every minute.</string>
 					<key>exampleSettings</key>
 					<string># The I2C display example needs no other settings.</string>
+					<key>exampleComponents</key>
+					<string></string>
 				</dict>
 				<key>wifi-request</key>
 				<dict>
@@ -1114,6 +1361,8 @@
 					<string># Wi-Fi and HTTPS make the firmware larger than the default 1 MB app
 # partition allows: use a partition table with a 1.5 MB one.
 CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y</string>
+					<key>exampleComponents</key>
+					<string></string>
 				</dict>
 				<key>ble-light</key>
 				<dict>
@@ -1127,6 +1376,55 @@ CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y</string>
 					<string># Bluetooth LE, with the NimBLE stack.
 CONFIG_BT_ENABLED=y
 CONFIG_BT_NIMBLE_ENABLED=y</string>
+					<key>exampleComponents</key>
+					<string></string>
+				</dict>
+				<key>matter-light</key>
+				<dict>
+					<key>exampleTitle</key>
+					<string>Matter light</string>
+					<key>exampleModule</key>
+					<string>LightColor</string>
+					<key>exampleSummary</key>
+					<string>a colour light for Matter, the smart home standard: Apple's Home app (and other Matter apps) can turn the LED on and off and set its brightness and colour. It needs a board with 8 MB of flash, such as the ESP32-C6-DevKitC-1.</string>
+					<key>exampleSettings</key>
+					<string># Matter needs two app partitions of 3.75 MB (for updates over the air), on
+# 8 MB of flash: partitions.csv.
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_OFFSET=0xC000
+
+# Bluetooth LE (NimBLE) is used only for commissioning.
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+CONFIG_BT_NIMBLE_EXT_ADV=n
+CONFIG_BT_NIMBLE_HCI_EVT_BUF_SIZE=70
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=y
+
+# Wi-Fi station only
+CONFIG_ENABLE_WIFI_STATION=y
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Networking
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+CONFIG_USE_MINIMAL_MDNS=y
+CONFIG_ENABLE_EXTENDED_DISCOVERY=y
+
+# Matter
+CONFIG_ENABLE_OTA_REQUESTOR=y
+CONFIG_CHIP_ENABLE_BDX_LOG_TRANSFER=y
+CONFIG_ESP_SECURE_CERT_DS_PERIPHERAL=n
+
+
+# FreeRTOS should use legacy API
+CONFIG_FREERTOS_ENABLE_BACKWARD_COMPATIBILITY=y</string>
+					<key>exampleComponents</key>
+					<string>  espressif/esp_matter: "^1.6.0"</string>
 				</dict>
 				<key>deep-sleep</key>
 				<dict>
@@ -1138,6 +1436,8 @@ CONFIG_BT_NIMBLE_ENABLED=y</string>
 					<string>it shows a colour on the LED for a second, sleeps in deep sleep for 10 seconds, and wakes up with the next colour.</string>
 					<key>exampleSettings</key>
 					<string># The Deep sleep example needs no other settings.</string>
+					<key>exampleComponents</key>
+					<string></string>
 				</dict>
 			</dict>
 		</dict>

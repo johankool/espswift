@@ -65,6 +65,13 @@ import Testing
             "-Xcc", "-DESP_PLATFORM", "-DCONFIG_SOC_RMT_SUPPORTED", "-DSWIFT_PACKAGE",
             "-load-plugin-executable", "/s/MMIOMacros-tool#MMIOMacros",
         ])
+        // C++ interoperability, and how its C++ headers are imported; not the
+        // C flags for the chip.
+        #expect(CodeCompletion.flags(fromSwiftPMArguments: [
+            "-cxx-interoperability-mode=default", "-Xcc", "-nostdinc++", "-Xcc", "-std=gnu++17", "-Xcc", "-fno-rtti",
+            "-Xcc", "-Wno-extern-c-compat", "-Xcc", "-fno-pic", "-Xcc", "-march=rv32imac",
+        ]) == ["-cxx-interoperability-mode=default", "-Xcc", "-nostdinc++", "-Xcc", "-std=gnu++17", "-Xcc", "-fno-rtti",
+               "-Xcc", "-Wno-extern-c-compat"])
         // Each include path once, quoted.
         #expect(CodeCompletion.responseFileText(["-I/a b", "-I/a b", "-Xcc", "-DX=\"1\""])
                 == "\"-I/a b\"\n\"-Xcc\"\n\"-DX=\\\"1\\\"\"\n")
