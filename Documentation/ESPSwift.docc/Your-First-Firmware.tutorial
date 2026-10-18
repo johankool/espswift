@@ -43,10 +43,14 @@
         @Steps {
             @Step {
                 In Xcode, choose File ▸ New ▸ Project. Under Other, choose **ESP32 RISC-V**, and click Next.
+
+                @Image(source: "new-project-template.png", alt: "Xcode's dialog for a new project, with the ESP32 RISC-V template selected under Other.")
             }
 
             @Step {
-                Name the project `Hello`. In the **Board** pop-up, choose your board, such as ESP32-C6-DevKitC-1, or Other with its chip for a board that isn't listed. In the **Example** pop-up, keep **Blink**. Click Next, and choose where to save it.
+                Name the project `Hello`. In the **Board** pop-up, choose your board, such as ESP32-C6-DevKitC-1, or Other with its chip for a board that isn't listed. In the **Example** pop-up, keep **Blink**. The firmware isn't signed, so Team can stay None. Click Next, and choose where to save it.
+
+                @Image(source: "new-project-options.png", alt: "The new project's options: Product Name, Team, Board set to ESP32-C6-DevKitC-1, and Example set to Blink.")
             }
 
             @Step {
