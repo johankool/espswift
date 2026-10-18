@@ -2,9 +2,9 @@
 
 Contributions to any of these are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Before the first release
+## Next
 
-- [ ] **Releases.** A release workflow that builds espswift for macOS and Linux, so the formula installs a release instead of building `main` (`--HEAD`, which needs Xcode). Then `install.sh`, which builds espswift from the repository, can go.
+- [ ] **Release binaries.** A release workflow that builds espswift for macOS and Linux, so Homebrew installs a built espswift (a bottle) instead of building it from the release's source, which needs Xcode. Then `install.sh`, which builds espswift from the repository, can go.
 
 ## Near-term
 
@@ -62,6 +62,6 @@ Not planned yet; worth considering.
 - [x] `espswift new` creates projects without Xcode
 - [x] Examples to start a project from, in the template's Example pop-up and `espswift new --example`, built and tested by CI: Blink, Button input (GPIO input with debouncing), I2C sensor (an SHT4x), I2C display (an SSD1306), Wi-Fi and HTTPS, Bluetooth LE light (a GATT server with NimBLE) and Deep sleep (a timer wake-up and RTC memory); `espswift new` asks for the board and the example
 - [x] ESP-IDF is installed with EIM, Espressif's ESP-IDF Installation Manager, and shared with Espressif's other tools
-- [x] A Homebrew tap (`brew install --HEAD espswift`), tested locally
+- [x] A Homebrew tap, [johankool/homebrew-espswift](https://github.com/johankool/homebrew-espswift), and the first release, 0.2.0 (`brew install espswift`)
 - [x] A DocC tutorial, "Your First Firmware" (`Documentation/ESPSwift.docc`): set up, create a project, run it, change it and test it on the Mac; CI builds it and checks it starts from the template's files
 - [x] Linux: espswift sets up, creates, builds and tests projects on Linux; the template test runs there too (a CI job)

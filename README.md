@@ -38,11 +38,11 @@ With [Homebrew](https://brew.sh):
 brew tap johankool/espswift
 brew trust --tap johankool/espswift
 brew trust --formula espressif/eim/eim
-brew install --HEAD espswift
+brew install espswift
 espswift setup
 ```
 
-Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose EIM installs ESP-IDF. Until ESPSwift has releases, Homebrew builds `espswift` from the main branch (`--HEAD`); update it with `brew upgrade --fetch-HEAD espswift`.
+Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose EIM installs ESP-IDF. Homebrew builds `espswift` from the release's source, which needs Xcode; `brew install --HEAD espswift` builds the main branch instead.
 
 Or from a copy of this repository:
 
@@ -299,7 +299,7 @@ Nothing is installed to system directories. Everything is scoped to your user ho
 
 ### Updating ESPSwift
 
-With Homebrew, run `brew upgrade --fetch-HEAD espswift`, then `espswift setup`, which updates the Xcode template too. With a copy of this repository, update it and run `install.sh` again. Each project's `build.sh` only runs the `espswift` that `espswift setup` links (`~/.espswift/bin/espswift build`), so updating ESPSwift also updates how existing projects build.
+With Homebrew, run `brew upgrade espswift` (or, with `--HEAD`, `brew upgrade --fetch-HEAD espswift`), then `espswift setup`, which updates the Xcode template too. With a copy of this repository, update it and run `install.sh` again. Each project's `build.sh` only runs the `espswift` that `espswift setup` links (`~/.espswift/bin/espswift build`), so updating ESPSwift also updates how existing projects build.
 
 When an update changes what projects need, the build shows a warning in Xcode's Issue navigator with the command that updates the project. You can also run it yourself, in the project's folder:
 
