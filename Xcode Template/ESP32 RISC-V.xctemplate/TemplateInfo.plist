@@ -1472,7 +1472,16 @@ These are esp-matter's test codes, which every device has until it gets codes of
 					<key>exampleComponents</key>
 					<string></string>
 					<key>exampleNotes</key>
-					<string></string>
+					<string>
+## Flashing a board that sleeps
+
+In deep sleep, the chip turns its USB port off: the board is connected for a few seconds after each wake-up, then gone for 10 seconds. That has two consequences:
+
+- **The console:** it says the port went away each time the chip goes to sleep, and shows the output again after it wakes up. (The firmware waits for the Mac to reconnect before it prints anything.)
+- **Flashing:** `Cmd+R` only finds the board while it's awake. If it says no board was found, put the board in its download mode, where it stays awake: hold its **BOOT** button, press and release **RESET**, then release **BOOT**. Then press `Cmd+R`. When flashing is done, the board starts the firmware; if it doesn't, press **RESET**.
+
+The same works for any firmware that keeps the board from being flashed, such as one that crashes as soon as it starts.
+</string>
 				</dict>
 			</dict>
 		</dict>

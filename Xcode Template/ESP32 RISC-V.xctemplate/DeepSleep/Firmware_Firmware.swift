@@ -10,7 +10,8 @@
 // the chip in deep sleep for 10 seconds, and starts again when it wakes up,
 // with the next colour. In deep sleep the chip uses a few microamps instead
 // of tens of milliamps, and only its RTC memory keeps its contents, so a
-// count of the wake-ups survives there.
+// count of the wake-ups survives there. A sleeping board isn't connected
+// over USB: see "Flashing a board that sleeps" in README.md.
 
 import Blink
 import ESPIDF

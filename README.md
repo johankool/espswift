@@ -172,7 +172,7 @@ A new project starts from one of the template's examples: the **Example** pop-up
 
 The ESP32-H2 and ESP32-P4 have no Wi-Fi, and the ESP32-P4 has no Bluetooth; there, those examples say so. The Matter light needs a board with 8 MB of flash, such as the ESP32-C6-DevKitC-1.
 
-The Matter light's project README explains how to add it to Apple Home, which needs a home hub (an Apple TV or a HomePod); it prints its pairing codes when it starts. A board in deep sleep isn't connected over USB: to flash it, hold BOOT while pressing RESET.
+The Matter light's project README explains how to add it to Apple Home, which needs a home hub (an Apple TV or a HomePod); it prints its pairing codes when it starts. A board in deep sleep isn't connected over USB; the Deep sleep example's project README explains how to flash it (hold BOOT while pressing RESET).
 
 ---
 
