@@ -24,8 +24,8 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **On-Chip Debugging** — breakpoints, backtraces and variables in Swift on the board, with LLDB  
 ✅ **Crash Backtraces** — a crash's backtrace, with Swift function names, files and lines, in Xcode's console  
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
-✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
-✅ **Examples to Start From** — Blink, a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
+✅ **Examples to Start From** — Blink (whether your board's LED is a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED), a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
+✅ **Tutorial** — [Your First Firmware](#tutorial), from setting up to testing your change on the Mac  
 
 ---
 
@@ -80,14 +80,14 @@ Xcode runs `espswift` for you (`Cmd+B`, `Cmd+R`); in Terminal it works in any fo
 
 | Command | What it does |
 | --- | --- |
-| `espswift new <name> [--board] [--chip]` | Creates a project from the template |
+| `espswift new <name> [--board] [--example]` | Creates a project from the template; without `--board` and `--example`, asks for them |
 | `espswift build [clean]` | Builds the project (`Cmd+B`) |
 | `espswift run` | Builds, flashes and shows the serial output (`Cmd+R`) |
 | `espswift flash` / `espswift monitor` | Flashes the latest build / shows the serial output, with crashes' backtraces (`--idf` for ESP-IDF's monitor, which takes input) |
 | `espswift debug` | Debugs the firmware on the board with LLDB |
 | `espswift add <library> [--header]` | Adds an ESP-IDF library from the [Component Registry](https://components.espressif.com) |
 | `espswift settings` | ESP-IDF's settings menu (menuconfig) |
-| `espswift update` | Updates a project created from an older template, or sets up one from elsewhere, such as an example |
+| `espswift update` | Updates a project created from an older template |
 | `espswift ports` | Lists connected boards |
 | `espswift doctor` | Checks ESP-IDF, Swift and the other tools |
 | `espswift setup` / `espswift uninstall` | Installs, updates or removes ESPSwift |
@@ -235,9 +235,11 @@ espswift/
 │   ├── Sources/espswift/            # The commands (swift-argument-parser)
 │   ├── Sources/EspSwiftCore/        # What they do: setup, build, flash, monitor, debug, ...
 │   └── Tests/EspSwiftCoreTests/     # Unit tests (swift test)
+├── Documentation/ESPSwift.docc/      # The DocC tutorial, Your First Firmware
 ├── tests/
 │   ├── test_template.sh             # Builds the template for every chip, and its examples (also run in CI, on macOS and Linux)
-│   └── xcode_project.py             # Writes a test project's Xcode project, as Xcode would
+│   ├── xcode_project.py             # Writes a test project's Xcode project, as Xcode would
+│   └── check_tutorial.sh            # Builds the tutorial and checks it against the template
 └── Xcode Template/
     └── ESP32 RISC-V.xctemplate/
         ├── TemplateInfo.plist       # Xcode template configuration
@@ -253,24 +255,26 @@ espswift/
         │   └── swift_flags.c        # Empty; provides ESP-IDF's C flags to the Swift package build
         ├── Firmware/                # Next to the .xcodeproj in new projects
         │   ├── Firmware.swift       # Firmware entry point (app_main)
-        │   ├── Board.swift          # The board's name and LED, from the Board pop-up
+        │   ├── Board.swift          # The board's name, LED and button, from the Board pop-up
         │   ├── LED.swift            # Drives the board's LED, whatever kind it is
         │   ├── FreeRTOS.swift       # Swift versions of FreeRTOS's macros, such as pdMS_TO_TICKS
         │   ├── Package.swift        # The firmware package, built by ESP-IDF with SwiftPM
         │   └── ESPIDF/include/ESPIDF.h   # ESP-IDF's C APIs for Swift (import ESPIDF)
-        └── Kit/                     # Packages/<Project>Kit: plain Swift, tested on the Mac (Cmd+U)
-            ├── Package.swift
-            ├── Sources/Blink/
-            └── Tests/BlinkTests/
+        ├── Kit/                     # Packages/<Project>Kit: plain Swift, tested on the Mac (Cmd+U)
+        │   ├── Package.swift
+        │   ├── Sources/Blink/
+        │   └── Tests/BlinkTests/
+        └── ButtonInput/, I2CSensor/, I2CDisplay/, WiFiRequest/, BLELight/, DeepSleep/   # The other examples' files
 ```
 
 ---
 
 ## System Requirements
 
-- macOS: Xcode 26 or later (tested with Xcode 26.6 and 27), and a macOS version that runs it. Code completion needs Xcode 27.
+- macOS: Xcode 26 or later, and a macOS version that runs it. The template is tested with Xcode 27.1 (earlier versions of it with Xcode 26.6 too); code completion needs Xcode 27.
 - Linux: Ubuntu 24.04 or similar, with ESP-IDF's prerequisites and Swift 6.4 (see [Install](#install))
-- Python, CMake and EIM: on macOS, `install.sh` and `espswift setup` install any that are missing with [Homebrew](https://brew.sh) (Python 3.14, which ESP-IDF 6.1 supports; Homebrew's default Python may be newer); on Linux, Python 3.10 or newer
+- Python, CMake and Git: on macOS, `espswift setup` installs any that are missing with [Homebrew](https://brew.sh) (Python 3.14, which ESP-IDF 6.1 supports; Homebrew's default Python may be newer); on Linux, Python 3.10 or newer
+- EIM, which installs ESP-IDF: on macOS, Homebrew installs it with `espswift`, and `install.sh` installs it if it's missing; on Linux, install it yourself (see [Install](#install))
 - About 10 GB of disk space: the Swift toolchain takes about 5 GB, ESP-IDF and its tools about 4 GB, and each project's build output about 250 MB
 - An internet connection for installing, and for each project's first build (which downloads its ESP-IDF components)
 - A board with a RISC-V based ESP32 chip (ESP32-C2, C3, C5, C6, C61, H2 or P4) and a USB connection
@@ -283,7 +287,7 @@ espswift/
 
 | Path | Contents |
 |------|----------|
-| `~/.espswift/bin/espswift` | `espswift`, which projects build with (a copy in `~/.espswift/libexec`) |
+| `~/.espswift/bin/espswift` | `espswift`, which projects build with: a link to Homebrew's, or (with `install.sh`) to a copy in `~/.espswift/libexec` |
 | `~/.espressif/v6.1/` | ESP-IDF 6.1, installed with EIM (~700 MB) |
 | `~/.espressif/tools/` | ESP-IDF's compilers, tools and Python environment, and EIM's list of installations, `eim_idf.json` (~3 GB) |
 | `~/.espswift/python/` | Link to the Python that EIM makes ESP-IDF's Python environment with (3.14 on macOS) |
@@ -295,7 +299,7 @@ Nothing is installed to system directories. Everything is scoped to your user ho
 
 ### Updating ESPSwift
 
-Run `install.sh` again from an up-to-date copy of this repository. Each project's `build.sh` only runs the `espswift` that `install.sh` installs (`~/.espswift/bin/espswift build`), so updating ESPSwift also updates how existing projects build.
+With Homebrew, run `brew upgrade --fetch-HEAD espswift`, then `espswift setup`, which updates the Xcode template too. With a copy of this repository, update it and run `install.sh` again. Each project's `build.sh` only runs the `espswift` that `espswift setup` links (`~/.espswift/bin/espswift build`), so updating ESPSwift also updates how existing projects build.
 
 When an update changes what projects need, the build shows a warning in Xcode's Issue navigator with the command that updates the project. You can also run it yourself, in the project's folder:
 
@@ -307,7 +311,7 @@ It replaces the project's `build.sh` with the template's and points code complet
 
 ### Switching ESP-IDF versions
 
-`espswift setup` installs a fixed ESP-IDF release (`Pins.espIDF` in `cli/Sources/EspSwiftCore/Versions.swift`) with EIM, next to any other versions EIM installed (`eim list`), and uses that one. When a new version of ESPSwift pins another release, run `install.sh` again to install it. To use an ESP-IDF that EIM didn't install, set `IDF_PATH` to its folder.
+`espswift setup` installs a fixed ESP-IDF release (`Pins.espIDF` in `cli/Sources/EspSwiftCore/Versions.swift`) with EIM, next to any other versions EIM installed (`eim list`), and uses that one. When a new version of ESPSwift pins another release, [update ESPSwift](#updating-espswift) to install it. To use an ESP-IDF that EIM didn't install, set `IDF_PATH` to its folder.
 
 If ESP-IDF's Python environment stops working, for instance after the Python it was made with was removed, `espswift doctor` says so, and `eim fix v6.1` repairs it.
 

@@ -14,7 +14,7 @@ Contributions to any of these are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md
 
 - [ ] **Test the other chips and boards on hardware.** Only the ESP32-C6-DevKitC-1 has run firmware (each example, with a network for Wi-Fi, a phone for Bluetooth and an SSD1306 for the I2C display; only the I2C sensor example hasn't read a real SHT4x yet). The ESP32-C2, C3, C5, C61, H2 and P4 are tested by building only, as are the other boards' LEDs: the WS2812 over SPI on the C2 and C61, the ESP8684-DevKitM-1's separate red, green and blue LEDs (assumed lit by a high level), the XIAO ESP32C6's one-colour LED (assumed lit by a low level) and the NanoC6's LED power pin.
 - [ ] **Build the Swift package with SwiftPM's default build system.** The firmware build uses `swift build --build-system native` (see `cli/Sources/EspSwiftCore/PackageBuild.swift`): Swift Build, SwiftPM's default since Swift 6.4, links C targets with Apple's linker, which can't link code for the ESP32. SwiftPM warns that the native build system is deprecated and will be removed, so this needs a fix in Swift Build, or a way around it, before then. Worth reporting to the SwiftPM project.
-- [ ] **Cache downloads in CI.** Every CI run downloads and installs ESP-IDF, its tools and Swift (about 5 of its 11 minutes). Caching them between runs would make CI faster.
+- [ ] **Cache downloads in CI.** Every CI run downloads and installs ESP-IDF, its tools and Swift (about 5 minutes of each run). Caching them between runs would make CI faster.
 - [ ] `espswift-idf` Swift Package: idiomatic Swift wrappers for ESP-IDF APIs (GPIO, LED, timers, ...), so projects don't call C functions such as `led_strip_new_rmt_device` directly, as the template's `LED.swift` does
 
 ## Ideas
@@ -41,7 +41,6 @@ Not planned yet; worth considering.
 - [ ] **More checks in CI:** ShellCheck for `install.sh`, the template's `build.sh` and the test; `espswift setup`'s swiftly route (CI uses swift.org's installer on macOS and Swift's Docker image on Linux); the Homebrew formula; and `espswift uninstall`.
 - [ ] **A VS Code and Cursor guide:** code completion there would need SourceKit-LSP pointed at the firmware build of the Swift package, and the CodeLLDB extension could debug with the same setup as `espswift debug`.
 
-
 ## Done
 
 - [x] ESP32-C3 and other RISC-V chips (ESP32-C2, C5, C61, H2, P4)
@@ -51,7 +50,8 @@ Not planned yet; worth considering.
 - [x] Code completion and jump to definition in Xcode (Xcode 27)
 - [x] Template build test, run in CI for every chip
 - [x] `Cmd+B` only builds; `Cmd+R` flashes the board and shows its serial output
-- [x] `Cmd+R` works in new projects without reopening them first ([#3](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template/issues/3))
+- [x] `Cmd+R` works in new projects without reopening them first ([#3](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template/issues/3)), and flashes that project's build, also after building another project
+- [x] Xcode's Project navigator shows the files you work with, and leaves out those you'd hardly ever change (`build.sh`, the `CMakeLists.txt` files, `.gitignore`, the scheme)
 - [x] On-chip debugging with LLDB (`espswift debug`): breakpoints in Swift, backtraces and variables, through the built-in USB-JTAG
 - [x] Crash backtraces in Xcode's console and `espswift monitor`: a crash's dump is decoded into Swift function names, files and lines, as ESP-IDF's monitor does
 - [x] Each project's `build.sh` runs the installed `espswift build`, so updating ESPSwift updates the build of every project
