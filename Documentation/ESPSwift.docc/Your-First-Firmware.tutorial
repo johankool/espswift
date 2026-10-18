@@ -12,7 +12,7 @@
 
         @Steps {
             @Step {
-                Install `espswift` with Homebrew, from ESPSwift's tap. Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose ESP-IDF Installation Manager (EIM) installs ESP-IDF.
+                Install `espswift` with Homebrew, from ESPSwift's tap, and Espressif's ESP-IDF Installation Manager (EIM), which installs ESP-IDF. Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's.
 
                 @Code(name: "Terminal", file: "install-01.sh")
             }

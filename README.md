@@ -38,11 +38,11 @@ With [Homebrew](https://brew.sh):
 brew tap johankool/espswift
 brew trust --tap johankool/espswift
 brew trust --formula espressif/eim/eim
-brew install espswift
+brew install espswift espressif/eim/eim
 espswift setup
 ```
 
-Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose EIM installs ESP-IDF. Homebrew builds `espswift` from the release's source, which needs Xcode; `brew install --HEAD espswift` builds the main branch instead.
+Homebrew asks you to trust taps other than its own: ESPSwift's, and Espressif's, whose EIM installs ESP-IDF. On macOS with Apple Silicon, Homebrew installs a built `espswift` (a bottle); elsewhere it builds it from the release's source, which needs Xcode. `brew install --HEAD espswift` builds the main branch instead.
 
 Or from a copy of this repository:
 
@@ -270,7 +270,7 @@ espswift/
 - macOS: Xcode 26 or later, and a macOS version that runs it. The template is tested with Xcode 27.1 (earlier versions of it with Xcode 26.6 too); code completion needs Xcode 27.
 - Linux: Ubuntu 24.04 or similar, with ESP-IDF's prerequisites and Swift 6.4 (see [Install](#install))
 - Python, CMake and Git: on macOS, `espswift setup` installs any that are missing with [Homebrew](https://brew.sh) (Python 3.14, which ESP-IDF 6.1 supports; Homebrew's default Python may be newer); on Linux, Python 3.10 or newer
-- EIM, which installs ESP-IDF: on macOS, Homebrew installs it with `espswift`, and `install.sh` installs it if it's missing; on Linux, install it yourself (see [Install](#install))
+- EIM, which installs ESP-IDF: on macOS, install it with Homebrew next to `espswift` (see [Install](#install)); `install.sh` installs it if it's missing. On Linux, install it yourself
 - About 10 GB of disk space: the Swift toolchain takes about 5 GB, ESP-IDF and its tools about 4 GB, and each project's build output about 250 MB
 - An internet connection for installing, and for each project's first build (which downloads its ESP-IDF components)
 - A board with a RISC-V based ESP32 chip (ESP32-C2, C3, C5, C6, C61, H2 or P4) and a USB connection
