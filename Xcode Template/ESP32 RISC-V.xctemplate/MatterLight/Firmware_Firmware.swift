@@ -19,13 +19,8 @@
 // uses to join your network.
 //
 // To add the light to Apple Home, which needs a home hub (an Apple TV or a
-// HomePod): in the Home app, tap + ▸ Add Accessory, and scan the QR code,
-// or tap More options and enter the manual pairing code. The firmware
-// prints both when it starts, and a link that shows the QR code. (They're
-// esp-matter's test codes, which every device has until it gets codes of
-// its own: MT:Y.K9042C00KA0648G00 and 3497-011-2332.) The Home app warns
-// that the light isn't certified: choose Add Anyway. It then gives the
-// light your Wi-Fi network, over Bluetooth LE.
+// HomePod), see "Adding the light to Apple Home" in README.md: the firmware
+// prints the codes the Home app asks for when it starts.
 
 import ESPIDF
 import LightColor

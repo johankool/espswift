@@ -1309,6 +1309,8 @@
 					<string># The Blink example needs no other settings.</string>
 					<key>exampleComponents</key>
 					<string></string>
+					<key>exampleNotes</key>
+					<string></string>
 				</dict>
 				<key>button-input</key>
 				<dict>
@@ -1321,6 +1323,8 @@
 					<key>exampleSettings</key>
 					<string># The Button input example needs no other settings.</string>
 					<key>exampleComponents</key>
+					<string></string>
+					<key>exampleNotes</key>
 					<string></string>
 				</dict>
 				<key>i2c-sensor</key>
@@ -1335,6 +1339,8 @@
 					<string># The I2C sensor example needs no other settings.</string>
 					<key>exampleComponents</key>
 					<string></string>
+					<key>exampleNotes</key>
+					<string></string>
 				</dict>
 				<key>i2c-display</key>
 				<dict>
@@ -1347,6 +1353,8 @@
 					<key>exampleSettings</key>
 					<string># The I2C display example needs no other settings.</string>
 					<key>exampleComponents</key>
+					<string></string>
+					<key>exampleNotes</key>
 					<string></string>
 				</dict>
 				<key>wifi-request</key>
@@ -1363,6 +1371,8 @@
 CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y</string>
 					<key>exampleComponents</key>
 					<string></string>
+					<key>exampleNotes</key>
+					<string></string>
 				</dict>
 				<key>ble-light</key>
 				<dict>
@@ -1377,6 +1387,8 @@ CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y</string>
 CONFIG_BT_ENABLED=y
 CONFIG_BT_NIMBLE_ENABLED=y</string>
 					<key>exampleComponents</key>
+					<string></string>
+					<key>exampleNotes</key>
 					<string></string>
 				</dict>
 				<key>matter-light</key>
@@ -1425,6 +1437,27 @@ CONFIG_ESP_SECURE_CERT_DS_PERIPHERAL=n
 CONFIG_FREERTOS_ENABLE_BACKWARD_COMPATIBILITY=y</string>
 					<key>exampleComponents</key>
 					<string>  espressif/esp_matter: "^1.6.0"</string>
+					<key>exampleNotes</key>
+					<string>
+## Adding the light to Apple Home
+
+Apple Home adds Matter accessories through a home hub: an Apple TV or a HomePod. The light joins your Wi-Fi network (2.4 GHz), and Home controls it through the hub.
+
+1. Press `Cmd+R`. The light starts, and the console shows its codes:
+
+   ```
+   Matter colour light. To add it to Apple Home, scan the QR code at
+     https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT:Y.K9042C00KA0648G00
+   or enter the manual pairing code 3497-011-2332.
+   ```
+
+2. On your iPhone, with Bluetooth on and connected to that Wi-Fi network, open the Home app and tap **+ ▸ Add Accessory**. Scan the QR code (the link shows it), or tap **More options…**, choose the light, and enter the manual pairing code, **3497-011-2332**.
+3. The Home app warns that the light isn't certified: choose **Add Anyway**. It gives the light your Wi-Fi network over Bluetooth LE, and adds it.
+
+Then turn the light on and off, and set its brightness and colour, in the Home app: the LED follows, and the console shows each change. The light remembers its home when it restarts or is flashed again.
+
+These are esp-matter's test codes, which every device has until it gets codes of its own (with Matter certification). To add the light to another home, remove it in the Home app first (the light's settings ▸ **Remove Accessory**): it can then be added again for 5 minutes, or after it restarts.
+</string>
 				</dict>
 				<key>deep-sleep</key>
 				<dict>
@@ -1437,6 +1470,8 @@ CONFIG_FREERTOS_ENABLE_BACKWARD_COMPATIBILITY=y</string>
 					<key>exampleSettings</key>
 					<string># The Deep sleep example needs no other settings.</string>
 					<key>exampleComponents</key>
+					<string></string>
+					<key>exampleNotes</key>
 					<string></string>
 				</dict>
 			</dict>

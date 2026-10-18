@@ -78,7 +78,7 @@ which builds it with warnings as errors and fails if the template's files no lon
 
 The template's **Example** pop-up chooses what a new project starts from. Each example is a value of the pop-up, in `TemplateInfo.plist`, with:
 - its files (its *Units*: nodes and definitions, which only that value adds): `Firmware/Firmware.swift`, the Kit package and `ESPIDF.h`, and any other files in `Firmware/`. Blink's are the template's own files; the other examples' are in a folder of their own, such as `ButtonInput/`, named as the template names files (`Firmware_WiFi.swift` for `Firmware/WiFi.swift`);
-- its variables: its title, its Kit module (`exampleModule`, which the Firmware package and the scheme's tests use), a one-sentence summary for the README, its lines for `sdkconfig.defaults`, and its ESP-IDF libraries for `main/idf_component.yml` (`exampleComponents`).
+- its variables: its title, its Kit module (`exampleModule`, which the Firmware package and the scheme's tests use), a one-sentence summary for the README, a section of its own for the README if it needs one (`exampleNotes`, Markdown starting and ending with a line break), its lines for `sdkconfig.defaults`, and its ESP-IDF libraries for `main/idf_component.yml` (`exampleComponents`).
 
 The Matter light also has a `Package.swift` of its own, which turns on C++ interoperability for esp-matter's C++ API, and C++ in `main/`, which ESP-IDF compiles: its `uint32_t` is an `unsigned long`, where Swift's Clang has an `unsigned int`, so functions that take one need a small C++ function that Swift calls instead.
 

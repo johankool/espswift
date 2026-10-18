@@ -1,7 +1,7 @@
 # ___PROJECTNAME___
 
 Embedded Swift firmware for ___VARIABLE_boardName___ (`___VARIABLE_chip___`), built with ESP-IDF. It starts as the **___VARIABLE_exampleTitle___** example: ___VARIABLE_exampleSummary___ The comments at the top of `Firmware/Firmware.swift` explain it, and what to wire.
-
+___VARIABLE_exampleNotes___
 ## Everyday use in Xcode
 
 | Shortcut | What it does |

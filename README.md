@@ -172,7 +172,7 @@ A new project starts from one of the template's examples: the **Example** pop-up
 
 The ESP32-H2 and ESP32-P4 have no Wi-Fi, and the ESP32-P4 has no Bluetooth; there, those examples say so. The Matter light needs a board with 8 MB of flash, such as the ESP32-C6-DevKitC-1.
 
-To add the Matter light to Apple Home, which needs a home hub (an Apple TV or a HomePod): in the Home app, tap **+ ▸ Add Accessory** and scan [its QR code](https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT:Y.K9042C00KA0648G00), or tap **More options** and enter its manual pairing code, **3497-011-2332**. The firmware prints both when it starts; they're esp-matter's test codes. The Home app warns that the light isn't certified; choose **Add Anyway**. A board in deep sleep isn't connected over USB: to flash it, hold BOOT while pressing RESET.
+The Matter light's project README explains how to add it to Apple Home, which needs a home hub (an Apple TV or a HomePod); it prints its pairing codes when it starts. A board in deep sleep isn't connected over USB: to flash it, hold BOOT while pressing RESET.
 
 ---
 
