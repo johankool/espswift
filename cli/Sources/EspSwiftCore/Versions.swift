@@ -1,7 +1,7 @@
 import Foundation
 
 /// espswift's own version.
-public let espswiftVersion = "0.2.0"
+public let espswiftVersion = "0.2.1"
 
 /// The versions ESPSwift is built and tested with: `espswift setup` installs
 /// them, and `espswift doctor` checks for them. (Until `espswift setup`
