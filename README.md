@@ -1,4 +1,4 @@
-# Embedded Swift Xcode Template for ESP32
+# ESPSwift: Embedded Swift for ESP32 (incl. Xcode Template)
 
 Write firmware for RISC-V based ESP32 chips in Swift — build and flash directly from Xcode, just like Arduino IDE, or from Terminal with `espswift`.
 
@@ -9,9 +9,9 @@ Write firmware for RISC-V based ESP32 chips in Swift — build and flash directl
 
 > ⚠️ **Experimental Preview** — This project is in active development. Commands and installation paths may change without notice. Tested on macOS 27 with Apple Silicon, and on Ubuntu 24.04.
 
-ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template) by Gibeom Ko.
+ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com/letstakeabreak/Embedded-Swift-Xcode-Template) by Gibeom Ko. His project was developed as part of the [Swift Mentorship Program](https://www.swift.org/mentorship/). 
 
-> 🤖 **AI-assisted development** — This project was built with significant help from Claude (Anthropic) as a pair programming tool. Architecture decisions, debugging, and hardware validation were done by the author.
+> 🤖 **AI-assisted development** — This project was built with significant help from Claude (Anthropic) as a pair programming tool. Architecture decisions, debugging, and hardware validation were done by the authors.
 
 ## Features
 
@@ -26,12 +26,6 @@ ESPSwift started as a fork of [Embedded Swift Xcode Template](https://github.com
 ✅ **`espswift` Command-Line Tool** — set up, create, build, flash, monitor and debug, on macOS and Linux  
 ✅ **Blink Example** — blinks your board's LED, whether it's a WS2812 RGB LED, separate red, green and blue LEDs or a one-colour LED  
 ✅ **Examples to Start From** — Blink, a button, an I2C sensor or display, Wi-Fi with HTTPS, a Bluetooth LE light or deep sleep, chosen when you create a project  
-
----
-
-## Demo
-
-> 🎬 Demo video coming soon — NeoPixel RGB cycle running on ESP32-C6, built and flashed directly from Xcode.
 
 ---
 
@@ -337,13 +331,12 @@ It never removes Homebrew or the packages installed with it (Python, CMake, EIM)
 
 ## Roadmap
 
-This project is being developed as part of the [Swift Mentorship Program](https://www.swift.org/mentorship/). See [ROADMAP.md](ROADMAP.md) for what's planned next.
+See [ROADMAP.md](ROADMAP.md) for what's planned next.
 
 ---
 
 ## Known Issues & Limitations
 
-- Embedded Swift is experimental; not all Swift standard library features are available
 - Xcode's serial console is read-only (no interactive input); use `espswift monitor --idf` in Terminal
 - The firmware package is built with SwiftPM's deprecated `--build-system native` (see [ROADMAP.md](ROADMAP.md))
 - The very first lines a board prints after flashing can be missing in the serial output; press the board's RESET button to see them

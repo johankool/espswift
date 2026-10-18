@@ -1,24 +1,21 @@
 # Roadmap
 
-This project is being developed as part of the [Swift Mentorship Program](https://www.swift.org/mentorship/). Contributions to any of these are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions to any of these are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Before the first release
 
-- [ ] **Bring `main` up to date.** The work since the Swift packages (espswift, EIM, the Board pop-up, crash backtraces, the LED in Swift) is on the `feature/espswift-cli` branch. CI hasn't run on it yet; in particular EIM's install on fresh runners (Homebrew on macOS, its release on Linux) is only tested locally.
-- [ ] **Rename the repository to `johankool/espswift`** on GitHub, and publish the Homebrew tap, [johankool/homebrew-espswift](https://github.com/johankool/homebrew-espswift), whose formula builds espswift from `main`.
 - [ ] **Releases.** A release workflow that builds espswift for macOS and Linux, so the formula installs a release instead of building `main` (`--HEAD`, which needs Xcode). Then `install.sh`, which builds espswift from the repository, can go.
 
 ## Near-term
 
-- [ ] **Test the other chips and boards on hardware.** Only the ESP32-C6-DevKitC-1 has run firmware (each example, with a network for Wi-Fi, a phone for Bluetooth and an SSD1306 for the I2C display; only the I2C sensor example hasn't read a real SHT4x yet). The ESP32-C2, C3, C5, C61, H2 and P4 are tested by building only, as are the other boards' LEDs: the WS2812 over SPI on the C2 and C61, the ESP8684-DevKitM-1's separate red, green and blue LEDs (assumed lit by a high level), the XIAO ESP32C6's one-colour LED (assumed lit by a low level) and the NanoC6's LED power pin.
-- [ ] **Code completion with Xcode 26.** Projects build without errors in Xcode 26.6, but code completion and jump to definition don't work there; they're verified with Xcode 27 only, and so is CI. A starting point: compare the compiler arguments the editor gets (`xcodebuild -target Indexing -showBuildSettingsForIndex -json`) in Xcode 26.6 and 27. Testing it in CI would also need a test fixture (`tests/fixtures/project.pbxproj`) created by Xcode 26.
-- [ ] **Build the Swift package with SwiftPM's default build system.** The firmware build uses `swift build --build-system native` (see `cli/Sources/EspSwiftCore/PackageBuild.swift`): Swift Build, SwiftPM's default since Swift 6.4, links C targets with Apple's linker, which can't link code for the ESP32. SwiftPM warns that the native build system is deprecated and will be removed, so this needs a fix in Swift Build, or a way around it, before then. Worth reporting to the SwiftPM project.
-- [ ] **Cache downloads in CI.** Every CI run downloads and installs ESP-IDF, its tools and Swift (about 5 of its 11 minutes). Caching them between runs would make CI faster.
+- [ ] **A documentation site:** publish the DocC tutorial (CI builds it for static hosting, as an artifact), e.g. on GitHub Pages; and more tutorials, such as one per example.
 
 ## Longer-term
 
+- [ ] **Test the other chips and boards on hardware.** Only the ESP32-C6-DevKitC-1 has run firmware (each example, with a network for Wi-Fi, a phone for Bluetooth and an SSD1306 for the I2C display; only the I2C sensor example hasn't read a real SHT4x yet). The ESP32-C2, C3, C5, C61, H2 and P4 are tested by building only, as are the other boards' LEDs: the WS2812 over SPI on the C2 and C61, the ESP8684-DevKitM-1's separate red, green and blue LEDs (assumed lit by a high level), the XIAO ESP32C6's one-colour LED (assumed lit by a low level) and the NanoC6's LED power pin.
+- [ ] **Build the Swift package with SwiftPM's default build system.** The firmware build uses `swift build --build-system native` (see `cli/Sources/EspSwiftCore/PackageBuild.swift`): Swift Build, SwiftPM's default since Swift 6.4, links C targets with Apple's linker, which can't link code for the ESP32. SwiftPM warns that the native build system is deprecated and will be removed, so this needs a fix in Swift Build, or a way around it, before then. Worth reporting to the SwiftPM project.
+- [ ] **Cache downloads in CI.** Every CI run downloads and installs ESP-IDF, its tools and Swift (about 5 of its 11 minutes). Caching them between runs would make CI faster.
 - [ ] `espswift-idf` Swift Package: idiomatic Swift wrappers for ESP-IDF APIs (GPIO, LED, timers, ...), so projects don't call C functions such as `led_strip_new_rmt_device` directly, as the template's `LED.swift` does
-- [ ] ESP32-S3 support (needs Xtensa support in Swift)
 
 ## Ideas
 
@@ -36,14 +33,14 @@ Not planned yet; worth considering.
 
 **Everyday workflow**
 - [ ] **Choose the serial port** in Xcode when several boards are connected; `espswift run` takes the first one it finds (in Terminal, `--port` chooses).
-- [ ] **Interactive serial input:** Xcode's console is output-only; a "Monitor in Terminal" action could open the serial monitor in Terminal for two-way communication.
 - [ ] **Show the firmware size after each build** (`idf.py size`), so growth is visible before it hits the flash limit.
 - [ ] **Faster builds with ccache,** which ESP-IDF supports for its C code.
+- [ ] **Code completion with Xcode 26.** Projects build without errors in Xcode 26.6, but code completion and jump to definition don't work there; they're verified with Xcode 27 only, and so is CI. A starting point: compare the compiler arguments the editor gets (`xcodebuild -target Indexing -showBuildSettingsForIndex -json`) in Xcode 26.6 and 27. Testing it in CI would also need a test fixture (`tests/fixtures/project.pbxproj`) created by Xcode 26.
 
 **Quality and reach**
 - [ ] **More checks in CI:** ShellCheck for `install.sh`, the template's `build.sh` and the test; `espswift setup`'s swiftly route (CI uses swift.org's installer on macOS and Swift's Docker image on Linux); the Homebrew formula; and `espswift uninstall`.
 - [ ] **A VS Code and Cursor guide:** code completion there would need SourceKit-LSP pointed at the firmware build of the Swift package, and the CodeLLDB extension could debug with the same setup as `espswift debug`.
-- [ ] **A documentation site:** publish the DocC tutorial (CI builds it for static hosting, as an artifact), e.g. on GitHub Pages; and more tutorials, such as one per example.
+
 
 ## Done
 

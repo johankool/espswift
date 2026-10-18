@@ -1,4 +1,4 @@
-# Contributing to Embedded Swift Xcode Template
+# Contributing to ESPSwift
 
 Thank you for your interest in contributing! This project aims to make Embedded Swift development on ESP32 as approachable as possible — contributions of all kinds are welcome.
 
