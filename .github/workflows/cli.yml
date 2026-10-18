@@ -1,5 +1,6 @@
 # Builds the espswift command-line tool (cli/) and runs its tests, on macOS
-# and on Linux, as espswift is meant to run on both.
+# (with Xcode 27, and the Xcode 26 Homebrew builds its bottle with) and on
+# Linux, as espswift is meant to run on both.
 
 name: espswift
 
@@ -42,6 +43,22 @@ jobs:
           # ESPSwift isn't installed on the runner, so the checks fail; this
           # only checks that the doctor runs.
           .build/debug/espswift doctor || true
+
+  # Homebrew builds espswift's bottle with the Xcode of its macOS runner,
+  # which can be older than the one the template needs (Xcode 26 has Swift
+  # 6.3, Xcode 27 Swift 6.4).
+  macos-xcode-26:
+    name: macOS (Xcode 26)
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build
+        working-directory: cli
+        run: swift build
+      - name: Test
+        working-directory: cli
+        run: swift test
 
   linux:
     name: Linux

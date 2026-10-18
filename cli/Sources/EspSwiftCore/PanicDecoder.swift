@@ -17,6 +17,12 @@ struct PanicDumpWatcher {
     /// A dump longer than this didn't end as expected; stop collecting.
     static let maximumLines = 400
 
+    // Its other properties are private, so (before Swift 6.4) the memberwise
+    // initializer is too.
+    init(hidesStack: Bool = false) {
+        self.hidesStack = hidesStack
+    }
+
     /// What the board's output holds, in order.
     enum Event: Equatable {
         /// Output to show.
